@@ -1,0 +1,26 @@
+{
+  "name": "Queirolo Mundo 4x4",
+  "short_name": "Queirolo 4x4",
+  "description": "Vehículos seminuevos certificados con financiamiento directo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#E63946",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["automotive", "shopping"],
+  "lang": "es-CL"
+}
