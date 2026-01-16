@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { mockVehicles } from '@/lib/data'
+import { getVehicles, getVehicleBySlug } from '@/lib/vehicles'
 import { formatCurrency, formatKilometers, getWhatsAppUrl } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,13 +19,14 @@ import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 import siteConfig from '@/config'
 
 export async function generateStaticParams() {
-    return mockVehicles.map((vehicle) => ({
+    const vehicles = await getVehicles()
+    return vehicles.map((vehicle) => ({
         slug: vehicle.slug,
     }))
 }
 
-export default function VehicleDetailPage({ params }: { params: { slug: string } }) {
-    const vehicle = mockVehicles.find((v) => v.slug === params.slug)
+export default async function VehicleDetailPage({ params }: { params: { slug: string } }) {
+    const vehicle = await getVehicleBySlug(params.slug)
 
     if (!vehicle) {
         notFound()
@@ -163,12 +164,16 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
 
                             <TabsContent value="features" className="p-6">
                                 <div className="grid gap-3 md:grid-cols-2">
-                                    {vehicle.features.map((feature, idx) => (
-                                        <div key={idx} className="flex items-center gap-2">
-                                            <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                                            <span className="text-gray-900">{feature}</span>
-                                        </div>
-                                    ))}
+                                    {vehicle.features && vehicle.features.length > 0 ? (
+                                        vehicle.features.map((feature, idx) => (
+                                            <div key={idx} className="flex items-center gap-2">
+                                                <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                                                <span className="text-gray-900">{feature}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500">No hay características registradas</p>
+                                    )}
                                 </div>
                             </TabsContent>
                         </Tabs>

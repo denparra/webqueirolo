@@ -8,13 +8,23 @@ export interface Vehicle {
   price: number
   monthlyPayment: number
   km: number
-  transmission: 'Automático' | 'Manual'
-  fuelType: 'Gasolina' | 'Diésel' | 'Híbrido' | 'Eléctrico'
+  transmission: 'Automático' | 'Manual' | string
+  fuelType: 'Gasolina' | 'Diésel' | 'Híbrido' | 'Eléctrico' | string
   image: string
   images: string[]
   isNew: boolean
   specs: VehicleSpecs
   features: string[]
+  // Sanity specific fields (can be optional or mapped)
+  category?: string
+  version?: string
+  status?: string
+  comfortFeatures?: string[]
+  safetyFeatures?: string[]
+  entertainmentFeatures?: string[]
+  otherFeatures?: string[]
+  description?: string
+  plate?: string
 }
 
 export interface VehicleSpecs {
@@ -61,14 +71,14 @@ export interface FinancingFormData {
   email: string
   phone: string
   comuna: string
-  
+
   // Vehicle Data
   vehicleId?: string
   vehicleBrand?: string
   vehicleModel?: string
   vehicleYear?: number
   vehiclePrice?: number
-  
+
   // Credit Data
   downPayment: number
   term: number

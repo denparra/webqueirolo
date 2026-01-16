@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { VehicleFilters as Filters, Vehicle } from '@/lib/types'
+import { getVehicles } from '@/lib/vehicles'
 import { mockVehicles } from '@/lib/data'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 import { VehicleFilters } from '@/components/vehicles/VehicleFilters'
@@ -23,8 +24,28 @@ function VehicleListingContent() {
         fuelTypes: searchParams.getAll('fuel'),
     }))
 
-    // Filter vehicles based on current filters
-    const filteredVehicles = mockVehicles.filter((vehicle) => {
+    // Data State
+    const [allVehicles, setAllVehicles] = useState<Vehicle[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    // Initial Fetch
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const data = await getVehicles()
+                setAllVehicles(data)
+            } catch (error) {
+                console.error("Failed to fetch vehicles", error)
+                setAllVehicles(mockVehicles) // Fallback
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
+    // Filter vehicles based on current filters logic (adapted to use state)
+    const filteredVehicles = (allVehicles.length > 0 ? allVehicles : []).filter((vehicle) => {
         // Brand filter
         if (filters.brands.length > 0 && !filters.brands.includes(vehicle.brand.toLowerCase())) {
             return false
@@ -95,7 +116,7 @@ function VehicleListingContent() {
                 {/* Results Count */}
                 <div className="mb-4 flex items-center justify-between">
                     <p className="text-sm text-gray-600">
-                        Mostrando {filteredVehicles.length} de {mockVehicles.length} vehículos
+                        Mostrando {filteredVehicles.length} de {allVehicles.length} vehículos
                     </p>
                 </div>
 
@@ -131,7 +152,7 @@ export default function VehiculosPage() {
                         Vehículos Disponibles
                     </h1>
                     <p className="text-lg text-gray-600">
-                        Encuentra tu próximo 4x4 entre nuestros {mockVehicles.length} vehículos certificados
+                        Encuentra tu próximo 4x4 entre nuestros vehículos certificados
                     </p>
                 </div>
 

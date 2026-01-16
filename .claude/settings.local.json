@@ -13,7 +13,9 @@
       "Bash(findstr:*)",
       "Bash(ping:*)",
       "mcp__playwright__browser_fill_form",
-      "mcp__playwright__browser_click"
+      "mcp__playwright__browser_click",
+      "Bash(npx next build)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
