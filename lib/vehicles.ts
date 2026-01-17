@@ -3,6 +3,20 @@ import { Vehicle } from './types'
 import { mockVehicles } from './data'
 import { estimateMonthlyPayment } from './calculations'
 
+const isProd = process.env.NODE_ENV === 'production'
+
+async function fetchWithRetry<T>(query: string, params: Record<string, unknown>) {
+    try {
+        return await client.fetch<T>(query, params, { next: { revalidate: 60 } })
+    } catch (error) {
+        if (!isProd) {
+            throw error
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        return await client.fetch<T>(query, params, { next: { revalidate: 60 } })
+    }
+}
+
 // Safe placeholder - uses a gray SVG data URI that works without external files
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ESin imagen%3C/text%3E%3C/svg%3E'
 
@@ -63,7 +77,11 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
 export async function getVehicles(): Promise<Vehicle[]> {
     // If no project ID, return mock data to prevent errors
     if (!projectId) {
-        console.warn('[getVehicles] Sanity Project ID not found. Using mock data.')
+        const message = '[getVehicles] Sanity Project ID not found.'
+        if (isProd) {
+            throw new Error(message)
+        }
+        console.warn(`${message} Using mock data.`)
         return mockVehicles
     }
 
@@ -94,17 +112,24 @@ export async function getVehicles(): Promise<Vehicle[]> {
   }`
 
     try {
-        const sanityVehicles = await client.fetch(query, {}, { next: { revalidate: 60 } })
+        const sanityVehicles = await fetchWithRetry<any[]>(query, {})
         return sanityVehicles.map(mapSanityVehicle)
     } catch (error) {
         console.error('Error fetching vehicles from Sanity:', error)
+        if (isProd) {
+            throw error
+        }
         return mockVehicles
     }
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefined> {
     if (!projectId) {
-        console.warn('[getVehicleBySlug] Sanity Project ID not found. Using mock data.')
+        const message = '[getVehicleBySlug] Sanity Project ID not found.'
+        if (isProd) {
+            throw new Error(message)
+        }
+        console.warn(`${message} Using mock data.`)
         return mockVehicles.find(v => v.slug === slug)
     }
 
@@ -135,10 +160,13 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefine
     }`
 
     try {
-        const vehicle = await client.fetch(query, { slug }, { next: { revalidate: 60 } })
+        const vehicle = await fetchWithRetry<any | null>(query, { slug })
         return vehicle ? mapSanityVehicle(vehicle) : undefined
     } catch (error) {
         console.error('Error fetching vehicle by slug:', error)
+        if (isProd) {
+            throw error
+        }
         return mockVehicles.find(v => v.slug === slug)
     }
 }

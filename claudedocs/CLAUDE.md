@@ -4,40 +4,133 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Queirolo Mundo 4x4 Website** - Modern, mobile-first website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
+**Queirolo Mundo 4x4 Website** - Modern, mobile-first Next.js website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
 
-**Current Status**: Project in planning/initial development phase. Reference analysis document (`analisis-queirolo-cl.md`) contains comprehensive analysis of current website (www.queirolo.cl) including structure, features, and modernization recommendations.
+**Current Status**: Active development. Frontend complete with Sanity CMS integration. Pending: real vehicle data population, backend integration for forms, final deployment configuration.
 
-**Tech Stack**: To be determined based on requirements (likely HTML/CSS/JavaScript static site or modern framework)
+**Tech Stack**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Sanity CMS, Zustand, Framer Motion
 
 ## Development Commands
 
-### Local Development
-```bash
-# Static server for HTML/CSS/JS (if using static approach)
-python -m http.server 8000
-# Access at http://localhost:8000
+All commands are defined in `package.json`:
 
-# Alternative with Node
-npx serve .
+```bash
+# Start development server (includes Sanity Studio at /studio)
+npm run dev
+# Access at http://localhost:3000
+# Sanity Studio at http://localhost:3000/studio
+
+# Build for production
+npm run build
+
+# Start production server (after build)
+npm run start
+
+# Run linter
+npm run lint
 ```
 
-### Docker Development (if implemented)
-```bash
-# Build and run with Docker Compose
-docker compose up --build
-
-# Direct Docker build
-docker build -t queirolo-web .
-docker run --rm -p 8080:80 queirolo-web
-```
+**Note**: No test framework is currently configured.
 
 ## Project Architecture
 
+### Tech Stack Details
+
+**Frontend**:
+- Next.js 14 (App Router) with React 18
+- TypeScript for type safety
+- Tailwind CSS + shadcn/ui (Radix components)
+- Heroicons for icons
+- Framer Motion for animations
+
+**State Management**:
+- Zustand (favorites and vehicle comparison)
+
+**CMS**:
+- Sanity.io with embedded Studio at `/studio`
+- `next-sanity` for data fetching
+- `@sanity/image-url` for image optimization
+- Vision plugin for GROQ query testing
+
+**Analytics** (optional):
+- Google Analytics 4 (when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set)
+
+### Directory Structure
+
+```
+app/                     # Next.js App Router
+  page.tsx               # Home
+  vehiculos/             # Vehicle listing and detail pages
+    page.tsx             # Listing with filters
+    [slug]/page.tsx      # Individual vehicle detail
+  servicios/page.tsx     # Services (tabs: financing/consignment/contact)
+  nosotros/page.tsx      # About page
+  contacto/page.tsx      # Contact page with embedded map
+  studio/[[...tool]]/    # Sanity Studio (embedded)
+  sitemap.ts             # Dynamic sitemap
+  robots.ts              # Robots.txt
+  layout.tsx             # Root layout
+  globals.css            # Global styles
+
+components/              # Reusable UI components
+  layout/                # Header, Footer, WhatsAppButton
+  forms/                 # FinancingForm, ConsignmentForm, ContactForm
+  vehicles/              # VehicleCard, VehicleGallery, CompareBar, etc.
+  ui/                    # shadcn/ui components (Button, Dialog, etc.)
+
+lib/                     # Utilities and data fetching
+  vehicles.ts            # Sanity queries for vehicles (with mock fallback)
+  data.ts                # Mock vehicle data
+  calculations.ts        # Loan calculator logic
+  seo.ts                 # SEO helpers and JSON-LD
+  sanity.ts              # Sanity client configuration
+  types.ts               # TypeScript interfaces
+
+sanity/                  # Sanity CMS configuration
+  env.ts                 # Environment variables
+  lib/client.ts          # Sanity client
+  lib/image.ts           # Image URL builder
+  schemaTypes/           # Schema definitions
+    vehicle.ts           # Vehicle schema
+    index.ts             # Schema exports
+  structure.ts           # Studio structure
+
+store/                   # Zustand state stores
+  useFavorites.ts        # Favorites persistence (localStorage)
+  useCompare.ts          # Vehicle comparison state
+
+public/                  # Static assets
+  images/                # Logo, placeholders
+  manifest.json          # PWA manifest
+
+claudedocs/              # Internal documentation and roadmaps
+  00-Analysis-Planning/  # Analysis and design proposals
+  03-Phase3-Enhancement/ # Phase 3 implementation notes
+  04-Phase4-Optimization/# Phase 4 implementation notes
+  05-Phase5-LaunchPreparation/ # Phase 5 deployment guides
+
+config.ts                # Business configuration (hours, contact, etc.)
+```
+
+### Routes
+
+**Public Routes**:
+- `/` - Homepage with hero, featured vehicles, services
+- `/vehiculos` - Vehicle catalog with filters (brand, price, year, km, transmission, fuel)
+- `/vehiculos/[slug]` - Vehicle detail page with gallery, specs, calculator
+- `/servicios` - Services page with tabs (financing, consignment, purchase)
+- `/nosotros` - About page (company history, team)
+- `/contacto` - Contact page with embedded Google Maps iframe
+- `/studio` - Sanity Studio (CMS admin interface)
+
+**Generated Routes**:
+- `/sitemap.xml` - Dynamic sitemap (currently uses mock data)
+- `/robots.txt` - Robots configuration
+
 ### Business Context
 
-**Company**: Queirolo Mundo 4x4
-**Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile
+**Company**: Queirolo Mundo 4x4  
+**Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile  
 **Business Model**: Vehicle sales, financing, vehicle purchase (including debt), consignment
 
 **Operating Hours**:
@@ -49,212 +142,225 @@ docker run --rm -p 8080:80 queirolo-web
 - Phone: (+56 2) 4367-0362
 - Instagram: Active presence
 
-### Core Website Sections
+### Key Features (Implemented)
 
-Based on current site analysis (see `analisis-queirolo-cl.md`):
+1. **Vehicle Catalog** (`/vehiculos`)
+   - Dynamic filtering (brand, price, year, km, transmission, fuel)
+   - Filter state synced to URL query parameters
+   - Grid layout with responsive design
+   - "RECIÉN LLEGADO" badges for new arrivals
+   - Fallback to mock data if Sanity not configured
 
-1. **INICIO (Homepage)**
-   - Hero section with vehicle slider
-   - Featured vehicles ("RECIÉN LLEGADO" badges)
-   - Service overview cards
-   - Trust indicators
+2. **Vehicle Detail Pages** (`/vehiculos/[slug]`)
+   - Image gallery with lightbox and zoom
+   - Tabbed interface (specifications, features)
+   - Real-time loan calculator
+   - WhatsApp contact integration
+   - SEO metadata and JSON-LD structured data
 
-2. **SEMINUEVOS (Inventory)**
-   - Vehicle catalog with advanced filters (brand, model, year, price, transmission, fuel, location)
-   - Grid layout for vehicle cards
-   - ~25 vehicles in inventory (reference)
-   - Vehicle detail pages with image galleries
+3. **Vehicle Comparison Tool**
+   - Compare up to 3 vehicles side-by-side
+   - Persistent comparison bar (fixed bottom)
+   - Modal with detailed comparison table
+   - State managed via Zustand
 
-3. **FINANCIAMIENTO (Financing)**
-   - Direct credit offering ("TU CRÉDITO DIRECTO INMEDIATO")
-   - Benefits: No debt registration, immediate delivery, insured vehicles
-   - Credit quotation form (personal data, vehicle data, credit data)
-   - **Recommendation**: Implement real-time loan simulator
+4. **Favorites System**
+   - Heart icon on vehicle cards
+   - Persisted in localStorage
+   - Managed via Zustand store
 
-4. **AUTO EN PRENDA (Vehicle Purchase with Debt)**
-   - 3-step process explanation
-   - Contact form for vehicle assessment
-   - Target: Vehicle owners with outstanding debt
-
-5. **CONSIGNACION (Consignment)**
-   - Consignment service explanation
-   - Form for vehicle owners to offer vehicles
-   - Commission-based model
-
-6. **CONTACTO (Contact)**
-   - Interactive map (Leaflet/OpenStreetMap integration)
-   - Contact information and hours
-   - Social media links
-
-### Design System
-
-**Color Palette** (Corporate):
-- Primary Red: `#e74c3c` (brand color for logo, buttons, accents)
-- Dark Red: `#c0392b` (hover states, emphasis)
-- Black: `#000000` (text, headers, backgrounds)
-- White: `#ffffff` (backgrounds, text on dark)
-- Dark Gray: `#2c3e50` (secondary backgrounds)
-
-**Typography**:
-- Primary: Sans-serif (Inter, Roboto, or Outfit recommended for modernization)
-- Fallback: -apple-system, BlinkMacSystemFont, system-ui
-
-**Spacing/Layout**:
-- Mobile-first responsive design
-- Breakpoints: 768px (tablet), 1024px (desktop)
-- Consistent padding and margin using CSS variables recommended
-
-### Key Features to Implement
-
-1. **Conversion Optimization**
-   - Floating WhatsApp button (omnipresent)
-   - Multiple lead capture forms (financing, consignment, purchase)
-   - Click-to-call phone numbers
-   - UTM parameter tracking for marketing
-
-2. **Vehicle Catalog**
-   - Dynamic filtering (AJAX preferred over page reload)
-   - Image galleries with lightbox/modal
-   - "RECIÉN LLEGADO" badge system
-   - Sorting options (price, year, brand)
-   - **Advanced**: 360° vehicle viewer, comparison tool
-
-3. **Loan Calculator**
-   - Real-time calculation based on:
-     - Vehicle price (monto)
-     - Down payment (pie)
-     - Number of installments (cuotas)
-     - Interest rate (annual %, typically ~12%)
+5. **Loan Calculator**
+   - Real-time monthly payment calculation
+   - Configurable: vehicle price, down payment, installments
    - Formula: `cuotaMensual = montoFinanciar * (tasaMensual * (1 + tasaMensual)^cuotas) / ((1 + tasaMensual)^cuotas - 1)`
-   - Display: Monthly payment, total cost, amortization graph
+   - Default interest rate: 12% annual
 
-4. **Forms Integration**
-   - Form validation (client-side + server-side)
-   - Chilean phone format: `+56XXXXXXXXX` (9 digits after +56)
-   - RUT validation (Chilean ID, Módulo 11 algorithm)
-   - Success/error feedback
-   - Integration endpoint: n8n webhook or backend API
+6. **Forms** (currently simulated)
+   - Financing form
+   - Consignment form
+   - Contact form
+   - Client-side validation
+   - **Pending**: Backend integration for actual submission
 
-5. **Performance Optimization**
-   - Lazy loading for images (`<img loading="lazy">`)
-   - WebP format with JPG fallback
-   - Responsive images (`srcset`, `<picture>`)
-   - Minified CSS/JS
-   - CDN for static assets
+7. **SEO & PWA**
+   - Dynamic metadata per page
+   - JSON-LD structured data for vehicles
+   - Sitemap and robots.txt
+   - PWA manifest
+   - Cache headers configured in `next.config.js`
 
-6. **SEO Requirements**
-   - Schema.org markup for vehicles (type: `Car`)
-   - Meta tags: title, description, Open Graph
-   - Semantic HTML (proper heading hierarchy)
-   - Alt text for all images
-   - Clean URLs (e.g., `/seminuevos/bmw-x3-2018`)
+8. **Analytics** (optional)
+   - Google Analytics 4 integration
+   - Event tracking helpers available (not fully wired in UI)
 
-## Critical Implementation Notes
+9. **Floating WhatsApp Button**
+   - Omnipresent on all pages
+   - Direct link to business WhatsApp
 
-### Chilean Market Specifics
+## Sanity CMS Integration
+
+### Environment Variables
+
+Required for Sanity Studio and real data:
+
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
+NEXT_PUBLIC_SANITY_DATASET=production
+```
+
+Optional:
+```env
+NEXT_PUBLIC_SANITY_API_VERSION=2026-01-16
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+**Critical Notes**:
+- `NEXT_PUBLIC_*` variables are embedded at **build time**. Changing them requires a rebuild.
+- Do **not** use quotes around values in `.env.local` (some VPS environments fail with quotes).
+- If env vars are missing, the app falls back to `mockVehicles` from `lib/data.ts`.
+
+### Running Sanity Studio
+
+1. Ensure env vars are set in `.env.local`
+2. Run `npm run dev`
+3. Navigate to `http://localhost:3000/studio`
+4. Log in with your Sanity account
+
+### Creating and Publishing Vehicles
+
+1. In Studio, go to **Vehiculos** (Vehicles)
+2. Click **Create** and select `vehicle` document type
+3. Fill required fields:
+   - Name, slug (must be unique)
+   - Brand, model, year
+   - Price, mileage
+   - Transmission, fuel type
+   - Images (upload via Sanity asset manager)
+   - Features (comfort, safety, entertainment, other)
+4. Click **Publish** (drafts are not visible on frontend)
+
+### Data Fetching
+
+**How it works**:
+- `lib/vehicles.ts` contains `getVehicles()` and `getVehicleBySlug()`
+- Queries use GROQ: `*[_type == "vehicle"]`
+- Results are mapped to `Vehicle` interface
+- Images are fetched as `images[].asset->url` (from `cdn.sanity.io`)
+- If `projectId` is missing or fetch fails, falls back to `mockVehicles`
+
+**Revalidation**:
+- Data is revalidated every 60 seconds (ISR)
+- Configured via `{ next: { revalidate: 60 } }` in fetch options
+
+**Image Handling**:
+- Images are served from `cdn.sanity.io`
+- `next.config.js` includes `cdn.sanity.io` in `remotePatterns`
+- Placeholder SVG used if no images available
+
+## Deployment Notes
+
+### Build-Time Considerations
+
+- `NEXT_PUBLIC_*` env vars are resolved at **build time**
+- If deploying via Docker or VPS, ensure env vars are set **before** `npm run build`
+- Changing env vars in production requires a rebuild
+
+### Sanity CORS Configuration
+
+- Add your production domain to Sanity CORS origins
+- Go to `manage.sanity.io` → Your Project → API → CORS Origins
+- Add your domain (e.g., `https://queirolo.cl`)
+
+### Image Optimization
+
+- Next.js Image component requires `cdn.sanity.io` in `next.config.js` (already configured)
+- Verify images are published in Sanity and URLs resolve to `cdn.sanity.io`
+- If using mock data in production, ensure `public/images/vehicles/*` exists or images will fail
+
+### Common Pitfalls
+
+1. **Mock data in production**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set without quotes, then rebuild.
+2. **Images not loading**: Check that vehicles have published images in Sanity and `cdn.sanity.io` is in `next.config.js`.
+3. **Studio not loading**: Ensure env vars are set and you're logged into Sanity.
+4. **Sitemap shows mock data**: `app/sitemap.ts` currently uses `mockVehicles`; update to fetch from Sanity for production.
+5. **Forms don't submit**: Forms currently simulate submission; backend integration required for production.
+
+### Hosting Recommendations
+
+- **Vercel** (recommended for Next.js, automatic deployments)
+- **Netlify** (alternative with similar features)
+- **VPS/Docker** (requires manual setup, ensure env vars are set before build)
+
+## Chilean Market Specifics
+
 - **Currency**: Chilean Peso (CLP) - format with thousand separators: `$18.990.000`
 - **Phone Format**: `+56 9 XXXX XXXX` (mobile) or `+56 2 XXXX XXXX` (landline)
-- **RUT Validation**: Use Módulo 11 algorithm for client RUT (if collecting)
+- **RUT Validation**: Use Módulo 11 algorithm for Chilean ID (if collecting)
 - **Language**: Spanish only (Chilean variant)
-
-### Conversion Funnel
-```
-Visitor → [Interest Type] → Lead Capture → Qualified Lead
-         ↓
-         - Search Vehicle → Catalog → WhatsApp/Form
-         - Need Credit → Financing → Calculator → Form
-         - Sell Vehicle → Consignment/Debt Purchase → Form
-```
-
-### Form Data Schema (Reference)
-```javascript
-// Financing Form
-{
-  // Personal Data
-  nombre: string,
-  rut: string,          // Chilean ID (XX.XXX.XXX-X)
-  email: string,
-  telefono: string,     // +56XXXXXXXXX
-  comuna: string,       // Municipality/district
-
-  // Vehicle Data
-  marca: string,
-  modelo: string,
-  año: number,
-  patente: string,      // Optional (license plate)
-
-  // Credit Data
-  monto: number,        // Total vehicle price
-  pie: number,          // Down payment
-  cuotas: number,       // Number of installments
-
-  // Tracking
-  page_url: string,
-  timestamp: string,
-  utm_source: string,   // Optional
-  utm_medium: string,   // Optional
-  utm_campaign: string  // Optional
-}
-```
-
-## Modernization Priorities
-
-Based on `analisis-queirolo-cl.md`, prioritize:
-
-1. **Visual Design** (High Impact)
-   - Modern color palette with gradients
-   - Premium typography
-   - Full-width layouts with generous whitespace
-   - Micro-animations and smooth transitions
-
-2. **Mobile Experience** (Critical)
-   - Mobile-first design approach
-   - Touch-friendly interface (minimum 44x44px tap targets)
-   - Optimized forms for mobile keyboards
-   - Fast loading on mobile networks
-
-3. **Interactive Features** (Engagement)
-   - Real-time loan calculator
-   - Vehicle comparison tool
-   - 360° vehicle viewer
-   - Video content (showroom tour, testimonials)
-
-4. **Performance** (SEO/UX)
-   - Target < 1.5s initial load
-   - WebP images with lazy loading
-   - Minified assets
-   - CDN integration
-
-5. **Conversion Optimization**
-   - Clear CTAs above fold
-   - Trust indicators (years in business, vehicle count)
-   - Social proof (testimonials, reviews)
-   - Multiple contact options (WhatsApp, phone, form, chat)
 
 ## Reference Documents
 
-- `analisis-queirolo-cl.md` - Comprehensive analysis of current website with screenshots, recommendations, and implementation roadmap
-- `../guia_arquitectura_multiempresa.md` - Multi-tenant architecture guide (if integrating with backend system)
+Internal documentation in `claudedocs/`:
+- `00-Analysis-Planning/analisis-queirolo-cl.md` - Analysis of original website
+- `00-Analysis-Planning/FRONTEND_DESIGN_PROPOSAL.md` - Design roadmap
+- `03-Phase3-Enhancement/PHASE3_SUMMARY.md` - Phase 3 implementation notes
+- `04-Phase4-Optimization/PHASE4_SUMMARY.md` - Phase 4 optimization notes
+- `05-Phase5-LaunchPreparation/PHASE5_IMPLEMENTATION_GUIDE.md` - Launch preparation guide
+- `CONFIG_README.md` - Configuration guide (actual config in `config.ts`)
 
-## Deployment Considerations
+## Troubleshooting
 
-### Static Hosting Options
-- Netlify / Vercel (recommended for static sites)
-- AWS S3 + CloudFront
-- GitHub Pages
-- Railway (current hosting provider for related projects)
+**Problem**: Seeing mock data on `/vehiculos`  
+**Solution**: 
+1. Check `.env.local` has `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` (no quotes)
+2. Rebuild: `npm run build`
+3. Publish vehicles in Sanity Studio
 
-### Backend Integration (if needed)
-- API endpoints for vehicle inventory
-- Form submission handler (n8n webhook or custom API)
-- CMS for content management (inventory, blog posts)
-- Database: MySQL (consistent with related projects)
+**Problem**: Images not loading or Next.js Image errors  
+**Solution**:
+1. Verify images are published in Sanity
+2. Check `next.config.js` includes `cdn.sanity.io` in `remotePatterns` (already configured)
+3. If using mock data, ensure `public/images/vehicles/*` exists
+
+**Problem**: Studio won't open or fails to create vehicles  
+**Solution**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set in `.env.local`
+
+**Problem**: Sitemap doesn't reflect real data  
+**Solution**: `app/sitemap.ts` currently uses `mockVehicles`; update to fetch from Sanity for production
+
+**Problem**: GA4 not tracking  
+**Solution**: Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`
+
+**Problem**: Forms don't send data  
+**Solution**: Forms currently simulate submission; backend integration required for production
 
 ## Security Notes
 
-- Validate all form inputs server-side
-- Sanitize user-provided content
+- All form inputs should be validated server-side (currently client-side only)
 - Use HTTPS for all pages (especially forms)
-- Implement rate limiting on form submissions
+- Implement rate limiting on form submissions (when backend is integrated)
 - No sensitive data in client-side code
-- Secure webhook URLs (if using n8n integration)
+- Sanity API tokens should never be exposed (use environment variables)
+
+---
+
+## Change Log
+
+### What was improved and why:
+
+- **Removed outdated "to be determined" stack references**: The tech stack is now Next.js 14 + Sanity, not a static site. Updated to reflect actual implementation.
+- **Replaced static server commands with actual npm scripts**: Removed `python -m http.server` and `npx serve` commands; replaced with real `npm run dev/build/start/lint` from `package.json`.
+- **Removed Docker commands**: No Docker configuration exists in the repo; removed misleading Docker examples.
+- **Updated architecture section with real directory structure**: Added accurate file tree based on actual `app/`, `components/`, `lib/`, `sanity/`, `store/` structure.
+- **Added real routes**: Documented actual routes (`/vehiculos`, `/vehiculos/[slug]`, `/servicios`, `/nosotros`, `/contacto`, `/studio`) verified in codebase.
+- **Added Sanity CMS integration section**: Documented how to run Studio, create/publish vehicles, and how data fetching works (GROQ queries, fallback to mock data).
+- **Added environment variables section**: Documented required `NEXT_PUBLIC_SANITY_*` vars, build-time embedding, and common pitfalls (quotes in env vars).
+- **Added deployment notes**: Documented CORS configuration, image optimization with `cdn.sanity.io`, build-time env var resolution, and common deployment pitfalls.
+- **Removed references to non-existent features**: Removed Leaflet/OpenStreetMap (current implementation uses Google Maps iframe), removed n8n webhook references (forms currently simulated).
+- **Added troubleshooting section**: Practical solutions for common issues (mock data, images not loading, Studio errors, sitemap, forms).
+- **Updated reference documents**: Aligned with actual `claudedocs/` structure and removed non-existent files.
+- **Removed backend integration assumptions**: Clarified that forms currently simulate submission and require backend integration for production.
+- **Added tech stack details**: Listed actual dependencies (Tailwind, shadcn/ui, Zustand, Framer Motion, next-sanity, etc.).
+- **Clarified current status**: Changed from "planning/initial development" to "active development" with clear list of what's done vs. pending.
+- **Removed generic modernization priorities**: Kept only business context and Chilean market specifics; removed redundant design recommendations already implemented.
+- **Added change log**: This section documents all improvements for transparency.

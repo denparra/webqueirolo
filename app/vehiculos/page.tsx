@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { VehicleFilters as Filters, Vehicle } from '@/lib/types'
 import { getVehicles } from '@/lib/vehicles'
-import { mockVehicles } from '@/lib/data'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 import { VehicleFilters } from '@/components/vehicles/VehicleFilters'
 
@@ -27,16 +26,19 @@ function VehicleListingContent() {
     // Data State
     const [allVehicles, setAllVehicles] = useState<Vehicle[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     // Initial Fetch
     useEffect(() => {
         async function fetchData() {
             try {
+                setError(null)
                 const data = await getVehicles()
                 setAllVehicles(data)
             } catch (error) {
                 console.error("Failed to fetch vehicles", error)
-                setAllVehicles(mockVehicles) // Fallback
+                setAllVehicles([])
+                setError('No se pudo cargar el inventario. Reintenta en unos segundos.')
             } finally {
                 setIsLoading(false)
             }
@@ -101,6 +103,25 @@ function VehicleListingContent() {
         const queryString = params.toString()
         router.push(`/vehiculos${queryString ? `?${queryString}` : ''}`, { scroll: false })
     }, [filters, router])
+
+    if (error && !isLoading) {
+        return (
+            <div className="flex flex-col gap-6 md:flex-row">
+                <VehicleFilters
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    resultCount={0}
+                />
+                <div className="flex-1">
+                    <div className="rounded-lg bg-white p-6 shadow">
+                        <p className="text-sm font-medium text-red-600">
+                            {error}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col gap-6 md:flex-row">
