@@ -1,23 +1,36 @@
-import { client } from './sanity'
+import { client, projectId } from './sanity'
 import { Vehicle } from './types'
 import { mockVehicles } from './data'
 import { estimateMonthlyPayment } from './calculations'
 
+// Safe placeholder - uses a gray SVG data URI that works without external files
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ESin imagen%3C/text%3E%3C/svg%3E'
+
+// Helper to get safe image URL
+function getSafeImageUrl(images: string[] | null | undefined): string {
+    if (images && Array.isArray(images) && images.length > 0 && images[0]) {
+        return images[0]
+    }
+    return PLACEHOLDER_IMAGE
+}
+
 // Mapper function to convert Sanity result to Vehicle interface
 function mapSanityVehicle(sanityVehicle: any): Vehicle {
+    const safeImages = sanityVehicle.images?.filter((img: string) => img) || []
+
     return {
         id: sanityVehicle._id,
         slug: sanityVehicle.slug,
-        brand: sanityVehicle.brand,
-        model: sanityVehicle.model,
-        year: sanityVehicle.year,
-        price: sanityVehicle.price,
-        monthlyPayment: estimateMonthlyPayment(sanityVehicle.price),
+        brand: sanityVehicle.brand || 'N/A',
+        model: sanityVehicle.model || 'N/A',
+        year: sanityVehicle.year || 0,
+        price: sanityVehicle.price || 0,
+        monthlyPayment: estimateMonthlyPayment(sanityVehicle.price || 0),
         km: sanityVehicle.mileage || 0,
-        transmission: sanityVehicle.transmission,
-        fuelType: sanityVehicle.fuel,
-        image: sanityVehicle.images && sanityVehicle.images.length > 0 ? sanityVehicle.images[0] : '/images/placeholder.jpg',
-        images: sanityVehicle.images || [],
+        transmission: sanityVehicle.transmission || 'N/A',
+        fuelType: sanityVehicle.fuel || 'N/A',
+        image: getSafeImageUrl(safeImages),
+        images: safeImages.length > 0 ? safeImages : [PLACEHOLDER_IMAGE],
         isNew: sanityVehicle.mileage < 100 && sanityVehicle.year >= new Date().getFullYear(),
         specs: {
             engine: 'N/A', // Not in current schema
@@ -49,8 +62,8 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
 
 export async function getVehicles(): Promise<Vehicle[]> {
     // If no project ID, return mock data to prevent errors
-    if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
-        console.warn('Sanity Project ID not found. Using mock data.')
+    if (!projectId) {
+        console.warn('[getVehicles] Sanity Project ID not found. Using mock data.')
         return mockVehicles
     }
 
@@ -90,7 +103,8 @@ export async function getVehicles(): Promise<Vehicle[]> {
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefined> {
-    if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+    if (!projectId) {
+        console.warn('[getVehicleBySlug] Sanity Project ID not found. Using mock data.')
         return mockVehicles.find(v => v.slug === slug)
     }
 
