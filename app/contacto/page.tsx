@@ -1,30 +1,11 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
-import dynamic from 'next/dynamic'
 import { ContactForm } from '@/components/forms/ContactForm'
 import { FadeIn } from '@/components/animations/FadeIn'
 import { SlideUp } from '@/components/animations/SlideUp'
 import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon } from '@heroicons/react/24/outline'
+import LazyContactMap from '@/components/maps/LazyContactMap'
 import siteConfig from '@/config'
-
-// Dynamic import for Leaflet (client-side only)
-const LeafletMap = dynamic(() => import('@/components/maps/LeafletMap'), {
-    ssr: false,
-    loading: () => <div className="w-full h-full bg-gray-200 animate-pulse" />,
-})
-
-// Wrapper component to pass config data
-function LeafletMapWrapper() {
-    const { lat, lng } = siteConfig.contact.address.coordinates
-    return (
-        <LeafletMap
-            center={[lat, lng]}
-            zoom={16}
-            markerText={siteConfig.contact.address.displayAddress}
-            className="w-full h-full"
-        />
-    )
-}
 
 export const metadata: Metadata = {
     title: `Contacto | ${siteConfig.company.name}`,
@@ -150,7 +131,7 @@ export default function ContactPage() {
 
             {/* Map Section */}
             <section className="h-[400px] w-full bg-gray-200">
-                <LeafletMapWrapper />
+                <LazyContactMap />
             </section>
         </div>
     )

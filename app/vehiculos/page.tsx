@@ -7,6 +7,8 @@ import { getVehicles } from '@/lib/vehicles'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 import { VehicleFilters } from '@/components/vehicles/VehicleFilters'
 
+let vehiclesPromise: Promise<Vehicle[]> | null = null
+
 function VehicleListingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -33,12 +35,16 @@ function VehicleListingContent() {
         async function fetchData() {
             try {
                 setError(null)
-                const data = await getVehicles()
+                if (!vehiclesPromise) {
+                    vehiclesPromise = getVehicles()
+                }
+                const data = await vehiclesPromise
                 setAllVehicles(data)
             } catch (error) {
                 console.error("Failed to fetch vehicles", error)
                 setAllVehicles([])
                 setError('No se pudo cargar el inventario. Reintenta en unos segundos.')
+                vehiclesPromise = null
             } finally {
                 setIsLoading(false)
             }

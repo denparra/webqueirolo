@@ -1968,6 +1968,154 @@ Para que `/studio` funcione correctamente en producción, es necesario configura
 
 ---
 
+## Update 2026-01-18 (Addendum)
+
+### Alcance de esta actualizacion
+- Fuente de verdad: `claudedocs/00-Analysis-Planning/FRONTEND_DESIGN_PROPOSAL.md` (este documento).
+- Insumo tecnico: `reporte-network-completo.md` (captura de red en entorno dev).
+- Objetivo: sumar mejoras reales y un plan por fases, sin eliminar contenido previo.
+
+### Hallazgos del reporte-network-completo
+
+**Resumen rapido**
+- Errores recurrentes: `/icons/icon-192x192.png` (404) en casi todas las rutas.
+- Paginas enlazadas que no existen: `/privacidad` y `/terminos` (404).
+- Imagenes locales faltantes: `/images/showroom.jpg` y `/images/history.jpg` (400 en `/nosotros` y `/contacto`).
+- Revalidaciones constantes (304): logos y `manifest.json` (cache max-age=0).
+- Doble query a Sanity en `/vehiculos` (misma query repetida).
+- Cargas pesadas en `/contacto` por mapa (Leaflet + tiles OSM).
+- `/studio` carga muchos JS chunks (esperable para admin).
+
+**Detalle por metrica (con base en la captura de red)**
+- **LCP (impacto estimado):** en `/vehiculos/[slug]` se cargan varias imagenes de 1920w en el primer render. Esto puede inflar LCP y la sensacion de lentitud en fotos si no hay placeholder o lazy para el resto.
+- **TTFB / Latencia de datos (estimado):** `/vehiculos` dispara 2 requests iguales a Sanity. Cada request externo agrega latencia de datos; deduplicar puede reducir TTFB percibido y tiempo hasta contenido.
+- **Peso de imagenes (observado por URL):** `/_next/image?...&w=1920` en detalle; `w=750` en listados. Falta una estrategia de `sizes` para evitar 1920w en mobile.
+- **Cache:** logos y `manifest.json` responden 304 en cada carga (max-age=0). `_next/static` se sirve como immutable (bien).
+- **Numero de requests por ruta:**  
+  - `/`: 11  
+  - `/vehiculos`: 18  
+  - `/vehiculos/[slug]`: 17  
+  - `/servicios`: 13  
+  - `/nosotros`: 15  
+  - `/contacto`: 29  
+  - `/studio`: 33  
+  - `/robots.txt`: 1  
+  - `/sitemap.xml`: 2  
+  - `/privacidad`: 11  
+  - `/terminos`: 11
+- **Main thread / JS (riesgo potencial):** `/studio` agrega multiples bundles JS y `/contacto` añade Leaflet + tiles. No hay medicion directa de main thread, pero la carga JS/tiles sugiere riesgo de bloqueo percibido si no se hace lazy-load.
+
+**Nota de interpretacion**
+- El reporte es de entorno dev (HMR + eval-source-map). Para cifras reales de LCP/TTFB/CLS/TBT se debe medir en build/production.
+
+### Priorizacion por impacto/esfuerzo
+
+**Quick wins (alto impacto, bajo esfuerzo)**
+- [x] Agregar `public/icons/icon-192x192.png`, `public/icons/icon-512x512.png` y `public/favicon.ico` (manifest ya apunta a estas rutas).
+- [x] Corregir `public/images/showroom.jpg` y `public/images/history.jpg` (placeholders livianos).
+- [x] Crear `/privacidad` y `/terminos` (paginas base con metadata y contenido simple).
+- [x] Evitar doble query a Sanity en `/vehiculos` (dedupe en `useEffect` para dev/StrictMode).
+- [x] Lazy-load del mapa en `/contacto` (carga bajo demanda con boton).
+
+**Cambios estructurales (alto impacto, esfuerzo medio)**
+- Estrategia completa de imagenes (placeholders, sizes, calidad, caches, preload selectivo).
+- Seccion Home "Autos Destacados" gestionada desde Sanity, con fallback.
+
+---
+
+## Phase 6: Image Performance Optimization (Planned)
+
+**Objetivo**
+- Reducir la sensacion de lentitud en fotos y bajar el costo real de transferencia sin degradar la calidad percibida.
+
+**Cambios esperados (probables rutas/archivos a tocar)**
+- `app/page.tsx` (hero y secciones con imagenes).
+- `app/vehiculos/page.tsx`, `app/vehiculos/[slug]/page.tsx`.
+- `components/vehicles/VehicleCard.tsx`, `components/vehicles/VehicleDetailGallery.tsx`.
+- `lib/vehicles.ts`, `lib/sanity.ts` (helpers de URL y LQIP).
+- `public/` (iconos, favicon, imagenes locales).
+- `next.config.js` (remote patterns / cache TTL si aplica).
+
+**Checklist de implementacion**
+- [ ] Auditar todas las referencias de imagenes y corregir 404/400 reportados.
+- [ ] Agregar `public/favicon.ico` y `public/icons/icon-192x192.png` (y 512 si se usa).
+- [ ] En `next/image`, definir `sizes` correctos por breakpoint para evitar 1920w en mobile.
+- [ ] Aplicar `priority` solo a imagenes hero/LCP; el resto debe ser lazy.
+- [ ] Habilitar `placeholder="blur"` y `blurDataURL`:
+  - Sanity: usar `@sanity/image-url` y metadata/LQIP (si disponible).
+  - Local: generar LQIP o usar placeholder uniforme.
+- [ ] Ajustar `quality` por contexto (listas 60-70, detalle 70-80).
+- [ ] Limitar el numero de imagenes en primer render (galeria: solo 1 visible).
+- [ ] Versionar logos/manifest o servirlos con cache largo para evitar 304.
+- [ ] Evaluar `sharp`:
+  - Ya existe en dependencias; asegurar que se instala en CI/hosting.
+  - Si `sharp` no esta disponible, Next cae a Squoosh (mas lento). Definir decision recomendada: **mantener sharp** y validar en deploy.
+
+**Riesgos / regresiones**
+- Placeholders mal configurados pueden generar flashes o contraste incorrecto.
+- `sizes` incorrecto puede servir imagenes borrosas o demasiado grandes.
+- Exceso de `priority` puede saturar la red inicial.
+- Cambios de cache pueden dejar assets obsoletos si no se versionan.
+
+**Criterios de aceptacion**
+- 0 errores 404/400 de imagenes en Network (incluye iconos y showroom/history).
+- LCP percibido mejora (imagenes hero muestran placeholder inmediato).
+- En mobile, no se solicitan 1920w para thumbnails/listas.
+- Logos y manifest dejan de revalidar en cada carga (cache efectivo).
+
+**Plan de verificacion**
+- Medir antes/despues con Lighthouse (Mobile + Desktop) en build de produccion.
+- Revisar Network tab:
+  - Numero de requests de imagenes por ruta.
+  - Tamano y resolucion solicitada (w=...).
+  - Cache headers y 304.
+- Revisar Web Vitals (LCP/CLS/TBT) con `next build` + `next start`.
+
+---
+
+## Phase 7: Home "Autos Destacados" (Planned)
+
+**Objetivo**
+- Incorporar una seccion en Home que muestre autos destacados de forma automatica desde Sanity, con fallback a datos locales si falta configuracion.
+
+**Cambios esperados (probables rutas/archivos a tocar)**
+- `sanity/schemaTypes/vehicle.ts` (confirmar/agregar `isFeatured` y opcional `featuredRank`).
+- `lib/vehicles.ts` (query `getFeaturedVehicles()`).
+- `lib/data.ts` (fallback `mockFeaturedVehicles` si no hay Sanity).
+- `app/page.tsx` (render de la seccion).
+- `components/vehicles/FeaturedVehicles.tsx` (componente nuevo o reutilizar `VehicleGrid`).
+- `components/vehicles/VehicleCard.tsx` (UI reutilizable).
+
+**Checklist de implementacion**
+- [ ] Definir estrategia de datos:
+  - `isFeatured` (boolean) para seleccion manual en Sanity.
+  - `featuredRank` (numero) para orden estable, si se requiere.
+  - Fallback automatico: ultimos N vehiculos si no hay destacados.
+- [ ] Implementar query con orden (rank -> fecha -> nombre).
+- [ ] Asegurar que la query no duplique llamadas (cache o revalidate).
+- [ ] Agregar seccion "Autos Destacados" en Home con CTA a `/vehiculos`.
+- [ ] Usar `next/image` con placeholder y `sizes` adecuados.
+- [ ] Incluir skeleton/placeholder para evitar salto visual.
+
+**Riesgos / regresiones**
+- Si no hay destacados, la seccion puede quedar vacia (resolver con fallback).
+- Carga extra de datos en Home puede afectar TTFB si no se cachea.
+- Duplicar vehiculos con el listado general si no se filtra bien.
+
+**Criterios de aceptacion**
+- La Home muestra 4-8 autos destacados sin configuracion manual extra.
+- Cambiar `isFeatured` en Sanity se refleja tras la ventana de revalidacion.
+- Si Sanity no esta disponible, se usan `mockVehicles` sin romper la pagina.
+- La seccion no degrada el LCP (placeholder visible, lazy para no-hero).
+
+**Plan de verificacion**
+- Revisar Home en dev y prod: seccion visible y enlaces correctos.
+- Medir Network: 1 request a Sanity (no duplicado).
+- Lighthouse: no empeora LCP/CLS respecto a baseline.
+- QA funcional: togglear `isFeatured` en Sanity y confirmar actualizacion.
+
+---
+
 ## 11. Next Steps
 
 ### Immediate Actions (Before Development Starts)
@@ -2128,6 +2276,12 @@ This document is a comprehensive frontend design proposal. All recommendations a
 The design is **not** a copy of the current site but rather a modern evolution that maintains brand identity while addressing identified pain points (outdated visuals, mobile UX, static interactions, slow performance).
 
 Implementation should follow the recommended stack (Next.js + Tailwind + shadcn/ui) for optimal results, but alternatives can be discussed based on team expertise and project constraints.
+
+---
+
+## Changelog
+- 2026-01-18: Addendum con hallazgos de red, priorizacion y fases 6-7 (optimizacion de imagenes y autos destacados).
+- 2026-01-18: Quick wins implementados (icons/favicon, placeholders de imagenes, paginas legales, dedupe vehiculos, lazy map) y documentacion tecnica en `claudedocs/03-implementation/frontend-quickwins/`. Archivos: `public/favicon.ico`, `public/icons/icon-192x192.png`, `public/icons/icon-512x512.png`, `public/images/showroom.jpg`, `public/images/history.jpg`, `app/privacidad/page.tsx`, `app/terminos/page.tsx`, `app/vehiculos/page.tsx`, `components/maps/LazyContactMap.tsx`, `app/contacto/page.tsx`.
 
 ---
 
