@@ -111,6 +111,7 @@ function VehicleListingContent() {
                     filters={filters}
                     onFiltersChange={setFilters}
                     resultCount={0}
+                    allVehicles={[]}
                 />
                 <div className="flex-1">
                     <div className="rounded-lg bg-white p-6 shadow">
@@ -130,6 +131,7 @@ function VehicleListingContent() {
                 filters={filters}
                 onFiltersChange={setFilters}
                 resultCount={filteredVehicles.length}
+                allVehicles={allVehicles}
             />
 
             {/* Vehicle Grid */}

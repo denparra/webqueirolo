@@ -26,28 +26,52 @@ export function FinancingForm() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        try {
+            // Append type to form data
+            const payload = {
+                ...formData,
+                type: 'financing_request',
+                message: `Solicitud de financiamiento para ${formData.vehicleBrand} ${formData.vehicleModel}. Pie: ${formData.downPayment}, Plazo: ${formData.term} meses.`,
+            }
 
-        setIsSubmitting(false)
-        setIsSubmitted(true)
-
-        setTimeout(() => {
-            setIsSubmitted(false)
-            setFormData({
-                name: '',
-                rut: '',
-                email: '',
-                phone: '',
-                comuna: '',
-                vehicleBrand: '',
-                vehicleModel: '',
-                vehicleYear: '',
-                vehiclePrice: '',
-                downPayment: '',
-                term: '48',
+            const response = await fetch('/api/submit-lead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
             })
-        }, 3000)
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al enviar la solicitud')
+            }
+
+            setIsSubmitting(false)
+            setIsSubmitted(true)
+
+            setTimeout(() => {
+                setIsSubmitted(false)
+                setFormData({
+                    name: '',
+                    rut: '',
+                    email: '',
+                    phone: '',
+                    comuna: '',
+                    vehicleBrand: '',
+                    vehicleModel: '',
+                    vehicleYear: '',
+                    vehiclePrice: '',
+                    downPayment: '',
+                    term: '48',
+                })
+            }, 3000)
+        } catch (error) {
+            console.error('Error submitting financing request:', error)
+            setIsSubmitting(false)
+            alert('Hubo un error al enviar la solicitud. Por favor intenta nuevamente.')
+        }
     }
 
     return (

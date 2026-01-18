@@ -20,6 +20,10 @@ const siteConfig = {
             city: 'Las Condes',
             fullAddress: 'Av. Las Condes 12461, L4. ShowRoom -3, Las Condes',
             displayAddress: 'Av. Las Condes 12461, Las Condes, Santiago', // Formato para mostrar
+            coordinates: {
+                lat: -33.4128,
+                lng: -70.5772,
+            },
         },
         phone1: '+56 2 4367-0362',
         phone2: '+56 9 7214-9979',

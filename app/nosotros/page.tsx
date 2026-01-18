@@ -161,7 +161,7 @@ export default function AboutPage() {
                                             ))}
                                         </div>
                                         <p className="text-gray-600 italic">
-                                            "Excelente atención y profesionalismo. Encontré exactamente la camioneta que buscaba y el proceso de financiamiento fue muy rápido."
+                                            &quot;Excelente atención y profesionalismo. Encontré exactamente la camioneta que buscaba y el proceso de financiamiento fue muy rápido.&quot;
                                         </p>
                                         <div>
                                             <p className="font-bold text-gray-900">Cliente Satisfecho</p>

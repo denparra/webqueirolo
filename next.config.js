@@ -2,6 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
 
+  // Enable instrumentation for Sentry
+  experimental: {
+    instrumentationHook: true,
+    serverComponentsExternalPackages: ['require-in-the-middle'],
+  },
+
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],

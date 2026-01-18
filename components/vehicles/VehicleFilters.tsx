@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { VehicleFilters as Filters } from '@/lib/types'
-import { brandOptions, transmissionOptions, fuelTypeOptions } from '@/lib/data'
+import { useState, useMemo } from 'react'
+import { VehicleFilters as Filters, Vehicle } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -12,10 +11,56 @@ interface VehicleFiltersProps {
     filters: Filters
     onFiltersChange: (filters: Filters) => void
     resultCount: number
+    allVehicles: Vehicle[]
 }
 
-export function VehicleFilters({ filters, onFiltersChange, resultCount }: VehicleFiltersProps) {
+export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehicles = [] }: VehicleFiltersProps) {
     const [isOpen, setIsOpen] = useState(false)
+
+    // Compute filter options dynamically from actual vehicles
+    const brandOptions = useMemo(() => {
+        if (!allVehicles || !allVehicles.length) return []
+        const brands = Array.from(new Set(allVehicles.map((v) => v.brand)))
+        return brands.map((brand) => ({
+            id: brand.toLowerCase(),
+            name: brand,
+            count: allVehicles.filter((v) => v.brand.toLowerCase() === brand.toLowerCase()).length,
+        }))
+    }, [allVehicles])
+
+    const transmissionOptions = useMemo(() => {
+        if (!allVehicles || !allVehicles.length) return []
+        const options = [
+            { id: 'automatico', name: 'Automático', aliases: ['automático', 'automatica', 'automática', 'auto'] },
+            { id: 'manual', name: 'Manual', aliases: ['manual'] },
+        ]
+        return options
+            .map((opt) => ({
+                ...opt,
+                count: allVehicles.filter((v) =>
+                    opt.aliases.some(alias => v.transmission.toLowerCase().includes(alias))
+                ).length,
+            }))
+            .filter((opt) => opt.count > 0)
+    }, [allVehicles])
+
+    const fuelTypeOptions = useMemo(() => {
+        if (!allVehicles || !allVehicles.length) return []
+        const options = [
+            { id: 'gasolina', name: 'Gasolina', aliases: ['gasolina', 'bencina', 'nafta'] },
+            { id: 'diesel', name: 'Diésel', aliases: ['diesel', 'diésel', 'petroleo'] },
+            { id: 'hibrido', name: 'Híbrido', aliases: ['hibrido', 'híbrido', 'hybrid'] },
+            { id: 'electrico', name: 'Eléctrico', aliases: ['electrico', 'eléctrico', 'electric'] },
+        ]
+        return options
+            .map((opt) => ({
+                ...opt,
+                count: allVehicles.filter((v) =>
+                    opt.aliases.some(alias => v.fuelType.toLowerCase().includes(alias))
+                ).length,
+            }))
+            .filter((opt) => opt.count > 0)
+    }, [allVehicles])
 
     const toggleBrand = (brandId: string) => {
         const newBrands = filters.brands.includes(brandId)

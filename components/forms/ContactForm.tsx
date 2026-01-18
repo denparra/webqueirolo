@@ -19,17 +19,35 @@ export function ContactForm() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        try {
+            const response = await fetch('/api/submit-lead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
 
-        setIsSubmitting(false)
-        setIsSubmitted(true)
+            const data = await response.json()
 
-        // Reset form after 3 seconds
-        setTimeout(() => {
-            setIsSubmitted(false)
-            setFormData({ name: '', email: '', phone: '', message: '' })
-        }, 3000)
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al enviar el formulario')
+            }
+
+            setIsSubmitting(false)
+            setIsSubmitted(true)
+
+            // Reset form after 3 seconds
+            setTimeout(() => {
+                setIsSubmitted(false)
+                setFormData({ name: '', email: '', phone: '', message: '' })
+            }, 3000)
+        } catch (error) {
+            console.error('Error submitting form:', error)
+            setIsSubmitting(false)
+            // Error handling UI could be added here
+            alert('Hubo un error al enviar el mensaje. Por favor intenta nuevamente.')
+        }
     }
 
     return (

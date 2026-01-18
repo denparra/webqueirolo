@@ -1,10 +1,30 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { ContactForm } from '@/components/forms/ContactForm'
 import { FadeIn } from '@/components/animations/FadeIn'
 import { SlideUp } from '@/components/animations/SlideUp'
 import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon } from '@heroicons/react/24/outline'
 import siteConfig from '@/config'
+
+// Dynamic import for Leaflet (client-side only)
+const LeafletMap = dynamic(() => import('@/components/maps/LeafletMap'), {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-gray-200 animate-pulse" />,
+})
+
+// Wrapper component to pass config data
+function LeafletMapWrapper() {
+    const { lat, lng } = siteConfig.contact.address.coordinates
+    return (
+        <LeafletMap
+            center={[lat, lng]}
+            zoom={16}
+            markerText={siteConfig.contact.address.displayAddress}
+            className="w-full h-full"
+        />
+    )
+}
 
 export const metadata: Metadata = {
     title: `Contacto | ${siteConfig.company.name}`,
@@ -130,16 +150,7 @@ export default function ContactPage() {
 
             {/* Map Section */}
             <section className="h-[400px] w-full bg-gray-200">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3330.1587740523!2d-70.5265!3d-33.3855!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDIzJzA3LjgiUyA3MMKwMzEnMzUuNCJX!5e0!3m2!1ses!2scl!4v1620000000000!5m2!1ses!2scl"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="grayscale hover:grayscale-0 transition-all duration-300"
-                ></iframe>
+                <LeafletMapWrapper />
             </section>
         </div>
     )

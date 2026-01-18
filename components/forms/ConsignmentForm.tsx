@@ -24,26 +24,52 @@ export function ConsignmentForm() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        try {
+            // Append context to message or use a specific type field if schema allowed it
+            const payload = {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                message: `Solicitud de consignación: ${formData.brand} ${formData.model} ${formData.year} (${formData.km} km) por $${formData.price}. ${formData.message}`,
+                type: 'consignment_request',
+            }
 
-        setIsSubmitting(false)
-        setIsSubmitted(true)
-
-        setTimeout(() => {
-            setIsSubmitted(false)
-            setFormData({
-                name: '',
-                phone: '',
-                email: '',
-                brand: '',
-                model: '',
-                year: '',
-                km: '',
-                price: '',
-                message: '',
+            const response = await fetch('/api/submit-lead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
             })
-        }, 3000)
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al enviar la solicitud')
+            }
+
+            setIsSubmitting(false)
+            setIsSubmitted(true)
+
+            setTimeout(() => {
+                setIsSubmitted(false)
+                setFormData({
+                    name: '',
+                    phone: '',
+                    email: '',
+                    brand: '',
+                    model: '',
+                    year: '',
+                    km: '',
+                    price: '',
+                    message: '',
+                })
+            }, 3000)
+        } catch (error) {
+            console.error('Error submitting consignment form:', error)
+            setIsSubmitting(false)
+            alert('Hubo un error al enviar la solicitud. Por favor intenta nuevamente.')
+        }
     }
 
     return (
