@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Queirolo Mundo 4x4 Website** - Modern, mobile-first Next.js website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
+**Queirolo Autos Website** - Modern, mobile-first Next.js website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
 
 **Current Status**: Active development. Frontend complete with Sanity CMS integration. Pending: real vehicle data population, backend integration for forms, final deployment configuration.
 
@@ -129,7 +129,7 @@ config.ts                # Business configuration (hours, contact, etc.)
 
 ### Business Context
 
-**Company**: Queirolo Mundo 4x4  
+**Company**: Queirolo Autos 
 **Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile  
 **Business Model**: Vehicle sales, financing, vehicle purchase (including debt), consignment
 

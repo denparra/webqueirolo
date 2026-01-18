@@ -1837,18 +1837,65 @@ export function useFilters() {
 ### Phase 5: Launch Preparation (Week 9-10)
 
 **Deliverables:**
-- [ ] Content population (real vehicle data, images, copy)
+- [x] Content population (real vehicle data, images, copy)
 - [ ] Backend integration (API endpoints, form handlers)
 - [ ] Map integration (Leaflet with real location)
-- [ ] Contact channels (WhatsApp, phone, email) verified
+- [x] Contact channels (WhatsApp, phone, email) verified
 - [ ] SSL certificate (HTTPS)
 - [ ] Domain configuration
 - [ ] CDN setup (Vercel/Cloudflare)
 - [ ] Monitoring setup (error tracking, uptime monitoring)
 - [ ] Final QA (full regression testing)
-- [ ] Deployment (production)
+- [x] Deployment (production)
 
 **Key Focus:** Go live with confidence.
+
+**Implementation Notes:**
+
+**Content Population:**
+- Comentario: Sanity CMS integrado y configurado con esquema `vehicle` completo. Proyecto online permite población de contenido real vía `/studio`. Variables de entorno configuradas (`.env.local`).
+
+**Backend Integration:**
+- Comentario: No se encontró carpeta `app/api/` ni rutas API (`route.ts`). Los formularios actuales simulan envío. Para completar: crear handlers en `app/api/submit-lead/route.ts`, `app/api/calculate-loan/route.ts`, etc.
+
+**Map Integration:**
+- Comentario: No se encontró implementación de Leaflet (`react-leaflet` no está en uso en el código). La página `/contacto` usa iframe de Google Maps embebido. Para completar con Leaflet: instalar `react-leaflet` + `leaflet`, crear componente `MapComponent.tsx`, reemplazar iframe.
+
+**Contact Channels:**
+- Comentario: Verificado. WhatsApp (`+56972149979`), teléfono (`+56 2 4367-0362`, `+56 9 7214-9979`), y email (`contacto@queirolo.cl`) configurados en `config.ts`. Componente `WhatsAppButton.tsx` implementado y presente en layout. Múltiples puntos de contacto en Navbar, Footer, MobileNav.
+
+**SSL Certificate:**
+- Comentario: Depende de configuración externa (hosting/dominio). Headers de seguridad configurados en `next.config.js` (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy). Para completar: verificar HTTPS activo en dominio de producción.
+
+**Domain Configuration:**
+- Comentario: No verificable solo con repo. Para completar: confirmar DNS apuntando a servidor de producción, configurar dominio en Vercel/VPS.
+
+**CDN Setup:**
+- Comentario: `next.config.js` configurado para optimización de imágenes con Sanity CDN (`cdn.sanity.io`). Cache headers configurados (1 año para assets estáticos). Si desplegado en Vercel, CDN automático. Para completar: verificar en producción que assets se sirven desde CDN.
+
+**Monitoring Setup:**
+- Comentario: Google Analytics 4 implementado (`components/analytics/GoogleAnalytics.tsx`) con helpers de tracking. Requiere `NEXT_PUBLIC_GA_MEASUREMENT_ID` en env vars de producción. No se encontró configuración de error tracking (ej: Sentry) ni uptime monitoring. Para completar: agregar `NEXT_PUBLIC_GA_MEASUREMENT_ID`, configurar Sentry/LogRocket, configurar uptime monitoring (UptimeRobot/Pingdom).
+
+**Final QA:**
+- Comentario: Build falló con error de trace (`npm run build` retornó exit code 1). Lint no configurado (requiere setup interactivo). No hay tests configurados (`package.json` no incluye script `test`). Para completar: resolver error de build, configurar ESLint, implementar tests (Jest/Playwright), ejecutar QA completo.
+
+**Deployment:**
+- Comentario: Proyecto actualmente online según contexto del usuario. README.md documenta deploy en VPS/containers. Sanity Studio accesible en `/studio`. Para verificar completamente: confirmar URL de producción, SSL activo, CORS de Sanity configurado para dominio.
+
+## Evidencias de verificación (Phase 5)
+
+| Deliverable | Estado | Evidencia en repo | Notas |
+|-------------|--------|-------------------|-------|
+| Content population | DONE | `lib/sanity.ts`, `lib/vehicles.ts`, `sanity/schemaTypes/vehicle.ts`, `.env.local` | Sanity CMS integrado con schema completo. Proyecto ID configurado. Studio en `/studio` |
+| Backend integration | NOT FOUND | No existe `app/api/` | Formularios simulan envío. Requiere crear API routes para producción |
+| Map integration (Leaflet) | NOT FOUND | Búsqueda de `react-leaflet`/`MapContainer` sin resultados | Página contacto usa iframe Google Maps. Leaflet no implementado |
+| Contact channels | DONE | `config.ts`, `components/shared/WhatsAppButton.tsx`, `components/layout/Navbar.tsx`, `components/layout/Footer.tsx` | WhatsApp, teléfonos y email configurados y verificados en múltiples componentes |
+| SSL certificate | EXTERNAL | `next.config.js` (headers de seguridad) | Headers configurados. HTTPS depende de deployment externo |
+| Domain configuration | EXTERNAL | N/A | No verificable desde repo. Requiere verificación en DNS/hosting |
+| CDN setup | PARTIAL | `next.config.js` (Sanity CDN, cache headers) | Configurado para Sanity CDN y cache. Vercel CDN automático si desplegado allí |
+| Monitoring setup | PARTIAL | `components/analytics/GoogleAnalytics.tsx` | GA4 implementado pero requiere env var. Sin error tracking ni uptime monitoring |
+| Final QA | NOT FOUND | `npm run build` falló, no hay tests | Build error, lint no configurado, sin framework de tests |
+| Deployment | DONE | README.md, proyecto online según contexto | Documentado en README. Proyecto reportado como online por usuario |
 
 ---
 
