@@ -42,10 +42,10 @@ const siteConfig = {
 
     // Horarios de atención
     businessHours: {
-        weekdays: 'Lunes a Viernes: 09:30 - 18:00',
-        saturday: 'Sábado: Con cita previa',
+        weekdays: 'Lun-Vie: 09:30 - 18:00',
+        saturday: 'Con cita previa',
         sunday: 'Cerrado',
-        weekdaysDetailed: 'Lunes a Viernes: 09:30 - 18:00',
+        weekdaysDetailed: 'Lun-Vie: 9:30 - 18:00',
         saturdayDetailed: 'Sábado: Con cita previa',
     },
 

@@ -9,12 +9,6 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import siteConfig from '@/config'
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Queirolo Autos - Venta de Vehículos Seminuevos en Las Condes',
-  description: 'Más de 60 años vendiendo autos con confianza. Venta, consignación y financiamiento en Las Condes, Santiago. Visítanos sin compromiso.',
-}
 
 export default function HomePage() {
   return (
@@ -24,7 +18,7 @@ export default function HomePage() {
         <div className="container relative z-10 mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="mb-6 text-4xl font-bold leading-tight text-white lg:text-6xl">
-              Queirolo Autos: Tu próximo auto con la confianza de siempre
+              Tu Próximo 4x4 Está Aquí
             </h1>
             <p className="mb-8 text-lg text-gray-200 lg:text-xl">
               {siteConfig.company.tagline}
@@ -32,13 +26,13 @@ export default function HomePage() {
             <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <Button size="lg" asChild>
                 <Link href="/vehiculos">
-                  Ver Vehículos
+                  Ver Vehículos Disponibles
                   <ArrowRightIcon className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="secondary" asChild>
-                <Link href="/nosotros">
-                  Conocer Nuestra Historia
+                <Link href="/servicios#financiamiento">
+                  Simular Financiamiento
                 </Link>
               </Button>
             </div>
@@ -54,10 +48,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold text-gray-900 lg:text-4xl">
-              ¿Por qué elegir {siteConfig.company.fullName}?
+              ¿Por Qué Elegir {siteConfig.company.fullName}?
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">
-              Más de 60 años en el rubro automotriz
+              Más de 15 años de experiencia en el mercado automotriz chileno
             </p>
           </div>
 
@@ -68,11 +62,11 @@ export default function HomePage() {
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
                   <ShieldCheckIcon className="h-6 w-6 text-primary-600" />
                 </div>
-                <CardTitle>Revisión Técnica Completa</CardTitle>
+                <CardTitle>Vehículos Certificados</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Cada vehículo pasa por una inspección exhaustiva antes de estar disponible.
+                  Todos nuestros vehículos pasan por una rigurosa inspección mecánica y de documentación.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -83,11 +77,11 @@ export default function HomePage() {
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
                   <CurrencyDollarIcon className="h-6 w-6 text-primary-600" />
                 </div>
-                <CardTitle>Financiamiento con Financieras</CardTitle>
+                <CardTitle>Financiamiento Directo</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Te ayudamos a encontrar opciones de crédito adaptadas a tu situación.
+                  Facilidades de pago sin banco, con tasas competitivas y aprobación rápida.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -98,11 +92,11 @@ export default function HomePage() {
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
                   <TruckIcon className="h-6 w-6 text-primary-600" />
                 </div>
-                <CardTitle>Recibimos tu Auto</CardTitle>
+                <CardTitle>Permuta Disponible</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Evaluamos tu vehículo actual como parte de pago.
+                  Aceptamos tu vehículo usado como parte de pago. Tasación justa y transparente.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -113,11 +107,11 @@ export default function HomePage() {
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
                   <ClockIcon className="h-6 w-6 text-primary-600" />
                 </div>
-                <CardTitle>Trámites Online</CardTitle>
+                <CardTitle>Proceso Rápido</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Transferencia con clave única y procesos digitales sin complicaciones.
+                  Desde la consulta hasta la entrega de llaves en el menor tiempo posible.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -130,10 +124,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-gray-900 lg:text-4xl">
-              ¿Listo para tu próximo auto?
+              ¿Listo para tu Próxima Aventura?
             </h2>
             <p className="mb-8 text-lg text-gray-600">
-              Visítanos en Las Condes o escríbenos. Te atendemos sin presiones y resolvemos todas tus dudas.
+              Visítanos en nuestra sala de ventas en Las Condes o contáctanos por WhatsApp para más información
             </p>
             <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <Button size="lg" variant="whatsapp" asChild>

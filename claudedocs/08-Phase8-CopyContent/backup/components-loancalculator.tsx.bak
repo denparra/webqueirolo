@@ -22,7 +22,7 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
     return (
         <div className="rounded-xl bg-white p-8 shadow-lg">
             <h3 className="mb-6 text-2xl font-bold text-gray-900">
-                Simula tu Cuota
+                Calcula Tu Cuota en Tiempo Real
             </h3>
 
             <div className="grid gap-8 md:grid-cols-2">
@@ -150,11 +150,11 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
                     className="w-full md:w-auto"
                     onClick={onRequestCredit}
                 >
-                    Solicitar Evaluación
+                    Solicitar Este Crédito
                 </Button>
                 <p className="mt-4 text-xs text-gray-500">
-                    Valores referenciales. La cuota final depende de la evaluación crediticia
-                    y las condiciones de la financiera. CAE informado al momento de la solicitud.
+                    Valores referenciales. Cuota final sujeta a evaluación crediticia.
+                    CAE informado al momento de la solicitud.
                 </p>
             </div>
         </div>

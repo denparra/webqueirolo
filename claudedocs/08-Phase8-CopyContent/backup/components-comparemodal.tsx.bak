@@ -101,7 +101,7 @@ export function CompareModal({ isOpen, onClose, vehicles }: CompareModalProps) {
                                 {vehicles.map((v) => (
                                     <td key={v.id} className="p-4">
                                         <Button variant="primary" className="w-full" asChild>
-                                            <Link href={`/vehiculos/${v.slug}`}>Conocer este Vehículo</Link>
+                                            <Link href={`/vehiculos/${v.slug}`}>Ver Detalles</Link>
                                         </Button>
                                     </td>
                                 ))}

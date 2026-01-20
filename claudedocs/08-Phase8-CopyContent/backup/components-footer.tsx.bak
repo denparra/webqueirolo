@@ -68,17 +68,22 @@ export default function Footer() {
             <ul className="space-y-2 text-sm" role="list">
               <li>
                 <Link href="/servicios#financiamiento" className="hover:text-primary-400 transition-colors">
-                  Financiamiento
+                  Financiamiento Directo
                 </Link>
               </li>
               <li>
-                <Link href="/servicios#consignacion" className="hover:text-primary-400 transition-colors">
-                  Consignación
+                <Link href="/servicios#tasacion" className="hover:text-primary-400 transition-colors">
+                  Tasación de Vehículos
                 </Link>
               </li>
               <li>
-                <Link href="/servicios#parte-de-pago" className="hover:text-primary-400 transition-colors">
-                  Parte de Pago
+                <Link href="/servicios#permuta" className="hover:text-primary-400 transition-colors">
+                  Permuta
+                </Link>
+              </li>
+              <li>
+                <Link href="/servicios#garantia" className="hover:text-primary-400 transition-colors">
+                  Garantía Extendida
                 </Link>
               </li>
             </ul>
@@ -123,14 +128,14 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col items-center justify-between space-y-4 text-sm md:flex-row md:space-y-0">
             <p className="text-center md:text-left">
-              © {new Date().getFullYear()} {siteConfig.company.fullName}. Todos los derechos reservados. Hecho con pasión en Chile.
+              © {new Date().getFullYear()} {siteConfig.company.fullName}. Todos los derechos reservados.
             </p>
             <div className="flex space-x-6">
               <Link href="/privacidad" className="hover:text-primary-400 transition-colors">
-                Política de Privacidad
+                Privacidad
               </Link>
               <Link href="/terminos" className="hover:text-primary-400 transition-colors">
-                Términos y Condiciones
+                Términos
               </Link>
             </div>
           </div>

@@ -34,19 +34,20 @@ export const siteConfig = {
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Queirolo Autos - Venta de Vehículos Seminuevos en Las Condes',
+    default: `${siteConfig.name} | Vehículos Seminuevos en Las Condes`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   keywords: [
-    'vehículos seminuevos',
-    'autos usados',
-    'financiamiento con financieras',
-    'consignación',
-    'parte de pago',
+    'vehículos 4x4',
+    'seminuevos',
+    'financiamiento',
     'Las Condes',
-    'Santiago',
     'Chile',
+    'SUV',
+    'camionetas',
+    'todoterreno',
+    'automotriz',
   ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
@@ -188,8 +189,8 @@ export function generateVehicleListSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Nuestros Vehículos',
-    description: 'Explora nuestro stock actual, seleccionado con estándares de calidad.',
+    name: 'Vehículos Disponibles',
+    description: 'Catálogo de vehículos seminuevos certificados',
     numberOfItems: mockVehicles.length,
     itemListElement: mockVehicles.map((vehicle, index) => ({
       '@type': 'ListItem',

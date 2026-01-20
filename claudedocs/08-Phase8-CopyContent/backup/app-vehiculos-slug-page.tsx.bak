@@ -172,7 +172,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-gray-500">Este vehículo no tiene características adicionales registradas.</p>
+                                        <p className="text-gray-500">No hay características registradas</p>
                                     )}
                                 </div>
                             </TabsContent>
@@ -185,7 +185,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                             {/* Contact Card */}
                             <Card>
                                 <CardHeader>
-                                <CardTitle>¿Te interesa este vehículo?</CardTitle>
+                                    <CardTitle>¿Interesado en este vehículo?</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     <Button variant="secondary" className="w-full border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white" asChild>
@@ -198,7 +198,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                         Agendar Visita
                                     </Button>
                                     <Button variant="outline" className="w-full">
-                                        Consultar Financiamiento
+                                        Solicitar Financiamiento
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -210,7 +210,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                 </CardHeader>
                                 <CardContent>
                                     <p className="mb-4 text-sm text-gray-600">
-                                        Calcula una cuota mensual aproximada
+                                        Calcula tu cuota mensual aproximada
                                     </p>
                                     <Button variant="secondary" className="w-full" asChild>
                                         <a href="#calculadora">Ver Calculadora Completa</a>

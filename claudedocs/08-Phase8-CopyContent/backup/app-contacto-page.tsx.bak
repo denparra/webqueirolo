@@ -8,8 +8,8 @@ import LazyContactMap from '@/components/maps/LazyContactMap'
 import siteConfig from '@/config'
 
 export const metadata: Metadata = {
-    title: 'Contacto - Queirolo Autos Las Condes',
-    description: 'Visítanos en Av. Las Condes 12461. Atención personalizada de lunes a viernes. Escríbenos por WhatsApp.',
+    title: `Contacto | ${siteConfig.company.name}`,
+    description: 'Contáctanos para encontrar tu próximo vehículo 4x4. Estamos ubicados en Las Condes, Santiago.',
 }
 
 export default function ContactPage() {
@@ -21,7 +21,7 @@ export default function ContactPage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-900/50 to-transparent z-10" />
                 <Image
                     src="/images/showroom.jpg" // Ensuring we use a valid placeholder or image
-                    alt="Contacto Queirolo Autos"
+                    alt="Contacto Queirolo Mundo 4x4"
                     fill
                     className="object-cover"
                     priority
@@ -30,7 +30,7 @@ export default function ContactPage() {
                     <FadeIn>
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">Contáctanos</h1>
                         <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-                            Estamos aquí para ayudarte a encontrar tu próximo auto
+                            Estamos aquí para ayudarte a encontrar el vehículo perfecto
                         </p>
                     </FadeIn>
                 </div>
@@ -106,7 +106,7 @@ export default function ContactPage() {
                                             <h3 className="font-bold text-gray-900 mb-1">Horarios</h3>
                                             <p className="text-gray-600">{siteConfig.businessHours.weekdaysDetailed}</p>
                                             <p className="text-gray-600">{siteConfig.businessHours.saturdayDetailed}</p>
-                                            <p className="text-gray-500 text-sm mt-1">Domingo y Feriados: {siteConfig.businessHours.sunday}</p>
+                                            <p className="text-gray-500 text-sm mt-1">Domingos y Festivos: {siteConfig.businessHours.sunday}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@ export default function ContactPage() {
                                 <div className="mb-8">
                                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Envíanos un Mensaje</h2>
                                     <p className="text-gray-600">
-                                        Completa el formulario y te contactaremos pronto.
+                                        Completa el formulario y te contactaremos a la brevedad posible.
                                     </p>
                                 </div>
                                 <ContactForm />

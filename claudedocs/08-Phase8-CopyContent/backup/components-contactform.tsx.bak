@@ -46,7 +46,7 @@ export function ContactForm() {
             console.error('Error submitting form:', error)
             setIsSubmitting(false)
             // Error handling UI could be added here
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
+            alert('Hubo un error al enviar el mensaje. Por favor intenta nuevamente.')
         }
     }
 
@@ -55,7 +55,7 @@ export function ContactForm() {
             <CardHeader>
                 <CardTitle id="contact-form-title">Contáctanos</CardTitle>
                 <CardDescription id="contact-form-desc">
-                    Déjanos tus datos y te contactaremos pronto.
+                    Déjanos tus datos y te contactaremos a la brevedad
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -73,13 +73,13 @@ export function ContactForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Gracias por escribirnos! Un asesor te contactará pronto.'}
+                        {isSubmitting && 'Enviando formulario, por favor espere.'}
+                        {isSubmitted && 'Formulario enviado exitosamente. Gracias por contactarnos.'}
                     </div>
 
                     <div>
                         <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-gray-700">
-                            Nombre completo <span aria-hidden="true" className="text-red-500">*</span>
+                            Nombre Completo <span aria-hidden="true" className="text-red-500">*</span>
                         </label>
                         <Input
                             id="contact-name"
@@ -90,13 +90,13 @@ export function ContactForm() {
                             autoComplete="name"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Ej: Juan Pérez"
+                            placeholder="Juan Pérez"
                         />
                     </div>
 
                     <div>
                         <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-gray-700">
-                            Correo electrónico <span aria-hidden="true" className="text-red-500">*</span>
+                            Email <span aria-hidden="true" className="text-red-500">*</span>
                         </label>
                         <Input
                             id="contact-email"
@@ -107,7 +107,7 @@ export function ContactForm() {
                             autoComplete="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder="tucorreo@ejemplo.cl"
+                            placeholder="juan@ejemplo.cl"
                         />
                     </div>
 
@@ -151,7 +151,7 @@ export function ContactForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Mensaje'}
                     </Button>
                 </form>
             </CardContent>

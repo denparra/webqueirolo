@@ -68,16 +68,16 @@ export function ConsignmentForm() {
         } catch (error) {
             console.error('Error submitting consignment form:', error)
             setIsSubmitting(false)
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
+            alert('Hubo un error al enviar la solicitud. Por favor intenta nuevamente.')
         }
     }
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle id="consignment-form-title">Solicitar Evaluación para Consignación</CardTitle>
+                <CardTitle id="consignment-form-title">Consigna tu Vehículo</CardTitle>
                 <CardDescription id="consignment-form-desc">
-                    Déjanos los datos de tu vehículo y te contactaremos para coordinar la evaluación.
+                    Déjanos los datos de tu vehículo y te contactaremos para evaluarlo
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -95,8 +95,8 @@ export function ConsignmentForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Recibimos tu solicitud! Te contactaremos para coordinar la evaluación de tu vehículo.'}
+                        {isSubmitting && 'Enviando solicitud de consignación, por favor espere.'}
+                        {isSubmitted && 'Solicitud enviada exitosamente. Te contactaremos para evaluar tu vehículo.'}
                     </div>
 
                     {/* Contact Information */}
@@ -105,7 +105,7 @@ export function ConsignmentForm() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div>
                                 <label htmlFor="consignment-name" className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nombre completo <span aria-hidden="true" className="text-red-500">*</span>
+                                    Nombre Completo <span aria-hidden="true" className="text-red-500">*</span>
                                 </label>
                                 <Input
                                     id="consignment-name"
@@ -116,7 +116,6 @@ export function ConsignmentForm() {
                                     autoComplete="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Ej: Juan Pérez"
                                 />
                             </div>
                             <div>
@@ -132,7 +131,6 @@ export function ConsignmentForm() {
                                     autoComplete="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    placeholder="+56 9 1234 5678"
                                 />
                             </div>
                         </div>
@@ -140,7 +138,7 @@ export function ConsignmentForm() {
 
                     <div>
                         <label htmlFor="consignment-email" className="mb-2 block text-sm font-medium text-gray-700">
-                            Correo electrónico <span aria-hidden="true" className="text-red-500">*</span>
+                            Email <span aria-hidden="true" className="text-red-500">*</span>
                         </label>
                         <Input
                             id="consignment-email"
@@ -151,7 +149,6 @@ export function ConsignmentForm() {
                             autoComplete="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder="tucorreo@ejemplo.cl"
                         />
                     </div>
 
@@ -243,14 +240,13 @@ export function ConsignmentForm() {
 
                     <div>
                         <label htmlFor="consignment-message" className="mb-2 block text-sm font-medium text-gray-700">
-                            Mensaje
+                            Mensaje Adicional (Opcional)
                         </label>
                         <textarea
                             id="consignment-message"
                             name="message"
                             value={formData.message}
                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                            placeholder="¿En qué podemos ayudarte?"
                             rows={3}
                             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         />
@@ -262,7 +258,7 @@ export function ConsignmentForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Solicitud Enviada!' : 'Enviar Solicitud'}
                     </Button>
                 </form>
             </CardContent>

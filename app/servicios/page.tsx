@@ -10,6 +10,12 @@ import {
     TruckIcon,
 } from '@heroicons/react/24/outline'
 import siteConfig from '@/config'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Servicios - Financiamiento y Consignación - Queirolo Autos',
+    description: 'Financiamiento con financieras, consignación de vehículos y recepción en parte de pago. Conoce todos nuestros servicios.',
+}
 
 export default function ServiciosPage() {
     return (
@@ -18,10 +24,10 @@ export default function ServiciosPage() {
                 {/* Header */}
                 <div className="mb-12 text-center">
                     <h1 className="mb-4 text-4xl font-bold text-gray-900 lg:text-5xl">
-                        Nuestros Servicios
+                        Servicios
                     </h1>
                     <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                        Soluciones completas para la compra, venta y financiamiento de tu vehículo 4x4
+                        Conoce cómo podemos ayudarte
                     </p>
                 </div>
 
@@ -30,7 +36,7 @@ export default function ServiciosPage() {
                     <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
                         <TabsTrigger value="financiamiento">Financiamiento</TabsTrigger>
                         <TabsTrigger value="consignacion">Consignación</TabsTrigger>
-                        <TabsTrigger value="contacto">Contacto</TabsTrigger>
+                        <TabsTrigger value="parte-de-pago">Parte de Pago</TabsTrigger>
                     </TabsList>
 
                     {/* Financiamiento Tab */}
@@ -38,17 +44,20 @@ export default function ServiciosPage() {
                         {/* Benefits Section */}
                         <div className="rounded-lg bg-white p-8 shadow">
                             <h2 className="mb-6 text-2xl font-bold text-gray-900">
-                                Financia Tu Vehículo Sin Complicaciones
+                                Financiamiento con Financieras
                             </h2>
+                            <p className="mb-6 text-gray-600">
+                                Te ayudamos a encontrar la mejor opción de crédito para tu próximo auto.
+                            </p>
                             <div className="grid gap-6 md:grid-cols-3">
                                 <div className="flex gap-4">
                                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
                                         <ClockIcon className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-1 font-semibold text-gray-900">Aprobación Inmediata</h3>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Evaluación Rápida</h3>
                                         <p className="text-sm text-gray-600">
-                                            Respuesta en minutos, sin largas esperas
+                                            Respuesta en 24 a 48 horas aproximadamente
                                         </p>
                                     </div>
                                 </div>
@@ -57,9 +66,9 @@ export default function ServiciosPage() {
                                         <ShieldCheckIcon className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-1 font-semibold text-gray-900">Sin Deuda Registrada</h3>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Plazos de 12 a 60 Meses</h3>
                                         <p className="text-sm text-gray-600">
-                                            No queda registrada en el sistema financiero
+                                            Elige el plazo que mejor se adapte a ti
                                         </p>
                                     </div>
                                 </div>
@@ -68,13 +77,67 @@ export default function ServiciosPage() {
                                         <CurrencyDollarIcon className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-1 font-semibold text-gray-900">Tasas Competitivas</h3>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Pie desde 20%</h3>
                                         <p className="text-sm text-gray-600">
-                                            Las mejores condiciones del mercado
+                                            Flexibilidad en el monto inicial
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
+                                        <TruckIcon className="h-6 w-6 text-primary-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Casos Especiales</h3>
+                                        <p className="text-sm text-gray-600">
+                                            Evaluamos cada situación de forma particular
                                         </p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="rounded-lg bg-primary-50 p-6">
+                            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                                Pasos
+                            </h3>
+                            <ol className="space-y-3">
+                                <li className="flex gap-3">
+                                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                        1
+                                    </span>
+                                    <span className="text-gray-700">
+                                        Completa el formulario con tus datos
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                        2
+                                    </span>
+                                    <span className="text-gray-700">
+                                        Evaluamos tu perfil con nuestras financieras
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                        3
+                                    </span>
+                                    <span className="text-gray-700">
+                                        Te contactamos con las opciones disponibles
+                                    </span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                        4
+                                    </span>
+                                    <span className="text-gray-700">
+                                        Elige la mejor y retira tu vehículo
+                                    </span>
+                                </li>
+                            </ol>
+                            <p className="mt-4 text-sm text-gray-600">
+                                El financiamiento está sujeto a evaluación crediticia. Los plazos, tasas y condiciones dependen del perfil del cliente y de la financiera seleccionada.
+                            </p>
                         </div>
 
                         {/* Calculator */}
@@ -87,20 +150,23 @@ export default function ServiciosPage() {
                     </TabsContent>
 
                     {/* Consignación Tab */}
-                    <TabsContent value="consignacion" className="mt-8 space-y-8">
+                    <TabsContent value="consignacion" id="consignacion" className="mt-8 space-y-8">
                         <div className="rounded-lg bg-white p-8 shadow">
                             <h2 className="mb-6 text-2xl font-bold text-gray-900">
-                                Vende Tu Vehículo con Nosotros
+                                Consignación de Vehículos
                             </h2>
+                            <p className="mb-8 text-gray-600">
+                                Vendemos tu auto por ti, sin que tengas que preocuparte por nada.
+                            </p>
                             <div className="mb-8 grid gap-6 md:grid-cols-2">
                                 <div className="flex gap-4">
                                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
                                         <TruckIcon className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-1 font-semibold text-gray-900">Proceso Simple</h3>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Sin Prendas</h3>
                                         <p className="text-sm text-gray-600">
-                                            Solo déjanos tu vehículo y nosotros nos encargamos de todo
+                                            Solo recibimos vehículos sin gravámenes
                                         </p>
                                     </div>
                                 </div>
@@ -109,9 +175,31 @@ export default function ServiciosPage() {
                                         <ShieldCheckIcon className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h3 className="mb-1 font-semibold text-gray-900">Tasación Justa</h3>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Retiro Cuando Desees</h3>
                                         <p className="text-sm text-gray-600">
-                                            Evaluación transparente basada en el mercado actual
+                                            Tu auto es tuyo hasta que se venda
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
+                                        <ClockIcon className="h-6 w-6 text-primary-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Evaluación Personalizada</h3>
+                                        <p className="text-sm text-gray-600">
+                                            Cada caso se analiza individualmente
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
+                                        <CurrencyDollarIcon className="h-6 w-6 text-primary-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="mb-1 font-semibold text-gray-900">Gestión Completa</h3>
+                                        <p className="text-sm text-gray-600">
+                                            Nos encargamos de todo el proceso de venta
                                         </p>
                                     </div>
                                 </div>
@@ -119,7 +207,7 @@ export default function ServiciosPage() {
 
                             <div className="rounded-lg bg-primary-50 p-6">
                                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                                    ¿Cómo Funciona?
+                                    Requisitos
                                 </h3>
                                 <ol className="space-y-3">
                                     <li className="flex gap-3">
@@ -127,7 +215,7 @@ export default function ServiciosPage() {
                                             1
                                         </span>
                                         <span className="text-gray-700">
-                                            Completa el formulario con los datos de tu vehículo
+                                            Vehículo sin prendas ni gravámenes
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -135,7 +223,7 @@ export default function ServiciosPage() {
                                             2
                                         </span>
                                         <span className="text-gray-700">
-                                            Nuestro equipo te contacta para coordinar una evaluación
+                                            Documentación al día
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -143,7 +231,7 @@ export default function ServiciosPage() {
                                             3
                                         </span>
                                         <span className="text-gray-700">
-                                            Publicamos tu vehículo y gestionamos la venta
+                                            Evaluación previa del vehículo
                                         </span>
                                     </li>
                                 </ol>
@@ -153,58 +241,61 @@ export default function ServiciosPage() {
                         <ConsignmentForm />
                     </TabsContent>
 
-                    {/* Contacto Tab */}
-                    <TabsContent value="contacto" className="mt-8">
+                    {/* Parte de Pago Tab */}
+                    <TabsContent value="parte-de-pago" id="parte-de-pago" className="mt-8">
                         <div className="grid gap-8 md:grid-cols-2">
                             <ContactForm />
 
                             <div className="space-y-6">
                                 <div className="rounded-lg bg-white p-6 shadow">
                                     <h3 className="mb-4 text-xl font-semibold text-gray-900">
-                                        Información de Contacto
+                                        Recibimos tu Auto en Parte de Pago
                                     </h3>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <p className="mb-1 text-sm font-medium text-gray-600">Dirección</p>
-                                            <p className="text-gray-900">
-                                                Av. Las Condes 12461, Local 4A
-                                                <br />
-                                                Las Condes, Santiago - Chile
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="mb-1 text-sm font-medium text-gray-600">Teléfonos</p>
-                                            <p className="text-gray-900">
-                                                (+56 9) 7214-9979
-                                                <br />
-                                                (+56 2) 4367-0362
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="mb-1 text-sm font-medium text-gray-600">Horarios</p>
-                                            <p className="text-gray-900">
-                                                Lunes a Viernes: 09:30 - 18:00
-                                                <br />
-                                                Sábado: Previa Cita
-                                            </p>
-                                        </div>
+                                    <p className="mb-6 text-gray-600">
+                                        ¿Tienes un auto que quieres dar en parte de pago? Lo evaluamos y te entregamos un valor justo.
+                                    </p>
+                                    <div className="rounded-lg bg-primary-50 p-6">
+                                        <h4 className="mb-4 text-lg font-semibold text-gray-900">Proceso</h4>
+                                        <ol className="space-y-3">
+                                            <li className="flex gap-3">
+                                                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                                    1
+                                                </span>
+                                                <span className="text-gray-700">
+                                                    Traes tu vehículo para evaluación
+                                                </span>
+                                            </li>
+                                            <li className="flex gap-3">
+                                                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                                    2
+                                                </span>
+                                                <span className="text-gray-700">
+                                                    Descontamos cualquier deuda pendiente
+                                                </span>
+                                            </li>
+                                            <li className="flex gap-3">
+                                                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                                                    3
+                                                </span>
+                                                <span className="text-gray-700">
+                                                    El saldo restante se aplica a tu nuevo auto
+                                                </span>
+                                            </li>
+                                        </ol>
                                     </div>
+                                    <p className="mt-4 text-sm text-gray-600">
+                                        Si tu auto tiene deuda, la descontamos del valor y realizamos todos los trámites de transferencia.
+                                    </p>
                                 </div>
 
                                 <div className="rounded-lg bg-primary-50 p-6">
-                                    <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                                        ¿Prefieres WhatsApp?
-                                    </h3>
-                                    <p className="mb-4 text-sm text-gray-600">
-                                        Contáctanos directamente y te responderemos a la brevedad
-                                    </p>
                                     <a
                                         href={`https://wa.me/${siteConfig.contact.whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#20BA5A]"
                                     >
-                                        Abrir WhatsApp
+                                        Consultar Evaluación
                                     </a>
                                 </div>
                             </div>

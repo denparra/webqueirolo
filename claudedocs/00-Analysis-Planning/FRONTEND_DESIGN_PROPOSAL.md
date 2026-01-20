@@ -2116,6 +2116,54 @@ Para que `/studio` funcione correctamente en producción, es necesario configura
 
 ---
 
+## Phase 8: Copy & Content Optimization (Planned)
+
+**Objetivo**
+- Optimizar todo el contenido textual del sitio para mejorar conversión, claridad, tono de marca y experiencia de usuario.
+- Reemplazar contenido placeholder con datos reales de la empresa.
+- Crear páginas de error personalizadas (404/500).
+
+**Alcance**
+Esta fase se centra **exclusivamente en texto/copy**, no en UI, estilos ni layout:
+- Home: Hero copy, features, CTAs
+- Vehículos: Listado, filtros, cards, detalle
+- Servicios: Tabs, beneficios, pasos, forms
+- Nosotros: Historia real, stats reales, equipo real, testimonios reales
+- Contacto: Copy del formulario y mensajes
+- Footer: Links, legal, copyright
+- Microcopy: Labels, placeholders, validaciones, errores, estados vacíos, loading
+- SEO: Títulos, descripciones, H1s
+
+**Entregables**
+1. `PHASE8_FASTQUESTIONS.md` - Cuestionario para obtener información real del cliente
+2. `PHASE8_COPY_CONTENT_GUIDE.md` - Guía completa con auditoría y proceso
+3. Copy final aprobado por cliente
+4. Implementación de textos actualizados
+5. Páginas 404 y 500 personalizadas
+
+**Documentación**
+Ver carpeta `claudedocs/08-Phase8-CopyContent/` para guía detallada y cuestionario.
+
+**Checklist de implementación**
+- [ ] Cliente completa FastQuestions con datos reales
+- [ ] Reemplazar stats placeholder en /nosotros (años, clientes, vehículos)
+- [ ] Actualizar equipo con nombres y roles reales
+- [ ] Obtener e implementar testimonios reales
+- [ ] Revisar y mejorar todos los CTAs
+- [ ] Optimizar microcopy de formularios
+- [ ] Crear páginas 404 y 500 personalizadas
+- [ ] Verificar consistencia de tono (tú vs usted)
+- [ ] Validar ortografía y gramática
+
+**Criterios de aceptación**
+- Cero contenido placeholder visible en producción
+- Estadísticas verificables y reales
+- Testimonios con nombres reales (o iniciales con permiso)
+- Tono consistente en todo el sitio
+- Páginas de error con branding y CTAs útiles
+
+---
+
 ## 11. Next Steps
 
 ### Immediate Actions (Before Development Starts)
@@ -2280,6 +2328,7 @@ Implementation should follow the recommended stack (Next.js + Tailwind + shadcn/
 ---
 
 ## Changelog
+- 2026-01-18: Phase 8 (Copy & Content Optimization) agregada. Documentación en `claudedocs/08-Phase8-CopyContent/`. Incluye auditoría completa de copy actual, FastQuestions para cliente, y guía de implementación.
 - 2026-01-18: Addendum con hallazgos de red, priorizacion y fases 6-7 (optimizacion de imagenes y autos destacados).
 - 2026-01-18: Quick wins implementados (icons/favicon, placeholders de imagenes, paginas legales, dedupe vehiculos, lazy map) y documentacion tecnica en `claudedocs/03-implementation/frontend-quickwins/`. Archivos: `public/favicon.ico`, `public/icons/icon-192x192.png`, `public/icons/icon-512x512.png`, `public/images/showroom.jpg`, `public/images/history.jpg`, `app/privacidad/page.tsx`, `app/terminos/page.tsx`, `app/vehiculos/page.tsx`, `components/maps/LazyContactMap.tsx`, `app/contacto/page.tsx`.
 

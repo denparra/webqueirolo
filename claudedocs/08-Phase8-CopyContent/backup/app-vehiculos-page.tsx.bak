@@ -43,7 +43,7 @@ function VehicleListingContent() {
             } catch (error) {
                 console.error("Failed to fetch vehicles", error)
                 setAllVehicles([])
-                setError('No pudimos cargar el inventario. Refresca la página o vuelve en unos minutos.')
+                setError('No se pudo cargar el inventario. Reintenta en unos segundos.')
                 vehiclesPromise = null
             } finally {
                 setIsLoading(false)
@@ -159,10 +159,10 @@ function VehicleListingContent() {
                 ) : (
                     <div className="rounded-lg bg-white p-12 text-center shadow">
                         <p className="text-lg font-medium text-gray-900">
-                            No encontramos vehículos con esos filtros.
+                            No se encontraron vehículos con los filtros seleccionados
                         </p>
                         <p className="mt-2 text-sm text-gray-600">
-                            Prueba con otros criterios o explora todo nuestro stock.
+                            Intenta ajustar los filtros para ver más resultados
                         </p>
                     </div>
                 )}
@@ -178,10 +178,10 @@ export default function VehiculosPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="mb-2 text-3xl font-bold text-gray-900 lg:text-4xl">
-                        Nuestros Vehículos
+                        Vehículos Disponibles
                     </h1>
                     <p className="text-lg text-gray-600">
-                        Explora nuestro stock actual, seleccionado con estándares de calidad.
+                        Encuentra tu próximo 4x4 entre nuestros vehículos certificados
                     </p>
                 </div>
 

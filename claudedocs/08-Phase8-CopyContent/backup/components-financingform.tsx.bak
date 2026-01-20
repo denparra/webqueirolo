@@ -70,16 +70,16 @@ export function FinancingForm() {
         } catch (error) {
             console.error('Error submitting financing request:', error)
             setIsSubmitting(false)
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
+            alert('Hubo un error al enviar la solicitud. Por favor intenta nuevamente.')
         }
     }
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle id="financing-form-title">Solicitar Evaluación</CardTitle>
+                <CardTitle id="financing-form-title">Solicitar Financiamiento</CardTitle>
                 <CardDescription id="financing-form-desc">
-                    Completa el formulario con tus datos.
+                    Completa el formulario y te contactaremos para evaluar tu crédito
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -97,8 +97,8 @@ export function FinancingForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Solicitud recibida! Evaluaremos tu caso y te contactaremos en las próximas horas.'}
+                        {isSubmitting && 'Enviando solicitud de financiamiento, por favor espere.'}
+                        {isSubmitted && 'Solicitud enviada exitosamente. Te contactaremos pronto.'}
                     </div>
 
                     {/* Personal Data */}
@@ -107,7 +107,7 @@ export function FinancingForm() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div>
                                 <label htmlFor="financing-name" className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nombre completo <span aria-hidden="true" className="text-red-500">*</span>
+                                    Nombre Completo <span aria-hidden="true" className="text-red-500">*</span>
                                 </label>
                                 <Input
                                     id="financing-name"
@@ -118,7 +118,6 @@ export function FinancingForm() {
                                     autoComplete="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Ej: Juan Pérez"
                                 />
                             </div>
                             <div>
@@ -139,7 +138,7 @@ export function FinancingForm() {
                             </div>
                             <div>
                                 <label htmlFor="financing-email" className="mb-2 block text-sm font-medium text-gray-700">
-                                    Correo electrónico <span aria-hidden="true" className="text-red-500">*</span>
+                                    Email <span aria-hidden="true" className="text-red-500">*</span>
                                 </label>
                                 <Input
                                     id="financing-email"
@@ -150,7 +149,6 @@ export function FinancingForm() {
                                     autoComplete="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="tucorreo@ejemplo.cl"
                                 />
                             </div>
                             <div>
@@ -166,7 +164,6 @@ export function FinancingForm() {
                                     autoComplete="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    placeholder="+56 9 1234 5678"
                                 />
                             </div>
                             <div>
@@ -182,7 +179,6 @@ export function FinancingForm() {
                                     autoComplete="address-level2"
                                     value={formData.comuna}
                                     onChange={(e) => setFormData({ ...formData, comuna: e.target.value })}
-                                    placeholder="Ej: Las Condes"
                                 />
                             </div>
                         </div>
@@ -288,7 +284,7 @@ export function FinancingForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Solicitud Enviada!' : 'Solicitar Financiamiento'}
                     </Button>
                 </form>
             </CardContent>
