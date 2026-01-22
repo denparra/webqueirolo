@@ -2,6 +2,12 @@
 
 import { useState, useMemo } from 'react'
 import { VehicleFilters as Filters, Vehicle } from '@/lib/types'
+import {
+    DEFAULT_VEHICLE_FILTERS,
+    VEHICLE_FILTERS_KM_STEP,
+    VEHICLE_FILTERS_PRICE_STEP,
+    VEHICLE_FILTERS_YEAR_MAX_DEFAULT,
+} from '@/lib/constants/vehicleFilters'
 import { formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -86,11 +92,11 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
     const clearAllFilters = () => {
         onFiltersChange({
             brands: [],
-            priceMin: 5000000,
-            priceMax: 50000000,
-            yearMin: 2010,
-            yearMax: 2024,
-            kmMax: 200000,
+            priceMin: DEFAULT_VEHICLE_FILTERS.priceMin,
+            priceMax: DEFAULT_VEHICLE_FILTERS.priceMax,
+            yearMin: DEFAULT_VEHICLE_FILTERS.yearMin,
+            yearMax: VEHICLE_FILTERS_YEAR_MAX_DEFAULT,
+            kmMax: DEFAULT_VEHICLE_FILTERS.kmMax,
             transmissions: [],
             fuelTypes: [],
         })
@@ -100,11 +106,11 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
         filters.brands.length > 0 ||
         filters.transmissions.length > 0 ||
         filters.fuelTypes.length > 0 ||
-        filters.priceMin !== 5000000 ||
-        filters.priceMax !== 50000000 ||
-        filters.yearMin !== 2010 ||
-        filters.yearMax !== 2024 ||
-        filters.kmMax !== 200000
+        filters.priceMin !== DEFAULT_VEHICLE_FILTERS.priceMin ||
+        filters.priceMax !== DEFAULT_VEHICLE_FILTERS.priceMax ||
+        filters.yearMin !== DEFAULT_VEHICLE_FILTERS.yearMin ||
+        filters.yearMax !== VEHICLE_FILTERS_YEAR_MAX_DEFAULT ||
+        filters.kmMax !== DEFAULT_VEHICLE_FILTERS.kmMax
 
     const filterContent = (
         <>
@@ -148,9 +154,9 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
                         onValueChange={([min, max]) =>
                             onFiltersChange({ ...filters, priceMin: min, priceMax: max })
                         }
-                        min={5000000}
-                        max={50000000}
-                        step={500000}
+                        min={DEFAULT_VEHICLE_FILTERS.priceMin}
+                        max={DEFAULT_VEHICLE_FILTERS.priceMax}
+                        step={VEHICLE_FILTERS_PRICE_STEP}
                         className="mb-3"
                     />
                     <div className="flex items-center justify-between text-sm text-gray-600">
@@ -167,8 +173,8 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
                         onValueChange={([min, max]) =>
                             onFiltersChange({ ...filters, yearMin: min, yearMax: max })
                         }
-                        min={2010}
-                        max={2024}
+                        min={DEFAULT_VEHICLE_FILTERS.yearMin}
+                        max={VEHICLE_FILTERS_YEAR_MAX_DEFAULT}
                         step={1}
                         className="mb-3"
                     />
@@ -185,8 +191,8 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
                         value={[filters.kmMax]}
                         onValueChange={([max]) => onFiltersChange({ ...filters, kmMax: max })}
                         min={0}
-                        max={200000}
-                        step={10000}
+                        max={DEFAULT_VEHICLE_FILTERS.kmMax}
+                        step={VEHICLE_FILTERS_KM_STEP}
                         className="mb-3"
                     />
                     <div className="text-sm text-gray-600">

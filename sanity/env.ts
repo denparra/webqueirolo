@@ -1,12 +1,4 @@
-/**
- * Helper to clean env vars that might have quotes from misconfigured panels.
- * Some deployment environments (VPS, Docker) may include literal quotes in values.
- */
-function cleanEnvVar(value: string | undefined): string {
-  if (!value) return ''
-  // Remove surrounding quotes if present (handles "value" or 'value')
-  return value.replace(/^["']|["']$/g, '').trim()
-}
+import { apiVersion, cleanEnvVar } from './env-utils'
 
 function assertValue(v: string | undefined, errorMessage: string): string {
   const cleaned = cleanEnvVar(v)
@@ -16,8 +8,7 @@ function assertValue(v: string | undefined, errorMessage: string): string {
   return cleaned
 }
 
-export const apiVersion =
-  cleanEnvVar(process.env.NEXT_PUBLIC_SANITY_API_VERSION) || '2026-01-16'
+export { apiVersion }
 
 export const dataset = assertValue(
   process.env.NEXT_PUBLIC_SANITY_DATASET,

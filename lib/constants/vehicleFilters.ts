@@ -1,0 +1,22 @@
+import { VehicleFilters } from '@/lib/types'
+
+export const VEHICLE_FILTERS_PRICE_MIN_DEFAULT = 5_000_000
+export const VEHICLE_FILTERS_PRICE_MAX_DEFAULT = 50_000_000
+export const VEHICLE_FILTERS_PRICE_STEP = 500_000
+
+export const VEHICLE_FILTERS_YEAR_MIN_DEFAULT = 2010
+export const VEHICLE_FILTERS_YEAR_MAX_DEFAULT = new Date().getFullYear()
+
+export const VEHICLE_FILTERS_KM_MAX_DEFAULT = 200_000
+export const VEHICLE_FILTERS_KM_STEP = 10_000
+
+export const DEFAULT_VEHICLE_FILTERS: VehicleFilters = {
+  brands: [],
+  priceMin: VEHICLE_FILTERS_PRICE_MIN_DEFAULT,
+  priceMax: VEHICLE_FILTERS_PRICE_MAX_DEFAULT,
+  yearMin: VEHICLE_FILTERS_YEAR_MIN_DEFAULT,
+  yearMax: VEHICLE_FILTERS_YEAR_MAX_DEFAULT,
+  kmMax: VEHICLE_FILTERS_KM_MAX_DEFAULT,
+  transmissions: [],
+  fuelTypes: [],
+}

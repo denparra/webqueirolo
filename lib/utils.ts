@@ -40,7 +40,42 @@ export function formatPhone(phone: string): string {
 
 // Generate WhatsApp URL
 export function getWhatsAppUrl(phone: string, message?: string): string {
-  const cleanPhone = phone.replace(/\D/g, '')
+  const cleanPhone = (() => {
+    const trimmed = phone.trim()
+
+    // Support common formats:
+    // - E.164: "+569..."
+    // - wa.me URLs: "https://wa.me/569..." / "wa.me/569..."
+    // - api.whatsapp.com URLs: "https://api.whatsapp.com/send?phone=569..."
+    const hasScheme = /^https?:\/\//i.test(trimmed)
+    const looksLikeUrl =
+      hasScheme || trimmed.startsWith('wa.me/') || trimmed.startsWith('api.whatsapp.com/')
+
+    if (looksLikeUrl) {
+      try {
+        const url = new URL(hasScheme ? trimmed : `https://${trimmed}`)
+
+        if (url.hostname === 'wa.me') {
+          const fromPath = url.pathname.replace(/\D/g, '')
+          if (fromPath) return fromPath
+        }
+
+        const phoneParam = url.searchParams.get('phone')
+        if (phoneParam) {
+          const fromParam = phoneParam.replace(/\D/g, '')
+          if (fromParam) return fromParam
+        }
+
+        const fallback = url.pathname.replace(/\D/g, '')
+        if (fallback) return fallback
+      } catch {
+        // fall through
+      }
+    }
+
+    return trimmed.replace(/\D/g, '')
+  })()
+
   const encodedMessage = message ? encodeURIComponent(message) : ''
   return `https://wa.me/${cleanPhone}${encodedMessage ? `?text=${encodedMessage}` : ''}`
 }

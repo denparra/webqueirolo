@@ -1,16 +1,11 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 
-// Helper to clean env vars that might have quotes from misconfigured panels
-function cleanEnvVar(value: string | undefined): string {
-    if (!value) return ''
-    // Remove surrounding quotes if present (handles "value" or 'value')
-    return value.replace(/^["']|["']$/g, '').trim()
-}
+import { apiVersion, cleanEnvVar } from '@/sanity/env-utils'
 
 export const projectId = cleanEnvVar(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID)
 export const dataset = cleanEnvVar(process.env.NEXT_PUBLIC_SANITY_DATASET) || 'production'
-export const apiVersion = '2024-01-01'
+export { apiVersion }
 
 // Log configuration on server startup (only in development or when debugging)
 if (typeof window === 'undefined') {

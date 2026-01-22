@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { VehicleFilters as Filters, Vehicle } from '@/lib/types'
+import { DEFAULT_VEHICLE_FILTERS } from '@/lib/constants/vehicleFilters'
 import { getVehicles } from '@/lib/vehicles'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 import { VehicleFilters } from '@/components/vehicles/VehicleFilters'
@@ -16,11 +17,11 @@ function VehicleListingContent() {
     // Initialize filters from URL params
     const [filters, setFilters] = useState<Filters>(() => ({
         brands: searchParams.getAll('brand'),
-        priceMin: Number(searchParams.get('priceMin')) || 5000000,
-        priceMax: Number(searchParams.get('priceMax')) || 50000000,
-        yearMin: Number(searchParams.get('yearMin')) || 2010,
-        yearMax: Number(searchParams.get('yearMax')) || 2024,
-        kmMax: Number(searchParams.get('kmMax')) || 200000,
+        priceMin: Number(searchParams.get('priceMin')) || DEFAULT_VEHICLE_FILTERS.priceMin,
+        priceMax: Number(searchParams.get('priceMax')) || DEFAULT_VEHICLE_FILTERS.priceMax,
+        yearMin: Number(searchParams.get('yearMin')) || DEFAULT_VEHICLE_FILTERS.yearMin,
+        yearMax: Number(searchParams.get('yearMax')) || DEFAULT_VEHICLE_FILTERS.yearMax,
+        kmMax: Number(searchParams.get('kmMax')) || DEFAULT_VEHICLE_FILTERS.kmMax,
         transmissions: searchParams.getAll('transmission'),
         fuelTypes: searchParams.getAll('fuel'),
     }))
@@ -98,11 +99,16 @@ function VehicleListingContent() {
         const params = new URLSearchParams()
 
         filters.brands.forEach((brand) => params.append('brand', brand))
-        if (filters.priceMin !== 5000000) params.set('priceMin', String(filters.priceMin))
-        if (filters.priceMax !== 50000000) params.set('priceMax', String(filters.priceMax))
-        if (filters.yearMin !== 2010) params.set('yearMin', String(filters.yearMin))
-        if (filters.yearMax !== 2024) params.set('yearMax', String(filters.yearMax))
-        if (filters.kmMax !== 200000) params.set('kmMax', String(filters.kmMax))
+        if (filters.priceMin !== DEFAULT_VEHICLE_FILTERS.priceMin)
+            params.set('priceMin', String(filters.priceMin))
+        if (filters.priceMax !== DEFAULT_VEHICLE_FILTERS.priceMax)
+            params.set('priceMax', String(filters.priceMax))
+        if (filters.yearMin !== DEFAULT_VEHICLE_FILTERS.yearMin)
+            params.set('yearMin', String(filters.yearMin))
+        if (filters.yearMax !== DEFAULT_VEHICLE_FILTERS.yearMax)
+            params.set('yearMax', String(filters.yearMax))
+        if (filters.kmMax !== DEFAULT_VEHICLE_FILTERS.kmMax)
+            params.set('kmMax', String(filters.kmMax))
         filters.transmissions.forEach((trans) => params.append('transmission', trans))
         filters.fuelTypes.forEach((fuel) => params.append('fuel', fuel))
 

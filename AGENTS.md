@@ -7,7 +7,7 @@
 4. Abre `http://localhost:3000` y `http://localhost:3000/studio`
 5. Revisa rutas clave: `/vehiculos`, `/vehiculos/[slug]`, `/servicios`, `/nosotros`, `/contacto`.
 
-Nota: Si faltan env vars de Sanity, el frontend usa `mockVehicles` (`lib/data.ts`).
+Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el frontend usa `mockVehicles` (`lib/data.ts`). En produccion, el codigo hace fail-fast (lanza error) si falta `NEXT_PUBLIC_SANITY_PROJECT_ID`.
 
 ## Guardrails
 - Cambios minimos y enfocados; evita refactors masivos.
@@ -41,7 +41,7 @@ Sanity:
 - Studio usa `sanity.config.ts` + `sanity/env.ts` (env vars requeridas).
 - Schema principal: `sanity/schemaTypes/vehicle.ts`.
 - Frontend consulta en `lib/vehicles.ts` via GROQ y mapea a `Vehicle`.
-- Si falla la conexion o faltan env vars, se usa `lib/data.ts` como fallback.
+- En desarrollo, si falla la conexion o faltan env vars, se usa `lib/data.ts` como fallback; en produccion el fetch falla con error.
 - `app/sitemap.ts` usa `mockVehicles` para URLs de vehiculos (no Sanity).
 
 ## Build, Test, and Development Commands
@@ -50,7 +50,7 @@ Sanity:
 - `npm run build` creates an optimized production build in `.next/`.
 - `npm run start` serves the production build locally.
 - `npm run lint` runs the Next.js ESLint rules.
-- No `test` script is configured.
+- `npm run test` runs Jest (smoke tests).
 
 ## Environment Variables
 Required for Studio and real data:
@@ -58,14 +58,14 @@ Required for Studio and real data:
 - `NEXT_PUBLIC_SANITY_DATASET`
 
 Optional:
-- `NEXT_PUBLIC_SANITY_API_VERSION` (Studio default in `sanity/env.ts`)
+- `NEXT_PUBLIC_SANITY_API_VERSION` (default in `sanity/env-utils.ts`)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (enables GA4)
 
 Example `.env.local` (placeholders, no quotes):
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2026-01-16
+NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
@@ -91,9 +91,9 @@ Notes:
 - `CONFIG_README.md` references `config.js`, but the real file is `config.ts`.
 
 ## Testing Guidelines (Verification)
-- No automated test framework is currently configured.
 - Manual verification checklist:
   - `npm run lint`
+  - `npm run test`
   - `npm run build`
   - `npm run start` and open key routes (`/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/studio`)
   - Confirm Sanity data loads (or mock fallback is expected).
@@ -109,7 +109,7 @@ Notes:
 
 ### Debug 404 en `/vehiculos/[slug]`
 1. Confirm the slug exists and the vehicle is published in Sanity (not draft).
-2. Ensure env vars are set; if missing, the app falls back to `mockVehicles` in `lib/data.ts`.
+2. Ensure env vars are set; en desarrollo si faltan, la app cae a `mockVehicles` en `lib/data.ts` (en produccion falla con error).
 3. Verify `getVehicleBySlug` can fetch the slug (it reads `slug.current`).
 4. Rebuild to refresh static params if new vehicles were added and 404 persists.
 5. Check for case/encoding mismatches in the URL slug.

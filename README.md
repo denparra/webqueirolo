@@ -80,8 +80,9 @@ npm run dev
 npm run build
 npm run start
 npm run lint
+npm run test
 ```
-No hay framework de tests configurado actualmente.
+Tests basicos con Jest: `npm run test` (smoke).
 
 ## Variables de entorno
 Requeridas para Sanity Studio y datos reales:
@@ -89,14 +90,14 @@ Requeridas para Sanity Studio y datos reales:
 - `NEXT_PUBLIC_SANITY_DATASET`
 
 Opcionales:
-- `NEXT_PUBLIC_SANITY_API_VERSION` (default en `sanity/env.ts`)
+- `NEXT_PUBLIC_SANITY_API_VERSION` (default en `sanity/env-utils.ts`)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (habilita GA4)
 
 Ejemplo de `.env.local` (sin valores reales y sin comillas):
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2026-01-16
+NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
@@ -117,7 +118,8 @@ Como se consulta desde el frontend (alto nivel):
 - `lib/vehicles.ts` ejecuta queries GROQ a `*[_type == "vehicle"]` y mapea campos a `Vehicle`.
 - `app/vehiculos` carga los datos en el cliente y filtra localmente.
 - `app/vehiculos/[slug]` usa `getVehicleBySlug` y `generateStaticParams`.
-- Si faltan env vars o hay error de fetch, se usa `mockVehicles` como fallback.
+- En desarrollo (NODE_ENV != `production`), si faltan env vars o hay error de fetch, se usa `mockVehicles` como fallback.
+- En produccion, si faltan env vars de Sanity o falla el fetch, el codigo hace fail-fast (lanza error) para evitar servir datos mock por accidente.
 
 ## Deploy (VPS/containers)
 - Build vs runtime: `NEXT_PUBLIC_*` se resuelve en build, por lo que debes reconstruir imagen si cambian.

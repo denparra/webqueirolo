@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Vehicle } from '@/lib/types'
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatKilometers, getWhatsAppUrl } from '@/lib/utils'
+import siteConfig from '@/config'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -26,7 +27,7 @@ interface VehicleCardProps {
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
     const whatsappUrl = getWhatsAppUrl(
-        "56912345678", // Replace with actual number
+        siteConfig.contact.whatsapp,
         `Hola, me interesa el ${vehicle.brand} ${vehicle.model} ${vehicle.year}`
     )
 
