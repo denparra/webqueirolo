@@ -32,7 +32,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
         notFound()
     }
 
-    const whatsappMessage = `Hola, me interesa el ${vehicle.brand} ${vehicle.model} ${vehicle.year}`
+    const whatsappMessage = `Hola, me interesa el ${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
     const whatsappUrl = getWhatsAppUrl(siteConfig.contact.whatsapp, whatsappMessage)
 
     return (
@@ -63,6 +63,9 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                         {vehicle.brand}
                                     </p>
                                     <h1 className="text-3xl font-bold text-gray-900">{vehicle.model}</h1>
+                                    {vehicle.version && (
+                                        <p className="mt-1 text-lg font-medium text-gray-700">{vehicle.version}</p>
+                                    )}
                                     <p className="mt-2 text-lg text-gray-600">{vehicle.year}</p>
                                 </div>
                                 <div className="text-right">

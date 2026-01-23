@@ -28,7 +28,7 @@ interface VehicleCardProps {
 export function VehicleCard({ vehicle }: VehicleCardProps) {
     const whatsappUrl = getWhatsAppUrl(
         siteConfig.contact.whatsapp,
-        `Hola, me interesa el ${vehicle.brand} ${vehicle.model} ${vehicle.year}`
+        `Hola, me interesa el ${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
     )
 
     // Favorites Store
@@ -65,7 +65,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             <div className="relative aspect-video overflow-hidden">
                 <Image
                     src={vehicle.image}
-                    alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+                    alt={`${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -104,15 +104,15 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
 
             {/* Content */}
             <CardContent className="p-6">
-                {/* Brand */}
-                <p className="mb-1 text-xs font-medium uppercase text-gray-600">
-                    {vehicle.brand}
-                </p>
-
-                {/* Title */}
-                <h3 className="mb-3 text-lg font-semibold text-gray-900">
-                    {vehicle.model}
+                {/* Brand + Model (Título principal) */}
+                <h3 className="mb-1 text-lg font-semibold text-gray-900">
+                    {vehicle.brand} {vehicle.model}
                 </h3>
+
+                {/* Version + Year (Subtítulo) */}
+                <p className="mb-3 text-sm text-gray-600">
+                    {vehicle.version && `${vehicle.version} · `}{vehicle.year}
+                </p>
 
                 {/* Specs */}
                 <div className="mb-4 flex items-center gap-4 text-sm text-gray-600">
