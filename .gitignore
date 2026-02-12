@@ -39,3 +39,6 @@ next-env.d.ts
 # Editor
 .vscode
 .idea
+
+# Script bulk de autos
+/script/
