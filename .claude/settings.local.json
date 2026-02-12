@@ -29,7 +29,13 @@
       "mcp__Sanity__query_documents",
       "mcp__chrome-devtools__performance_start_trace",
       "mcp__chrome-devtools__performance_analyze_insight",
-      "mcp__Sanity__list_projects"
+      "mcp__Sanity__list_projects",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(where:*)"
     ]
   }
 }
