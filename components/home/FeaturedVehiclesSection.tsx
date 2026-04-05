@@ -13,15 +13,15 @@ export async function FeaturedVehiclesSection() {
   }
 
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-10 lg:py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <FadeIn>
-          <div className="mb-10 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-gray-900 lg:text-4xl">
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-3xl font-bold text-gray-900 lg:text-4xl">
               Autos Destacados
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-gray-600">
+            <p className="mx-auto max-w-2xl text-base text-gray-500">
               Seleccionados especialmente para ti
             </p>
           </div>

@@ -14,6 +14,7 @@ import {
     UserGroupIcon,
     PaintBrushIcon,
     CheckCircleIcon,
+    TagIcon,
 } from '@heroicons/react/24/outline'
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 import siteConfig from '@/config'
@@ -78,8 +79,8 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                 </div>
                             </div>
 
-                            {/* Quick Specs */}
-                            <div className="grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 md:grid-cols-4">
+                            {/* Quick Specs — solo muestra los campos con datos reales */}
+                            <div className="flex flex-wrap gap-6 border-t border-gray-200 pt-4">
                                 <div className="flex items-center gap-2">
                                     <CalendarIcon className="h-5 w-5 text-gray-400" />
                                     <div>
@@ -94,20 +95,24 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                         <p className="font-semibold text-gray-900">{formatKilometers(vehicle.km)}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <CogIcon className="h-5 w-5 text-gray-400" />
-                                    <div>
-                                        <p className="text-xs text-gray-600">Transmisión</p>
-                                        <p className="font-semibold text-gray-900">{vehicle.transmission}</p>
+                                {vehicle.transmission && (
+                                    <div className="flex items-center gap-2">
+                                        <CogIcon className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-xs text-gray-600">Transmisión</p>
+                                            <p className="font-semibold text-gray-900">{vehicle.transmission}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <FireIcon className="h-5 w-5 text-gray-400" />
-                                    <div>
-                                        <p className="text-xs text-gray-600">Combustible</p>
-                                        <p className="font-semibold text-gray-900">{vehicle.fuelType}</p>
+                                )}
+                                {vehicle.fuelType && (
+                                    <div className="flex items-center gap-2">
+                                        <FireIcon className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-xs text-gray-600">Combustible</p>
+                                            <p className="font-semibold text-gray-900">{vehicle.fuelType}</p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
@@ -120,27 +125,43 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
 
                             <TabsContent value="specs" className="p-6">
                                 <div className="grid gap-4 md:grid-cols-2">
+                                    {/* Año */}
                                     <div className="flex items-center gap-3">
-                                        <CogIcon className="h-6 w-6 text-primary-600" />
+                                        <CalendarIcon className="h-6 w-6 text-primary-600" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Motor</p>
-                                            <p className="font-semibold text-gray-900">{vehicle.specs.engine}</p>
+                                            <p className="text-sm text-gray-600">Año</p>
+                                            <p className="font-semibold text-gray-900">{vehicle.year}</p>
                                         </div>
                                     </div>
+                                    {/* Kilometraje */}
                                     <div className="flex items-center gap-3">
-                                        <FireIcon className="h-6 w-6 text-primary-600" />
+                                        <TruckIcon className="h-6 w-6 text-primary-600" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Potencia</p>
-                                            <p className="font-semibold text-gray-900">{vehicle.specs.power}</p>
+                                            <p className="text-sm text-gray-600">Kilometraje</p>
+                                            <p className="font-semibold text-gray-900">{formatKilometers(vehicle.km)}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <CogIcon className="h-6 w-6 text-primary-600" />
-                                        <div>
-                                            <p className="text-sm text-gray-600">Torque</p>
-                                            <p className="font-semibold text-gray-900">{vehicle.specs.torque}</p>
+                                    {/* Transmisión */}
+                                    {vehicle.transmission && (
+                                        <div className="flex items-center gap-3">
+                                            <CogIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Transmisión</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.transmission}</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+                                    {/* Combustible */}
+                                    {vehicle.fuelType && (
+                                        <div className="flex items-center gap-3">
+                                            <FireIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Combustible</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.fuelType}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Tracción */}
                                     <div className="flex items-center gap-3">
                                         <TruckIcon className="h-6 w-6 text-primary-600" />
                                         <div>
@@ -148,6 +169,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                             <p className="font-semibold text-gray-900">{vehicle.specs.drivetrain}</p>
                                         </div>
                                     </div>
+                                    {/* Asientos */}
                                     <div className="flex items-center gap-3">
                                         <UserGroupIcon className="h-6 w-6 text-primary-600" />
                                         <div>
@@ -155,13 +177,56 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                             <p className="font-semibold text-gray-900">{vehicle.specs.seating}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <PaintBrushIcon className="h-6 w-6 text-primary-600" />
-                                        <div>
-                                            <p className="text-sm text-gray-600">Color</p>
-                                            <p className="font-semibold text-gray-900">{vehicle.specs.color}</p>
+                                    {/* Puertas */}
+                                    {vehicle.specs.doors > 0 && (
+                                        <div className="flex items-center gap-3">
+                                            <TagIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Puertas</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.specs.doors}</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+                                    {/* Color */}
+                                    {vehicle.specs.color && (
+                                        <div className="flex items-center gap-3">
+                                            <PaintBrushIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Color</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.specs.color}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Carrocería */}
+                                    {vehicle.specs.bodyType && (
+                                        <div className="flex items-center gap-3">
+                                            <TagIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Carrocería</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.specs.bodyType}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Categoría */}
+                                    {vehicle.category && (
+                                        <div className="flex items-center gap-3">
+                                            <TagIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Categoría</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.category}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Motor — solo si está disponible */}
+                                    {vehicle.specs.engine && (
+                                        <div className="flex items-center gap-3">
+                                            <CogIcon className="h-6 w-6 text-primary-600" />
+                                            <div>
+                                                <p className="text-sm text-gray-600">Motor</p>
+                                                <p className="font-semibold text-gray-900">{vehicle.specs.engine}</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </TabsContent>
 

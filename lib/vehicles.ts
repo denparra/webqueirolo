@@ -2,6 +2,7 @@ import { client, projectId } from './sanity'
 import { Vehicle } from './types'
 import { mockVehicles } from './data'
 import { estimateMonthlyPayment } from './calculations'
+import { getFeatureLabel } from './constants/featureLabels'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -28,9 +29,17 @@ function getSafeImageUrl(images: string[] | null | undefined): string {
     return PLACEHOLDER_IMAGE
 }
 
+// Apply Sanity CDN image transformation to reduce source payload
+function applySanityTransform(url: string, width = 1200, quality = 80): string {
+    if (!url || url.startsWith('data:') || url.includes('?')) return url
+    return `${url}?w=${width}&q=${quality}&auto=format&fit=max`
+}
+
 // Mapper function to convert Sanity result to Vehicle interface
 function mapSanityVehicle(sanityVehicle: any): Vehicle {
     const safeImages = sanityVehicle.images?.filter((img: string) => img) || []
+
+    const rawImages = safeImages.length > 0 ? safeImages : [PLACEHOLDER_IMAGE]
 
     return {
         id: sanityVehicle._id,
@@ -41,26 +50,25 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
         price: sanityVehicle.price || 0,
         monthlyPayment: estimateMonthlyPayment(sanityVehicle.price || 0),
         km: sanityVehicle.mileage || 0,
-        transmission: sanityVehicle.transmission || 'N/A',
-        fuelType: sanityVehicle.fuel || 'N/A',
-        image: getSafeImageUrl(safeImages),
-        images: safeImages.length > 0 ? safeImages : [PLACEHOLDER_IMAGE],
+        transmission: sanityVehicle.transmission || '',
+        fuelType: sanityVehicle.fuel || '',
+        image: applySanityTransform(getSafeImageUrl(safeImages), 800),
+        images: rawImages.map((url) => applySanityTransform(url, 1200)),
         isNew: sanityVehicle.mileage < 100 && sanityVehicle.year >= new Date().getFullYear(),
+        lqip: sanityVehicle.lqip || undefined,
         specs: {
-            engine: 'N/A', // Not in current schema
-            power: 'N/A',
-            torque: 'N/A',
             drivetrain: sanityVehicle.safetyFeatures?.includes('4x4') ? '4x4' : '4x2',
             seating: sanityVehicle.comfortFeatures?.includes('tercera_fila') ? 7 : 5,
-            color: sanityVehicle.color || 'N/A',
+            color: sanityVehicle.color || undefined,
             doors: sanityVehicle.doors || 4,
+            bodyType: sanityVehicle.bodyType || undefined,
         },
         features: [
             ...(sanityVehicle.comfortFeatures || []),
             ...(sanityVehicle.safetyFeatures || []),
             ...(sanityVehicle.entertainmentFeatures || []),
-            ...(sanityVehicle.otherFeatures || [])
-        ],
+            ...(sanityVehicle.otherFeatures || []),
+        ].map(getFeatureLabel),
         // Preserve detailed arrays
         comfortFeatures: sanityVehicle.comfortFeatures,
         safetyFeatures: sanityVehicle.safetyFeatures,
@@ -68,6 +76,7 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
         otherFeatures: sanityVehicle.otherFeatures,
         description: sanityVehicle.description,
         category: sanityVehicle.category,
+        bodyType: sanityVehicle.bodyType,
         version: sanityVehicle.version,
         status: sanityVehicle.status,
         plate: sanityVehicle.plate
@@ -98,10 +107,12 @@ export async function getVehicles(): Promise<Vehicle[]> {
     model,
     version,
     category,
+    bodyType,
     doors,
     color,
     plate,
     "images": images[].asset->url,
+    "lqip": images[0].asset->metadata.lqip,
     comfortFeatures,
     safetyFeatures,
     entertainmentFeatures,
@@ -146,10 +157,12 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefine
       model,
       version,
       category,
+      bodyType,
       doors,
       color,
       plate,
       "images": images[].asset->url,
+      "lqip": images[0].asset->metadata.lqip,
       comfortFeatures,
       safetyFeatures,
       entertainmentFeatures,

@@ -9,12 +9,10 @@ import siteConfig from '@/config'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
-    CalendarIcon,
     CogIcon,
     TruckIcon,
     HeartIcon,
     ArrowsRightLeftIcon,
-    ArrowRightIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid' // Added
 import { useFavorites } from '@/store/useFavorites' // Added
@@ -23,9 +21,10 @@ import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 
 interface VehicleCardProps {
     vehicle: Vehicle
+    priority?: boolean
 }
 
-export function VehicleCard({ vehicle }: VehicleCardProps) {
+export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
     const whatsappUrl = getWhatsAppUrl(
         siteConfig.contact.whatsapp,
         `Hola, me interesa el ${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
@@ -60,105 +59,106 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
     }
 
     return (
-        <Card className="group overflow-hidden border-2 transition-all duration-300 hover:border-primary-500 hover:shadow-xl">
+        <Card className="group overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 hover:border-primary-400 hover:shadow-lg">
             {/* Image Section */}
-            <div className="relative aspect-video overflow-hidden">
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
                 <Image
                     src={vehicle.image}
                     alt={`${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={priority}
+                    placeholder={vehicle.lqip ? 'blur' : undefined}
+                    blurDataURL={vehicle.lqip}
                 />
 
                 {/* Badge */}
                 {vehicle.isNew && (
-                    <span className="absolute left-3 top-3 rounded-full bg-primary-500 px-3 py-1 text-sm font-semibold text-white">
+                    <span className="absolute left-3 top-3 rounded-md bg-primary-500 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
                         RECIÉN LLEGADO
                     </span>
                 )}
 
                 {/* Quick Actions (show on hover) */}
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                         onClick={handleFavoriteClick}
-                        className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:text-red-500 transition-colors"
+                        className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow hover:bg-white hover:text-red-500 transition-colors"
                         aria-label="Agregar a favoritos"
                     >
                         {mounted && isFav ? (
-                            <HeartIconSolid className="w-6 h-6 text-red-500" />
+                            <HeartIconSolid className="w-5 h-5 text-red-500" />
                         ) : (
-                            <HeartIcon className="w-6 h-6" />
+                            <HeartIcon className="w-5 h-5" />
                         )}
                     </button>
                     <button
                         onClick={handleCompareClick}
-                        className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors ${isComparing ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white/90 hover:text-primary-600'
-                            }`}
+                        className={`w-9 h-9 backdrop-blur-sm rounded-full flex items-center justify-center shadow hover:bg-white transition-colors ${isComparing ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white/95 hover:text-primary-600'}`}
                         aria-label="Comparar vehículo"
                     >
-                        <ArrowsRightLeftIcon className="w-6 h-6" />
+                        <ArrowsRightLeftIcon className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
             {/* Content */}
-            <CardContent className="p-6">
-                {/* Brand + Model (Título principal) */}
-                <h3 className="mb-1 text-lg font-semibold text-gray-900">
+            <CardContent className="p-4">
+                {/* Brand + Model */}
+                <h3 className="mb-0.5 text-base font-bold text-gray-900 leading-snug">
                     {vehicle.brand} {vehicle.model}
                 </h3>
 
-                {/* Version + Year (Subtítulo) */}
-                <p className="mb-3 text-sm text-gray-600">
-                    {vehicle.version && `${vehicle.version} · `}{vehicle.year}
+                {/* Version + Year */}
+                <p className="mb-3 text-sm text-gray-500">
+                    {vehicle.version ? `${vehicle.version} · ` : ''}{vehicle.year}
                 </p>
 
-                {/* Specs */}
-                <div className="mb-4 flex items-center gap-4 text-sm text-gray-600">
+                {/* Specs — km + transmisión (año ya está arriba) */}
+                <div className="mb-3 flex items-center gap-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
-                        <CalendarIcon className="h-4 w-4" />
-                        {vehicle.year}
-                    </span>
-                    <span className="flex items-center gap-1">
-                        <TruckIcon className="h-4 w-4" />
+                        <TruckIcon className="h-3.5 w-3.5 shrink-0" />
                         {formatKilometers(vehicle.km)}
                     </span>
-                    <div className="flex items-center gap-1">
-                        <CogIcon className="h-4 w-4" />
-                        <span>{vehicle.transmission}</span>
-                    </div>
+                    {vehicle.transmission && (
+                        <>
+                            <span className="text-gray-300">·</span>
+                            <span className="flex items-center gap-1">
+                                <CogIcon className="h-3.5 w-3.5 shrink-0" />
+                                {vehicle.transmission}
+                            </span>
+                        </>
+                    )}
                 </div>
 
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-gray-100 pt-3">
                     {/* Price */}
-                    <p className="mb-1 text-2xl font-bold text-primary-600">
+                    <p className="text-xl font-bold text-primary-600 leading-none">
                         {formatCurrency(vehicle.price)}
                     </p>
-
-                    {/* Monthly Payment */}
-                    <p className="mb-4 text-sm text-gray-600">
-                        o desde {formatCurrency(vehicle.monthlyPayment)}/mes
+                    <p className="mt-0.5 mb-3 text-xs text-gray-400">
+                        Desde {formatCurrency(vehicle.monthlyPayment)}/mes
                     </p>
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                        <Button variant="primary" className="flex-1" asChild>
-                            <Link href={`/vehiculos/${vehicle.slug}`}>Conocer este Vehículo</Link>
+                        <Button variant="primary" className="flex-1 text-sm" asChild>
+                            <Link href={`/vehiculos/${vehicle.slug}`}>Ver Vehículo</Link>
                         </Button>
                         <Button
                             variant="secondary"
                             size="icon"
                             asChild
-                            className="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
+                            className="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white shrink-0"
                         >
                             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar por WhatsApp">
-                                <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                                <ChatBubbleLeftRightIcon className="h-4 w-4" />
                             </a>
                         </Button>
                     </div>
                 </div>
             </CardContent>
-        </Card >
+        </Card>
     )
 }

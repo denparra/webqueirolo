@@ -127,9 +127,106 @@ Notes:
 - Studio fails to load: missing `NEXT_PUBLIC_SANITY_*` env vars.
 - GA4 not visible: set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and rebuild.
 
+## Co-gobierno de reglas
+
+`AGENTS.md` (este archivo) y `claudedocs/CLAUDE.md` son **co-base entrelazada**.  
+Ninguno manda sobre el otro; ambos deben reflejar las mismas reglas operativas críticas.
+
+- `AGENTS.md`: reglas operativas completas, alcance, restricciones, trazabilidad y DoD.
+- `claudedocs/CLAUDE.md`: resumen ejecutable, comandos, mapa de rutas, recordatorios críticos.
+
+**Regla de consistencia**: toda regla crítica nueva o cambiada debe actualizarse en **ambos** en la misma sesión.  
+Si hay diferencia entre ambos:
+1. Aplicar la opción más segura/no destructiva.
+2. Registrar `DECISION` en `docs/logbook.md`.
+3. Proponer alineación inmediata de ambos archivos.
+
+**Fuente de verdad técnica** (prevalece sobre docs narrativas):
+- Schema: `sanity/schemaTypes/vehicle.ts`
+- Queries: `lib/vehicles.ts`
+- Configuración negocio: `config.ts`
+- Tipos: `lib/types.ts`
+
+---
+
+## Trazabilidad obligatoria
+
+Registrar en `docs/logbook.md` todo cambio relevante (no ruido cotidiano):
+- Decisiones que cambian dirección técnica o de negocio
+- Acciones que modifican código, config o documentación base
+- Ejecución de pruebas con resultado
+- Riesgos, bloqueos e incidentes
+- Cambios de alcance o políticas
+
+**Formato de ID:** `LOG-YYYYMMDD-XXX` (contador diario de 3 dígitos)
+
+**Taxonomía permitida:** `DECISION` | `PLAN` | `ACTION` | `TEST` | `RISK` | `BLOCKER` | `SECURITY` | `INCIDENT`
+
+**Campos obligatorios por entrada:**
+- ID, Fecha, Tipo, Contexto, Acuerdo/resultado, Impacto, Siguiente paso, Referencias
+
+---
+
+## Estructura de implementaciones formales
+
+Toda iniciativa formal vive en `docs/implementation/IMP-YYYYMMDD-XXX/`.
+
+```
+docs/
+  logbook.md              ← bitácora de trazabilidad
+  INDEX.md                ← mapa de lectura para onboarding
+  implementation/
+    README.md             ← guía de iniciativas
+    IMP-template.md       ← template reutilizable
+    IMP-YYYYMMDD-XXX/
+      IMP.md              (obligatorio)
+      ROADMAP.md          (recomendado)
+      EVIDENCE.md         (recomendado)
+      ROLLBACK.md         (recomendado en cambios de riesgo)
+```
+
+Reglas:
+- No mezclar dos iniciativas distintas en una misma carpeta.
+- Toda carpeta creada debe estar referenciada en `docs/logbook.md`.
+- Crear la carpeta antes de empezar el trabajo, no al final.
+
+---
+
+## Política de commits
+
+Esquema recomendado:
+```
+<tipo>(<alcance>): <resumen corto>
+
+<por qué del cambio>
+
+Refs: <LOG-ID>, <IMP-ID>
+```
+
+Tipos: `feat` | `fix` | `docs` | `refactor` | `test` | `chore` | `security`
+
+Restricciones (ver Guardrails):
+- No commit sin solicitud explícita del owner.
+- No `--amend` salvo solicitud explícita.
+- No `push --force` a ramas protegidas.
+
+---
+
+## Definition of Done universal
+
+Se considera completada una iniciativa cuando:
+- [ ] Existe carpeta `IMP-YYYYMMDD-XXX/` con `IMP.md`
+- [ ] Se registró decisión/acción en `docs/logbook.md`
+- [ ] Hay evidencia de validación (manual o automatizada)
+- [ ] Se documentó impacto, riesgos y rollback
+- [ ] Referencias cruzadas log ↔ IMP ↔ artefactos completas
+
+---
+
 ## Change log
 - Reordered content into quickstart, how-to, verification, and troubleshooting flow.
 - Added env var requirements, build-time notes, and Sanity workflow details.
 - Documented key routes and data flow (Sanity + fallback).
 - Added playbooks for VPS deploy, dynamic 404s, and pre-deploy validation.
 - Added guardrails and clarified config file usage.
+- LOG-20260405-001: Added co-governance, traceability policy, implementation structure, and DoD (IMP-20260405-001).

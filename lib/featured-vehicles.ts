@@ -52,6 +52,11 @@ export async function getFeaturedVehicles(): Promise<FeaturedVehicle[]> {
   }
 }
 
+function applySanityTransform(url: string, width = 800, quality = 80): string {
+  if (!url || url.startsWith('data:') || url.includes('?')) return url
+  return `${url}?w=${width}&q=${quality}&auto=format&fit=max`
+}
+
 function mapToFeaturedVehicle(raw: any): FeaturedVehicle {
   return {
     id: raw._id,
@@ -65,7 +70,7 @@ function mapToFeaturedVehicle(raw: any): FeaturedVehicle {
     km: raw.mileage || 0,
     transmission: raw.transmission || 'N/A',
     category: raw.category,
-    image: raw.image || '',
+    image: applySanityTransform(raw.image || ''),
     lqip: raw.lqip,
     isNew: raw.mileage < 100 && raw.year >= new Date().getFullYear(),
   }

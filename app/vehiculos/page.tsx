@@ -158,8 +158,8 @@ function VehicleListingContent() {
                 {/* Grid */}
                 {filteredVehicles.length > 0 ? (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                        {filteredVehicles.map((vehicle) => (
-                            <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                        {filteredVehicles.map((vehicle, idx) => (
+                            <VehicleCard key={vehicle.id} vehicle={vehicle} priority={idx < 4} />
                         ))}
                     </div>
                 ) : (

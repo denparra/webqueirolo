@@ -23,15 +23,18 @@ export function VehicleDetailGallery({ vehicle }: VehicleDetailGalleryProps) {
         <div className="mb-6 overflow-hidden rounded-lg bg-white shadow">
             {/* Main Image */}
             <div
-                className="relative aspect-video cursor-pointer hover:opacity-95 transition-opacity group"
+                className="relative aspect-video cursor-pointer hover:opacity-95 transition-opacity group bg-gray-50"
                 onClick={() => openLightbox(0)}
             >
                 <Image
                     src={vehicle.image}
                     alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 66vw"
+                    placeholder={vehicle.lqip ? 'blur' : undefined}
+                    blurDataURL={vehicle.lqip}
                 />
 
                 {/* Overlay Icon */}
@@ -51,14 +54,15 @@ export function VehicleDetailGallery({ vehicle }: VehicleDetailGalleryProps) {
                 {vehicle.images.slice(0, 4).map((img, idx) => (
                     <div
                         key={idx}
-                        className="relative aspect-video overflow-hidden rounded cursor-pointer hover:ring-2 ring-primary-500 transition-all"
+                        className="relative aspect-video overflow-hidden rounded cursor-pointer hover:ring-2 ring-primary-500 transition-all bg-gray-50"
                         onClick={() => openLightbox(idx)}
                     >
                         <Image
                             src={img}
                             alt={`Vista ${idx + 1}`}
                             fill
-                            className="object-cover hover:scale-110 transition-transform duration-300"
+                            className="object-contain hover:scale-105 transition-transform duration-300"
+                            sizes="25vw"
                         />
                     </div>
                 ))}

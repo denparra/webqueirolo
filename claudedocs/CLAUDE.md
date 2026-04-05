@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Co-gobierno**: Este archivo y `AGENTS.md` (raíz) son co-base entrelazada.
+> Toda regla crítica nueva debe actualizarse en **ambos** en la misma sesión.
+> Si hay diferencia → aplicar la opción más segura + registrar `DECISION` en `docs/logbook.md`.
+> Ver `docs/INDEX.md` para mapa de lectura completo.
+
 ## Project Overview
 
 **Queirolo Autos Website** - Modern, mobile-first Next.js website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
@@ -298,9 +303,28 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 - **RUT Validation**: Use Módulo 11 algorithm for Chilean ID (if collecting)
 - **Language**: Spanish only (Chilean variant)
 
+## Trazabilidad obligatoria
+
+Ante cualquier cambio relevante:
+1. Registrar en `docs/logbook.md` con ID `LOG-YYYYMMDD-XXX`
+2. Para iniciativas formales, crear `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`
+3. Referencias cruzadas log ↔ IMP ↔ artefactos
+
+**Taxonomía:** `DECISION` | `PLAN` | `ACTION` | `TEST` | `RISK` | `BLOCKER` | `SECURITY` | `INCIDENT`
+
+Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md` para template.
+
+---
+
 ## Reference Documents
 
-Internal documentation in `claudedocs/`:
+**Gobernanza:**
+- `AGENTS.md` (raíz) — co-base de reglas operativas completas
+- `docs/logbook.md` — bitácora de trazabilidad
+- `docs/INDEX.md` — mapa de onboarding
+- `docs/implementation/` — iniciativas formales
+
+**Documentación interna** en `claudedocs/`:
 - `00-Analysis-Planning/analisis-queirolo-cl.md` - Analysis of original website
 - `00-Analysis-Planning/FRONTEND_DESIGN_PROPOSAL.md` - Design roadmap
 - `03-Phase3-Enhancement/PHASE3_SUMMARY.md` - Phase 3 implementation notes
@@ -364,3 +388,4 @@ Internal documentation in `claudedocs/`:
 - **Clarified current status**: Changed from "planning/initial development" to "active development" with clear list of what's done vs. pending.
 - **Removed generic modernization priorities**: Kept only business context and Chilean market specifics; removed redundant design recommendations already implemented.
 - **Added change log**: This section documents all improvements for transparency.
+- **LOG-20260405-001**: Added co-governance header, traceability section, and updated Reference Documents to include governance files (IMP-20260405-001).

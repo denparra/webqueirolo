@@ -13,10 +13,12 @@ export interface Vehicle {
   image: string
   images: string[]
   isNew: boolean
+  lqip?: string
   specs: VehicleSpecs
   features: string[]
   // Sanity specific fields (can be optional or mapped)
   category?: string
+  bodyType?: string
   version?: string
   status?: string
   comfortFeatures?: string[]
@@ -28,13 +30,14 @@ export interface Vehicle {
 }
 
 export interface VehicleSpecs {
-  engine: string
-  power: string
-  torque: string
+  engine?: string
+  power?: string
+  torque?: string
   drivetrain: string
   seating: number
-  color: string
+  color?: string
   doors: number
+  bodyType?: string
   vin?: string
 }
 
