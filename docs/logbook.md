@@ -12,6 +12,36 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260422-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260422-002 |
+| **Fecha**       | 2026-04-22 |
+| **Tipo**        | TEST |
+| **Contexto**    | Verificación posterior a la inclusión de galería con lightbox en la sección de consignación. |
+| **Acuerdo/resultado** | `npm run lint` ejecutado con resultado exitoso (`✔ No ESLint warnings or errors`). |
+| **Impacto**     | Confirma consistencia de tipado/estilo sin afectar funcionalidad existente de formularios ni API. |
+| **Siguiente paso** | Validar visualmente `/servicios#consignacion` en desktop y móvil. |
+| **Referencias** | `app/servicios/page.tsx`, `components/services/ConsignmentDesignGallery.tsx` |
+
+---
+
+### LOG-20260422-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260422-001 |
+| **Fecha**       | 2026-04-22 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Solicitud de incluir diseños de consignación en `/servicios` sin romper la funcionalidad existente. |
+| **Acuerdo/resultado** | Completado. Se añadió una galería de consignación con vista ampliada (lightbox), navegación entre imágenes y accesos por clic/teclado, limitada al tab de consignación. Se mantuvo intacta la lógica de `ConsignmentForm` y `POST /api/submit-lead`. |
+| **Impacto**     | Cambio solo de presentación dentro de la sección de consignación. No hay cambios en rutas, backend ni payload de leads. |
+| **Siguiente paso** | Si se agregan más diseños, solo actualizar el arreglo `images` en `app/servicios/page.tsx`. |
+| **Referencias** | `app/servicios/page.tsx`, `components/services/ConsignmentDesignGallery.tsx`, `public/images/consignacion/c1.png`, `public/images/consignacion/c2.png` |
+
+---
+
 ### LOG-20260405-005
 
 | Campo           | Valor |

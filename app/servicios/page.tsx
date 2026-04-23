@@ -3,6 +3,7 @@ import { LoanCalculator } from '@/components/forms/LoanCalculator'
 import { FinancingForm } from '@/components/forms/FinancingForm'
 import { ConsignmentForm } from '@/components/forms/ConsignmentForm'
 import { ContactForm } from '@/components/forms/ContactForm'
+import { ConsignmentDesignGallery } from '@/components/services/ConsignmentDesignGallery'
 import {
     ShieldCheckIcon,
     ClockIcon,
@@ -236,6 +237,24 @@ export default function ServiciosPage() {
                                     </li>
                                 </ol>
                             </div>
+                        </div>
+
+                        <div className="rounded-lg bg-white p-8 shadow">
+                            <h3 className="mb-6 text-2xl font-bold text-gray-900">
+                                Diseños de Consignación
+                            </h3>
+                            <ConsignmentDesignGallery
+                                images={[
+                                    {
+                                        src: '/images/consignacion/c1.png',
+                                        alt: 'Diseño de consignación 1',
+                                    },
+                                    {
+                                        src: '/images/consignacion/c2.png',
+                                        alt: 'Diseño de consignación 2',
+                                    },
+                                ]}
+                            />
                         </div>
 
                         <ConsignmentForm />
