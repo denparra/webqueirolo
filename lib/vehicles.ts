@@ -37,9 +37,13 @@ function applySanityTransform(url: string, width = 1200, quality = 80): string {
 
 // Mapper function to convert Sanity result to Vehicle interface
 function mapSanityVehicle(sanityVehicle: any): Vehicle {
-    const safeImages = sanityVehicle.images?.filter((img: string) => img) || []
+    const safeImages: string[] = Array.isArray(sanityVehicle.images)
+        ? sanityVehicle.images.filter(
+            (img: unknown): img is string => typeof img === 'string' && img.length > 0
+        )
+        : []
 
-    const rawImages = safeImages.length > 0 ? safeImages : [PLACEHOLDER_IMAGE]
+    const rawImages: string[] = safeImages.length > 0 ? safeImages : [PLACEHOLDER_IMAGE]
 
     return {
         id: sanityVehicle._id,
@@ -53,7 +57,7 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
         transmission: sanityVehicle.transmission || '',
         fuelType: sanityVehicle.fuel || '',
         image: applySanityTransform(getSafeImageUrl(safeImages), 800),
-        images: rawImages.map((url) => applySanityTransform(url, 1200)),
+        images: rawImages.map((url: string) => applySanityTransform(url, 1200)),
         isNew: sanityVehicle.mileage < 100 && sanityVehicle.year >= new Date().getFullYear(),
         lqip: sanityVehicle.lqip || undefined,
         specs: {

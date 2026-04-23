@@ -12,6 +12,36 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260422-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260422-004 |
+| **Fecha**       | 2026-04-22 |
+| **Tipo**        | TEST |
+| **Contexto**    | Validación de build de producción tras corrección de tipado en `lib/vehicles.ts` que fallaba en VPS. |
+| **Acuerdo/resultado** | `npm run build` completado exitosamente (compilación, type-check y generación estática sin errores). |
+| **Impacto**     | Reduce riesgo de fallo en deploy por TypeScript estricto en entorno Docker/VPS. |
+| **Siguiente paso** | Reintentar deploy en VPS con el nuevo commit. |
+| **Referencias** | `lib/vehicles.ts` |
+
+---
+
+### LOG-20260422-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260422-003 |
+| **Fecha**       | 2026-04-22 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Error de deploy en VPS: `Type error: Parameter 'url' implicitly has an 'any' type` en `lib/vehicles.ts:56`. |
+| **Acuerdo/resultado** | Completado. Se tiparon explícitamente `safeImages` y `rawImages` como `string[]`, se filtró `images` con type guard (`unknown -> string`) y se tipó el parámetro `url` en `map` para compatibilidad con `strict: true`. |
+| **Impacto**     | Sin cambios funcionales en negocio/UI; solo endurecimiento de tipos para evitar falla de compilación en producción. |
+| **Siguiente paso** | Mantener este patrón de type guard cuando se mapeen datos provenientes de Sanity tipados como `any`. |
+| **Referencias** | `lib/vehicles.ts` |
+
+---
+
 ### LOG-20260422-002
 
 | Campo           | Valor |
