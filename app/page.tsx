@@ -15,8 +15,8 @@ import { Metadata } from 'next'
 import { FadeIn } from '@/components/animations/FadeIn'
 
 export const metadata: Metadata = {
-  title: 'Queirolo Autos - Venta de Vehiculos Seminuevos en Las Condes',
-  description: 'Mas de 60 anos vendiendo autos con confianza. Venta, consignacion y financiamiento en Las Condes, Santiago. Visitanos sin compromiso.',
+  title: siteConfig.seo.title,
+  description: siteConfig.seo.description,
 }
 
 const features = [

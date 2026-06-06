@@ -26,7 +26,6 @@ export interface Vehicle {
   entertainmentFeatures?: string[]
   otherFeatures?: string[]
   description?: string
-  plate?: string
 }
 
 export interface VehicleSpecs {

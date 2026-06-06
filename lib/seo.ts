@@ -90,8 +90,8 @@ export const defaultMetadata: Metadata = {
     },
   },
   verification: {
-    // Add Google Search Console verification when available
-    // google: 'verification_token',
+    // Se completa con la env var cuando el cliente tenga Search Console (sin valor, Next omite el tag).
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
   },
 }
 

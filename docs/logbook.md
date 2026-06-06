@@ -12,6 +12,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260605-005
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260605-005 |
+| **Fecha**       | 2026-06-05 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Plan SEO fases 5-8 (amplificación y medición): OG por vehículo, FAQ+tildes, patente/canonical, GSC/dominio. |
+| **Acuerdo/resultado** | Completado en rama `feat/seo-fase5-8-polish`. F6: FAQ schema en `/servicios` + tildes del home desde `config.seo`. F7: `plate` removido de GROQ/mapper/tipo (ya no viaja al cliente) + canonical estático del listado a `/vehiculos`. F8: GSC vía env `NEXT_PUBLIC_GSC_VERIFICATION` + `middleware.ts` redirect 308 apex→www. F5 (OG dinámica next/og): BLOQUEADA por bug de `@vercel/og` en Windows (ERR_INVALID_URL al cargar su fuente por defecto, crash en import del módulo, no sorteable) → revertida a OG estática con la foto real del vehículo (Fase 1). Build 60/60 OK + runtime de producción verificado. |
+| **Impacto**     | Rich result FAQ; canonical consolida filtros; redirect de dominio elimina contenido duplicado (mayor impacto del diagnóstico); patente fuera del payload. OG mantiene foto por vehículo (sin regresión). |
+| **Siguiente paso** | Commit + merge a main con tag. Follow-ups: OG dinámica en Linux, confirmar 308 en hosting, activar GSC, consolidar rutas legales duplicadas. |
+| **Referencias** | `IMP-20260605-004/IMP.md`, `app/servicios/page.tsx`, `app/page.tsx`, `app/vehiculos/layout.tsx`, `lib/seo.ts`, `lib/types.ts`, `lib/vehicles.ts`, `middleware.ts` |
+
+---
+
 ### LOG-20260605-004
 
 | Campo           | Valor |

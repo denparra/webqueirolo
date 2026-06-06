@@ -12,15 +12,44 @@ import {
 } from '@heroicons/react/24/outline'
 import siteConfig from '@/config'
 import { Metadata } from 'next'
+import { SchemaScript } from '@/components/shared/SchemaScript'
+import { generateFAQSchema } from '@/lib/seo'
 
 export const metadata: Metadata = {
     title: 'Servicios - Financiamiento y Consignación - Queirolo Autos',
     description: 'Financiamiento con financieras, consignación de vehículos y recepción en parte de pago. Conoce todos nuestros servicios.',
 }
 
+// Preguntas frecuentes (basadas en el contenido de la página) para el rich result de FAQ.
+const serviciosFaqs = [
+    {
+        question: '¿Cuánto demora la evaluación del financiamiento?',
+        answer: 'La evaluación se responde en aproximadamente 24 a 48 horas. Completas el formulario con tus datos, evaluamos tu perfil con nuestras financieras y te contactamos con las opciones disponibles.',
+    },
+    {
+        question: '¿En cuántas cuotas puedo financiar mi auto?',
+        answer: 'Los plazos van de 12 a 60 meses, con pie desde el 20%. El financiamiento está sujeto a evaluación crediticia; las tasas y condiciones dependen del perfil del cliente y de la financiera seleccionada.',
+    },
+    {
+        question: '¿Qué requisitos tiene la consignación de un vehículo?',
+        answer: 'El vehículo debe estar sin prendas ni gravámenes y con la documentación al día. Hacemos una evaluación previa del vehículo. Tu auto sigue siendo tuyo hasta que se venda y nos encargamos de todo el proceso de venta.',
+    },
+    {
+        question: '¿Reciben autos en parte de pago?',
+        answer: 'Sí. Evaluamos tu vehículo actual y te entregamos un valor justo. Si tiene deuda, la descontamos del valor y realizamos todos los trámites de transferencia; el saldo restante se aplica a tu nuevo auto.',
+    },
+    {
+        question: '¿Dónde están ubicados y cómo los contacto?',
+        answer: `Estamos en ${siteConfig.contact.address.fullAddress}. Puedes escribirnos por WhatsApp al ${siteConfig.contact.whatsappDisplay} para coordinar una evaluación o resolver tus dudas.`,
+    },
+]
+
 export default function ServiciosPage() {
     return (
         <div className="min-h-screen bg-gray-50 py-12">
+            {/* JSON-LD: preguntas frecuentes (rich result) */}
+            <SchemaScript schema={generateFAQSchema(serviciosFaqs)} />
+
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="mb-12 text-center">

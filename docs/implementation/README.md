@@ -38,3 +38,4 @@ docs/implementation/
 | IMP-20260605-001 | 2026-06-05 | SEO Fase 0 (config baseUrl) + Fase 1 (metadata por vehículo) | ✅ completado |
 | IMP-20260605-002 | 2026-06-05 | SEO Fase 2 (listado a Server Component) + Fase 3 (JSON-LD) | ✅ completado |
 | IMP-20260605-003 | 2026-06-05 | SEO Fase 4 (sitemap desde Sanity) | ✅ completado |
+| IMP-20260605-004 | 2026-06-05 | SEO Fases 5-8 (OG, FAQ/tildes, patente/canonical, GSC/dominio) | ✅ completado |

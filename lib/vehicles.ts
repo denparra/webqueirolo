@@ -82,8 +82,7 @@ function mapSanityVehicle(sanityVehicle: any): Vehicle {
         category: sanityVehicle.category,
         bodyType: sanityVehicle.bodyType,
         version: sanityVehicle.version,
-        status: sanityVehicle.status,
-        plate: sanityVehicle.plate
+        status: sanityVehicle.status
     }
 }
 
@@ -114,7 +113,6 @@ export async function getVehicles(): Promise<Vehicle[]> {
     bodyType,
     doors,
     color,
-    plate,
     "images": images[].asset->url,
     "lqip": images[0].asset->metadata.lqip,
     comfortFeatures,
@@ -164,7 +162,6 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefine
       bodyType,
       doors,
       color,
-      plate,
       "images": images[].asset->url,
       "lqip": images[0].asset->metadata.lqip,
       comfortFeatures,
