@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 import { mockVehicles } from '@/lib/data'
+import config from '@/config'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.queirolo.cl'
+  const baseUrl = config.url
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

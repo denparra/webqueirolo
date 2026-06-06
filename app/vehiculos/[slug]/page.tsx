@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getVehicles, getVehicleBySlug } from '@/lib/vehicles'
 import { formatCurrency, formatKilometers, getWhatsAppUrl } from '@/lib/utils'
@@ -24,6 +25,69 @@ export async function generateStaticParams() {
     return vehicles.map((vehicle) => ({
         slug: vehicle.slug,
     }))
+}
+
+// Normaliza un texto para usarlo en un <meta>: colapsa saltos de línea/espacios
+// y lo trunca a ~160 caracteres (lo que muestra Google) sin cortar palabras.
+function toMetaDescription(text: string, max = 160): string {
+    const clean = text.replace(/\s+/g, ' ').trim()
+    if (clean.length <= max) return clean
+    const cut = clean.slice(0, max - 1)
+    const lastSpace = cut.lastIndexOf(' ')
+    return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim()}…`
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+    const vehicle = await getVehicleBySlug(params.slug)
+
+    if (!vehicle) {
+        return { title: 'Vehículo no encontrado' }
+    }
+
+    const titleBase = [vehicle.brand, vehicle.model, vehicle.version, vehicle.year]
+        .filter(Boolean)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    const title = `${titleBase} usado | ${siteConfig.company.fullName}`
+
+    // Description: campo de Sanity si existe; si no, se autogenera desde specs.
+    const autoDescription = [
+        `${titleBase} en venta`,
+        vehicle.km ? `${formatKilometers(vehicle.km)}` : null,
+        vehicle.transmission || null,
+        vehicle.fuelType || null,
+    ]
+        .filter(Boolean)
+        .join(' · ') +
+        `. Disponible en ${siteConfig.company.fullName}, ${siteConfig.contact.address.city}. ` +
+        `Desde ${formatCurrency(vehicle.price)}.`
+    const description = toMetaDescription(vehicle.description?.trim() || autoDescription)
+
+    const url = `${siteConfig.url}/vehiculos/${vehicle.slug}`
+    const ogImage = vehicle.images?.[0] || vehicle.image
+
+    return {
+        title,
+        description,
+        alternates: { canonical: url },
+        openGraph: {
+            type: 'website',
+            url,
+            title,
+            description,
+            siteName: siteConfig.company.fullName,
+            images: ogImage
+                ? [{ url: ogImage, width: 1200, height: 630, alt: titleBase }]
+                : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: ogImage ? [ogImage] : undefined,
+        },
+    }
 }
 
 export default async function VehicleDetailPage({ params }: { params: { slug: string } }) {

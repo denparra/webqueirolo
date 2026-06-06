@@ -6,7 +6,7 @@ import config from '@/config'
 export const siteConfig = {
   name: config.company.fullName,
   description: config.company.tagline,
-  url: 'https://www.queirolo.cl',
+  url: config.url,
   locale: 'es_CL',
   phone: config.contact.whatsappDisplay,
   address: {

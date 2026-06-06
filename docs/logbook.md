@@ -12,6 +12,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260605-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260605-001 |
+| **Fecha**       | 2026-06-05 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Inicio de implementación del plan SEO por fases. Fase 0: la URL canónica estaba hardcodeada en 3 archivos. Fase 1: las fichas `/vehiculos/[slug]` no tenían `generateMetadata` → todo el catálogo heredaba el mismo `<title>`/`description` genérico (títulos duplicados, el daño SEO #1). |
+| **Acuerdo/resultado** | Completado en rama `feat/seo-fase0-1-metadata-vehiculo`. Fase 0: `config.url` agregado y consumido en `lib/seo.ts`, `app/sitemap.ts`, `app/robots.ts`. Fase 1: `generateMetadata` por vehículo con título `{Marca} {Modelo} {Versión} {Año} usado | Queirolo Autos` (sin precio/km), description de Sanity con fallback autogenerado, `canonical` absoluto, Open Graph + Twitter con la foto del auto. Lint ✅, type-check sin errores en archivos modificados. |
+| **Impacto**     | SEO: fin de títulos duplicados en el catálogo; canonical por ficha; share con foto real. Técnico: `config.url` como fuente única del host. Sin cambios visuales ni de rutas/negocio. |
+| **Siguiente paso** | Verificación visual en local (View Source de fichas). Continuar con Fase 2 (listado a Server Component) y Fase 3-4 según plan. |
+| **Referencias** | `IMP-20260605-001/IMP.md`, `config.ts`, `lib/seo.ts`, `app/sitemap.ts`, `app/robots.ts`, `app/vehiculos/[slug]/page.tsx`, `claudedocs/00-Analysis-Planning/2026-06-05-seo-plan-tecnico-implementacion.md` |
+
+---
+
 ### LOG-20260422-004
 
 | Campo           | Valor |

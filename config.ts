@@ -6,6 +6,9 @@
  */
 
 const siteConfig = {
+    // URL canónica del sitio (host único, sin slash final)
+    url: 'https://www.queirolo.cl',
+
     // Información de la empresa
     company: {
         name: 'Queirolo Autos',
