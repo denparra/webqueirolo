@@ -12,6 +12,36 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260605-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260605-002 |
+| **Fecha**       | 2026-06-05 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Plan SEO fases 2-3. Fase 2: el listado `/vehiculos` era `'use client'` con fetch en `useEffect` → Googlebot veía "Cargando vehículos…" (sin autos ni enlaces en el HTML). Fase 3: el JSON-LD (`Car`/`ItemList`/`Breadcrumb`) estaba escrito en `lib/seo.ts` pero sin usar. |
+| **Acuerdo/resultado** | Completado en rama `feat/seo-fase2-3-listado-server-jsonld`. Fase 2: `app/vehiculos/page.tsx` pasa a Server Component (`getVehicles()` server + `revalidate=60`); lógica de filtros movida a nuevo `components/vehicles/VehicleListingClient.tsx` que recibe `initialVehicles` por props. Fase 3: `generateVehicleSchema` ajustado (availability dinámica por status, sin VIN/patente, imagen absoluta) y `generateVehicleListSchema` recibe la lista real; render de `Car`+`Breadcrumb` en ficha e `ItemList` en listado. |
+| **Impacto**     | SEO: 42 autos + enlaces internos en HTML inicial; rich results habilitados. Sin cambios de UX (filtros preservados). |
+| **Siguiente paso** | Commit a main + tag. Continuar con fases 5-7 (OG dinámica, FAQ/tildes, patente/filtros noindex). |
+| **Referencias** | `IMP-20260605-002/IMP.md`, `app/vehiculos/page.tsx`, `components/vehicles/VehicleListingClient.tsx`, `lib/seo.ts`, `app/vehiculos/[slug]/page.tsx` |
+
+---
+
+### TEST-20260605 — Verificación de build y runtime (asociado a LOG-20260605-002)
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260605-003 |
+| **Fecha**       | 2026-06-05 |
+| **Tipo**        | TEST |
+| **Contexto**    | En `dev` apareció `TypeError: Cannot read properties of undefined (reading 'call')` (error de carga de chunk) al hidratar `/vehiculos` tras convertirla a Server Component. |
+| **Acuerdo/resultado** | Diagnosticado como bug conocido de Next 14.2 con `experimental.instrumentationHook` + HMR (dev-only): el SSR devolvía 200 con los 42 autos, y el home —sin cambios— también mostraba mismatches de hidratación preexistentes. `npm run build` pasó limpio (`60/60` páginas) y el runtime de producción (`next start`) renderizó `/vehiculos` sin errores, con filtros funcionando (BMW → 2 de 42) y JSON-LD presente. |
+| **Impacto**     | Confirma que las fases 2-3 funcionan en producción; el error de dev no es bloqueante ni real para prod. |
+| **Siguiente paso** | Proceder con commit. |
+| **Referencias** | `IMP-20260605-002/IMP.md`, `next.config.js` (instrumentationHook) |
+
+---
+
 ### LOG-20260605-001
 
 | Campo           | Valor |

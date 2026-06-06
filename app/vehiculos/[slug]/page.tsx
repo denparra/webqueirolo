@@ -19,6 +19,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 import siteConfig from '@/config'
+import { SchemaScript } from '@/components/shared/SchemaScript'
+import { generateVehicleSchema, generateBreadcrumbSchema } from '@/lib/seo'
 
 export async function generateStaticParams() {
     const vehicles = await getVehicles()
@@ -100,8 +102,17 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
     const whatsappMessage = `Hola, me interesa el ${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
     const whatsappUrl = getWhatsAppUrl(siteConfig.contact.whatsapp, whatsappMessage)
 
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: 'Vehículos', url: `${siteConfig.url}/vehiculos` },
+        { name: `${vehicle.brand} ${vehicle.model}`, url: `${siteConfig.url}/vehiculos/${vehicle.slug}` },
+    ])
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
+            {/* JSON-LD: datos estructurados del vehículo + breadcrumb */}
+            <SchemaScript schema={generateVehicleSchema(vehicle)} />
+            <SchemaScript schema={breadcrumbSchema} />
+
             <div className="container mx-auto px-4">
                 {/* Breadcrumb */}
                 <nav className="mb-6 text-sm text-gray-600">

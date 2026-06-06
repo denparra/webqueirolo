@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { mockVehicles } from './data'
+import { Vehicle } from './types'
 import config from '@/config'
 
 // Base metadata for the site
@@ -130,73 +130,83 @@ export function generateLocalBusinessSchema() {
   }
 }
 
-// Generate JSON-LD for vehicle
-export function generateVehicleSchema(vehicle: {
-  brand: string
-  model: string
-  year: number
-  price: number
-  km: number
-  transmission: string
-  fuelType: string
-  image: string
-  slug: string
-  specs: {
-    engine: string
-    color: string
-  }
-}) {
-  return {
+// Generate JSON-LD for vehicle.
+// IMPORTANTE: nunca se incluyen patente ni VIN (decisión de privacidad).
+export function generateVehicleSchema(vehicle: Vehicle) {
+  // availability: solo 'sold' marca SoldOut; 'available'/'reserved' siguen InStock.
+  const availability =
+    vehicle.status === 'sold'
+      ? 'https://schema.org/SoldOut'
+      : 'https://schema.org/InStock'
+
+  // La imagen de Sanity ya es una URL absoluta (cdn.sanity.io).
+  const image = vehicle.images?.[0] || vehicle.image
+
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Car',
-    name: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    name: [vehicle.brand, vehicle.model, vehicle.version, vehicle.year]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
     brand: {
       '@type': 'Brand',
       name: vehicle.brand,
     },
     model: vehicle.model,
-    vehicleModelDate: vehicle.year.toString(),
+    vehicleModelDate: vehicle.year ? vehicle.year.toString() : undefined,
     mileageFromOdometer: {
       '@type': 'QuantitativeValue',
       value: vehicle.km,
       unitCode: 'KMT',
     },
-    vehicleTransmission: vehicle.transmission,
-    fuelType: vehicle.fuelType,
-    vehicleEngine: {
-      '@type': 'EngineSpecification',
-      name: vehicle.specs.engine,
-    },
-    color: vehicle.specs.color,
-    image: `${siteConfig.url}${vehicle.image}`,
+    image,
     url: `${siteConfig.url}/vehiculos/${vehicle.slug}`,
     offers: {
       '@type': 'Offer',
       price: vehicle.price,
       priceCurrency: 'CLP',
-      availability: 'https://schema.org/InStock',
+      availability,
       seller: {
         '@type': 'AutoDealer',
         name: siteConfig.name,
       },
     },
   }
+
+  // Campos opcionales: solo se agregan si existen (evita valores vacíos en el schema).
+  if (vehicle.transmission) schema.vehicleTransmission = vehicle.transmission
+  if (vehicle.fuelType) schema.fuelType = vehicle.fuelType
+  if (vehicle.specs?.color) schema.color = vehicle.specs.color
+  if (vehicle.specs?.engine) {
+    schema.vehicleEngine = {
+      '@type': 'EngineSpecification',
+      name: vehicle.specs.engine,
+    }
+  }
+
+  return schema
 }
 
 // Generate JSON-LD for vehicle list page
-export function generateVehicleListSchema() {
+export function generateVehicleListSchema(vehicles: Vehicle[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Nuestros Vehículos',
     description: 'Explora nuestro stock actual, seleccionado con estándares de calidad.',
-    numberOfItems: mockVehicles.length,
-    itemListElement: mockVehicles.map((vehicle, index) => ({
+    numberOfItems: vehicles.length,
+    itemListElement: vehicles.map((vehicle, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       item: {
         '@type': 'Car',
-        name: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+        name: [vehicle.brand, vehicle.model, vehicle.version, vehicle.year]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim(),
         url: `${siteConfig.url}/vehiculos/${vehicle.slug}`,
       },
     })),

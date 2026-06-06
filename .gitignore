@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Script bulk de autos
 /script/
+
+# Playwright MCP tooling output
+.playwright-mcp/

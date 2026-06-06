@@ -36,3 +36,4 @@ docs/implementation/
 | IMP-20260405-002 | 2026-04-05 | Análisis de diseño + plan de mejoras con Magic MCP | ✅ completado |
 | IMP-20260405-003 | 2026-04-05 | Implementación mejoras de diseño (P1-P2-P4) | ✅ completado |
 | IMP-20260605-001 | 2026-06-05 | SEO Fase 0 (config baseUrl) + Fase 1 (metadata por vehículo) | ✅ completado |
+| IMP-20260605-002 | 2026-06-05 | SEO Fase 2 (listado a Server Component) + Fase 3 (JSON-LD) | ✅ completado |
