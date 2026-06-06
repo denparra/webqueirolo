@@ -20,7 +20,7 @@
 | 1 | `generateMetadata` por vehículo + canonical | 🔴 P0 | ✅ | Bajo · **✅ HECHA (IMP-20260605-001)** |
 | 2 | Listado a Server Component (render server del grid) | 🔴 P0 | ✅ | **Medio** · **✅ HECHA (IMP-20260605-002)** |
 | 3 | Cablear JSON-LD (`Car`+`Offer`, `ItemList`, `Breadcrumb`) | 🔴 P0 | Tras F1 ideal | Bajo · **✅ HECHA (IMP-20260605-002)** |
-| 4 | Sitemap desde Sanity + filtro por `status` | 🔴 P0 | ✅ | Bajo |
+| 4 | Sitemap desde Sanity + filtro por `status` | 🔴 P0 | ✅ | Bajo · **✅ HECHA (IMP-20260605-003)** |
 | 5 | OG image dinámica por vehículo (`next/og`) | 🟡 P1 | Tras F1 | Bajo |
 | 6 | FAQ schema en Servicios + tildes del home | 🟡 P1 | ✅ | Muy bajo |
 | 7 | Privacidad (`plate` fuera del payload) + filtros `noindex` | 🟡 P1 | ✅ | Bajo |

@@ -12,6 +12,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260605-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260605-004 |
+| **Fecha**       | 2026-06-05 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Plan SEO Fase 4. `app/sitemap.ts` usaba `mockVehicles` (datos mock) en vez del inventario real de Sanity → declaraba URLs falsas/viejas a Google y ocultaba el stock real. |
+| **Acuerdo/resultado** | Completado en rama `feat/seo-fase4-sitemap-sanity`. `sitemap()` pasa a `async` con `getVehicles()` (try/catch), filtra `sold` y registros sin slug/imágenes, `revalidate=60`. Se agregó `/contacto` a las estáticas. Verificado: `/sitemap.xml` con 50 URLs (8 estáticas + 42 fichas con slugs reales de Sanity), coincide con el listado. |
+| **Impacto**     | Crawleo: Google recibe el inventario real (42 vehículos). Vendidos excluidos del sitemap (siguen indexables). Sin cambios funcionales en la web. |
+| **Siguiente paso** | Commit + merge a main con tag. Continuar con fases 5-7. |
+| **Referencias** | `IMP-20260605-003/IMP.md`, `app/sitemap.ts`, `lib/vehicles.ts` |
+
+---
+
 ### LOG-20260605-002
 
 | Campo           | Valor |
