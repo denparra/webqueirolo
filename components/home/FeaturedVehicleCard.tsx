@@ -20,7 +20,7 @@ function formatKm(km: number): string {
 
 export function FeaturedVehicleCard({ vehicle, priority = false }: FeaturedVehicleCardProps) {
   const badge = vehicle.isNew
-    ? 'RECIEN LLEGADO'
+    ? 'RECIÉN LLEGADO'
     : vehicle.category || null
 
   return (
@@ -87,7 +87,7 @@ export function FeaturedVehicleCard({ vehicle, priority = false }: FeaturedVehic
         <div className="flex items-end justify-between border-t border-gray-100 pt-3">
           <div>
             <p className="text-xl font-bold text-primary-600 leading-none">{formatPrice(vehicle.price)}</p>
-            <p className="mt-0.5 text-xs text-gray-400">Desde {formatPrice(vehicle.monthlyPayment)}/mes</p>
+            <p className="mt-0.5 text-xs text-gray-400">Desde aprox. {formatPrice(vehicle.monthlyPayment)}/mes</p>
           </div>
           <span className="text-sm font-medium text-primary-500 transition-colors group-hover:text-primary-600 shrink-0 ml-2">
             Ver &rarr;

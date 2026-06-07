@@ -4,10 +4,10 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { value: '60+', label: 'Anos de experiencia' },
-  { value: '500+', label: 'Autos vendidos' },
-  { value: 'Las Condes', label: 'Santiago, Chile' },
-  { value: '100%', label: 'Financiamiento' },
+  { value: '60+', label: 'Años de experiencia' },
+  { value: '+10.000', label: 'Vehículos vendidos' },
+  { value: 'Lo Barnechea', label: 'Santiago, Chile' },
+  { value: 'Financieras', label: 'Financiamiento' },
 ]
 
 export function StatsBar() {

@@ -12,6 +12,36 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260607-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260607-002 |
+| **Fecha**       | 2026-06-07 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Fase 4 del frente `IMP-20260606-002`: la tarjeta de equipo en `/nosotros` usaba un placeholder `<div>` y nunca renderizaba la imagen. El owner decidió no usar retrato de la persona sino una foto de un auto antiguo de su época de Turismo Carretera. |
+| **Acuerdo/resultado** | Se cableó la tarjeta con `<Image>` condicional (cae a placeholder si el archivo no existe) y se agregó `imageAlt` descriptivo al array `team` en `app/nosotros/page.tsx`. `banner.jpg` de consignación ya estaba resuelto en sesión previa. Quedan por subir los assets `mario.jpg` (3:4) y `history.jpg` (1:1). |
+| **Impacto**     | F4 código completo; el frente queda a la espera solo de subir 2 imágenes (F3). `npm run lint` sin errores; sin build (regla del proyecto). |
+| **Siguiente paso** | Owner sube `public/images/team/mario.jpg` y `public/images/history.jpg`; verificar en `/nosotros`. |
+| **Referencias** | `app/nosotros/page.tsx`, `docs/implementation/IMP-20260606-002/IMAGES-SOT.md`, `docs/implementation/IMP-20260606-002/ROADMAP.md` |
+
+---
+
+### LOG-20260607-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260607-001 |
+| **Fecha**       | 2026-06-07 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Ejecución de las fases 1 y 2 del frente institucional `IMP-20260606-002`, más mejoras de copy pedidas por el owner: consistencia de "+10.000" vehículos vendidos, eliminación del "100%" de financiamiento (no aplica), rediseño de 2 tarjetas de "¿Por qué elegir?", y corrección de tildes/ñ en "años" en toda la web. |
+| **Acuerdo/resultado** | **F1 (localización):** `Lo Barnechea` como referencia pública; mapa degradado a vista de zona (zoom 13) con coordenadas referenciales; `streetAddress` del JSON-LD vuelto condicional. **F2 (crédito):** "Cuota mensual referencial", "Desde aprox. $X/mes" en cards y ficha; "100%" → "Financieras" en home y StatsBar. **Extras:** StatsBar "500+" → "+10.000"; tarjeta "60+/Revisión Técnica" reemplazada (stat "✓"); tildes/ñ corregidas en home, StatsBar y privacidad; `RECIEN`→`RECIÉN`. |
+| **Impacto**     | Baja el riesgo legal/comercial (sin promesa de 100% ni dirección exacta desactualizada) y elimina incoherencias visibles (conteo de ventas, tildes). `npm run lint` sin errores; no se ejecutó build (regla del proyecto). |
+| **Siguiente paso** | Fase 3: subir `history.jpg` (1:1) y `mario.jpg` (3:4). Fase 4: habilitar la tarjeta de equipo en `/nosotros` cuando exista `mario.jpg`. |
+| **Referencias** | `config.ts`, `lib/seo.ts`, `app/contacto/page.tsx`, `app/vehiculos/layout.tsx`, `components/maps/LazyContactMap.tsx`, `app/page.tsx`, `components/home/StatsBar.tsx`, `components/home/FeaturedVehicleCard.tsx`, `components/vehicles/VehicleCard.tsx`, `components/forms/LoanCalculator.tsx`, `app/vehiculos/[slug]/page.tsx`, `app/privacidad/page.tsx`, `docs/implementation/IMP-20260606-002/ROADMAP.md` |
+
+---
+
 ### LOG-20260606-005
 
 | Campo           | Valor |

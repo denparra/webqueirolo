@@ -22,27 +22,27 @@ export const metadata: Metadata = {
 const features = [
   {
     icon: ShieldCheckIcon,
-    stat: '60+',
-    title: 'Revision Tecnica Completa',
-    description: 'Cada vehiculo pasa por una inspeccion exhaustiva antes de estar disponible.',
+    stat: '✓',
+    title: 'Revisión Técnica Completa',
+    description: 'Cada vehículo pasa por una inspección exhaustiva antes de estar disponible.',
   },
   {
     icon: CurrencyDollarIcon,
-    stat: '100%',
+    stat: 'Financieras',
     title: 'Financiamiento con Financieras',
-    description: 'Te ayudamos a encontrar opciones de credito adaptadas a tu situacion.',
+    description: 'Te ayudamos a encontrar opciones de crédito adaptadas a tu situación.',
   },
   {
     icon: TruckIcon,
     stat: 'Parte',
     title: 'Recibimos tu Auto',
-    description: 'Evaluamos tu vehiculo actual como parte de pago.',
+    description: 'Evaluamos tu vehículo actual como parte de pago.',
   },
   {
     icon: ClockIcon,
     stat: 'Online',
-    title: 'Tramites Online',
-    description: 'Transferencia con clave unica y procesos digitales sin complicaciones.',
+    title: 'Trámites Online',
+    description: 'Transferencia con clave única y procesos digitales sin complicaciones.',
   },
 ]
 
@@ -61,10 +61,10 @@ export default function HomePage() {
           <FadeIn>
             <div className="mb-12 text-center">
               <h2 className="mb-4 text-3xl font-bold text-gray-900 lg:text-4xl">
-                ¿Por que elegir {siteConfig.company.fullName}?
+                ¿Por qué elegir {siteConfig.company.fullName}?
               </h2>
               <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                Mas de 60 anos en el rubro automotriz
+                Más de 60 años en el rubro automotriz
               </p>
             </div>
           </FadeIn>
@@ -99,10 +99,10 @@ export default function HomePage() {
           <FadeIn>
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="mb-4 text-3xl font-bold text-gray-900 lg:text-4xl">
-                ¿Listo para tu proximo auto?
+                ¿Listo para tu próximo auto?
               </h2>
               <p className="mb-2 text-lg text-gray-600">
-                Visitanos en Las Condes o escribenos. Te atendemos sin presiones y resolvemos todas tus dudas.
+                Visítanos en Lo Barnechea o escríbenos. Te atendemos sin presiones y resolvemos todas tus dudas.
               </p>
               <p className="mb-8 text-sm text-gray-500">
                 Respuesta en minutos
@@ -115,7 +115,7 @@ export default function HomePage() {
                 </Button>
                 <Button size="lg" variant="secondary" asChild>
                   <Link href="/contacto">
-                    Ver Ubicacion
+                    Ver Ubicación
                   </Link>
                 </Button>
               </div>

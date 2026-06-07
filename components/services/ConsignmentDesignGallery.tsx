@@ -68,7 +68,7 @@ export function ConsignmentDesignGallery({ images }: ConsignmentDesignGalleryPro
                         className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 text-left"
                         aria-label={`Abrir ${image.alt} en vista ampliada`}
                     >
-                        <div className="relative aspect-[4/5] w-full">
+                        <div className="relative aspect-[16/9] w-full">
                             <Image
                                 src={image.src}
                                 alt={image.alt}

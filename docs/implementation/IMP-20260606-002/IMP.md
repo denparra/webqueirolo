@@ -7,8 +7,8 @@
 | **ID**      | IMP-20260606-002 |
 | **Fecha**   | 2026-06-06 |
 | **Owner**   | Denny |
-| **Estado**  | planning |
-| **Log ref** | LOG-20260606-005 |
+| **Estado**  | in-progress (F1 ✅, F2 ✅, F3/F4 parcial) |
+| **Log ref** | LOG-20260606-005, LOG-20260607-001 |
 
 ## Objetivo
 
@@ -41,14 +41,14 @@ Ordenar en un solo frente los cambios institucionales de bajo y medio riesgo del
 
 - **Fase 0 — Diagnóstico y SOT** ✅  
   Baseline del frente, matriz de imágenes y verificación de touchpoints de copy.
-- **Fase 1 — Localización pública transitoria**  
-  Reemplazar la dirección visible por `Lo Barnechea` y eliminar promesas que impliquen local físico exacto mientras se busca nuevo espacio.
-- **Fase 2 — Crédito referencial / resguardo legal**  
-  Hacer explícito en todas las superficies relevantes que montos y cuotas son aproximados/referenciales y que la cifra final depende de la financiera y la evaluación.
-- **Fase 3 — Assets institucionales**  
-  Subida y conexión de imágenes institucionales priorizadas por el SOT.
-- **Fase 4 — Ajuste visual de consignación y equipo**  
-  Resolver el encaje visual del bloque “Diseños de Consignación” y habilitar correctamente la foto del equipo en `/nosotros`.
+- **Fase 1 — Localización pública transitoria** ✅ (2026-06-07)  
+  Dirección visible → `Lo Barnechea`, mapa degradado a vista de zona (zoom 13), metadata/SEO/JSON-LD actualizados. Detalle en `ROADMAP.md`.
+- **Fase 2 — Crédito referencial / resguardo legal** ✅ (2026-06-07)  
+  Cuotas a lenguaje referencial ("Cuota mensual referencial", "Desde aprox. $X/mes") y eliminación del "100%" de financiamiento → "Financieras".
+- **Fase 3 — Assets institucionales** 🟡  
+  Consignación resuelta con `banner.jpg` (16:5). Pendiente `history.jpg` (1:1) y `mario.jpg` (3:4).
+- **Fase 4 — Ajuste visual de consignación y equipo** 🟡 (código completo)  
+  Consignación cerrada (banner único sin overlay). Tarjeta de equipo cableada con `<Image>` condicional + `imageAlt` (2026-06-07). Solo falta subir los assets (F3).
 
 ## Impacto esperado
 

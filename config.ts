@@ -13,19 +13,21 @@ const siteConfig = {
     company: {
         name: 'Queirolo Autos',
         fullName: 'Queirolo Autos',
-        tagline: 'Venta, consignación y más de 60 años acompañándote. Desde Las Condes para todo Chile.',
+        tagline: 'Venta, consignación y más de 60 años acompañándote. Desde Lo Barnechea para todo Chile.',
     },
 
     // Información de contacto
     contact: {
         address: {
-            street: 'Av. Las Condes 12461, Local 4A, Las Condes, Santiago',
-            city: 'Las Condes',
-            fullAddress: 'Av. Las Condes 12461, Local 4A, Las Condes, Santiago',
-            displayAddress: 'Av. Las Condes 12461, Local 4A, Las Condes, Santiago', // Formato para mostrar
+            // En búsqueda de local nuevo: referencia pública solo a la comuna (sin dirección exacta).
+            street: '',
+            city: 'Lo Barnechea',
+            fullAddress: 'Lo Barnechea, Santiago',
+            displayAddress: 'Lo Barnechea, Santiago', // Formato para mostrar
             coordinates: {
-                lat: -33.4128,
-                lng: -70.5772,
+                // Zona referencial de Lo Barnechea (no dirección exacta).
+                lat: -33.3496,
+                lng: -70.5176,
             },
         },
         phone1: '+56 2 4367-0362',
@@ -79,9 +81,9 @@ const siteConfig = {
 
     // SEO y metadatos
     seo: {
-        title: 'Queirolo Autos - Venta de Vehículos Seminuevos en Las Condes',
-        description: 'Más de 60 años vendiendo autos con confianza. Venta, consignación y financiamiento en Las Condes, Santiago. Visítanos sin compromiso.',
-        keywords: 'vehículos seminuevos, autos usados, financiamiento con financieras, consignación, parte de pago, Las Condes, Santiago, Chile',
+        title: 'Queirolo Autos - Venta de Vehículos Seminuevos en Lo Barnechea',
+        description: 'Más de 60 años vendiendo autos con confianza. Venta, consignación y financiamiento en Lo Barnechea, Santiago. Visítanos sin compromiso.',
+        keywords: 'vehículos seminuevos, autos usados, financiamiento con financieras, consignación, parte de pago, Lo Barnechea, Santiago, Chile',
     },
 }
 

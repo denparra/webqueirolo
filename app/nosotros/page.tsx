@@ -15,7 +15,8 @@ export default function AboutPage() {
         {
             name: 'Mario Queirolo',
             role: 'Dueño',
-            image: '/images/team/mario.jpg', // Placeholder
+            image: '/images/team/mario.jpg',
+            imageAlt: 'Auto clásico de Turismo Carretera, legado automovilístico de Mario Queirolo',
             bio: 'Representa la continuación del legado automovilístico de la familia Queirolo en Chile. Al igual que su padre, Don Mario Queirolo Stagnaro, también se destacó como corredor de autos en competencias de Turismo Carretera, demostrando la misma pasión por la velocidad y el automovilismo que marcó generaciones.',
         },
     ]
@@ -153,10 +154,18 @@ export default function AboutPage() {
                             <SlideUp key={idx} delay={idx * 0.2}>
                                 <Card className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow">
                                     <div className="relative aspect-[3/4] bg-gray-200">
-                                        {/* Using div placeholder as we don't have images yet */}
-                                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                            Foto de {member.name}
-                                        </div>
+                                        {member.image ? (
+                                            <Image
+                                                src={member.image}
+                                                alt={member.imageAlt}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                                                Foto de {member.name}
+                                            </div>
+                                        )}
                                     </div>
                                     <CardContent className="p-6 text-center">
                                         <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>

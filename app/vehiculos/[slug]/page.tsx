@@ -149,7 +149,7 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                         {formatCurrency(vehicle.price)}
                                     </p>
                                     <p className="text-sm text-gray-600">
-                                        o desde {formatCurrency(vehicle.monthlyPayment)}/mes
+                                        o desde aprox. {formatCurrency(vehicle.monthlyPayment)}/mes
                                     </p>
                                 </div>
                             </div>

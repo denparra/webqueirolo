@@ -114,7 +114,7 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
 
                     {/* Monthly Payment (Primary Result) */}
                     <div className="rounded-lg border-2 border-primary-500 bg-white p-6">
-                        <p className="mb-1 text-sm text-gray-600">Cuota Mensual</p>
+                        <p className="mb-1 text-sm text-gray-600">Cuota mensual referencial</p>
                         <p className="text-5xl font-bold text-primary-600">
                             {formatCurrency(result.monthlyPayment)}
                         </p>

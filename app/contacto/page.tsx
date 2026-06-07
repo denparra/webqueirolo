@@ -8,8 +8,8 @@ import LazyContactMap from '@/components/maps/LazyContactMap'
 import siteConfig from '@/config'
 
 export const metadata: Metadata = {
-    title: 'Contacto - Queirolo Autos Las Condes',
-    description: 'Visítanos en Av. Las Condes 12461. Atención personalizada de lunes a viernes. Escríbenos por WhatsApp.',
+    title: 'Contacto - Queirolo Autos Lo Barnechea',
+    description: 'Estamos en Lo Barnechea, Santiago. Atención personalizada de lunes a viernes. Escríbenos por WhatsApp.',
 }
 
 export default function ContactPage() {

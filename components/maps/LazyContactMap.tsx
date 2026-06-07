@@ -17,7 +17,7 @@ export default function LazyContactMap() {
         return (
             <LeafletMap
                 center={[lat, lng]}
-                zoom={16}
+                zoom={13}
                 markerText={siteConfig.contact.address.displayAddress}
                 className="h-full w-full"
             />

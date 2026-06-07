@@ -32,7 +32,7 @@ export default function PrivacidadPage() {
             <li>Nombre y apellido.</li>
             <li>Numero de telefono.</li>
             <li>Correo electronico.</li>
-            <li>Patente y datos del vehiculo (marca, modelo, ano y antecedentes comerciales).</li>
+            <li>Patente y datos del vehiculo (marca, modelo, año y antecedentes comerciales).</li>
             <li>Mensajes enviados por formularios del sitio o por WhatsApp.</li>
           </ul>
 

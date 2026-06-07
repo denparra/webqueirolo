@@ -17,8 +17,9 @@ export const siteConfig = {
     postalCode: '',
   },
   geo: {
-    latitude: -33.4083,
-    longitude: -70.5669,
+    // Zona referencial de Lo Barnechea (no dirección exacta).
+    latitude: -33.3496,
+    longitude: -70.5176,
   },
   socialMedia: {
     instagram: config.social.instagram,
@@ -34,7 +35,7 @@ export const siteConfig = {
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Queirolo Autos - Venta de Vehículos Seminuevos en Las Condes',
+    default: 'Queirolo Autos - Venta de Vehículos Seminuevos en Lo Barnechea',
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -44,7 +45,7 @@ export const defaultMetadata: Metadata = {
     'financiamiento con financieras',
     'consignación',
     'parte de pago',
-    'Las Condes',
+    'Lo Barnechea',
     'Santiago',
     'Chile',
   ],
@@ -106,7 +107,8 @@ export function generateLocalBusinessSchema() {
     telephone: siteConfig.phone,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: siteConfig.address.street,
+      // streetAddress solo si existe una dirección exacta (hoy se opera sin local fijo).
+      ...(siteConfig.address.street ? { streetAddress: siteConfig.address.street } : {}),
       addressLocality: siteConfig.address.city,
       addressRegion: siteConfig.address.region,
       addressCountry: siteConfig.address.country,

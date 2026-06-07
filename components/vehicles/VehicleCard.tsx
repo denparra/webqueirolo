@@ -138,7 +138,7 @@ export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
                         {formatCurrency(vehicle.price)}
                     </p>
                     <p className="mt-0.5 mb-3 text-xs text-gray-400">
-                        Desde {formatCurrency(vehicle.monthlyPayment)}/mes
+                        Desde aprox. {formatCurrency(vehicle.monthlyPayment)}/mes
                     </p>
 
                     {/* Actions */}
