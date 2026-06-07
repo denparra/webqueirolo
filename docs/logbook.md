@@ -12,6 +12,36 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260607-005
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260607-005 |
+| **Fecha**       | 2026-06-07 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Ejecución de los 2 fixes de código de la Fase 4 de `IMP-20260607-002` (migración de dominio): Google aún mostraba la marca antigua "Queirolo Mundo 4x4". |
+| **Acuerdo/resultado** | `public/manifest.json`: `name`/`short_name` → "Queirolo Autos" + `description` actualizada (el manifest PWA reinyectaba el nombre viejo). `next.config.js`: `async redirects()` con `/stock` y `/stock/:path*` → `/vehiculos` (301 permanente). JSON válido + `npm run lint` OK. |
+| **Impacto**     | Se corta la fuente de código que alimentaba el nombre antiguo; las URLs viejas redirigen al equivalente nuevo. El resto (favicon/título viejos en el SERP) es recrawl de Google + acciones en GSC (Removals, Solicitar indexación, propiedad de dominio). |
+| **Siguiente paso** | Owner: en GSC agregar propiedad de dominio, enviar sitemap, Solicitar indexación del home, usar Eliminaciones para URLs viejas. Verificar post-deploy: `curl /manifest.json` (nombre nuevo), `curl -I /stock` (301). |
+| **Referencias** | `public/manifest.json`, `next.config.js`, `docs/implementation/IMP-20260607-002/IMP.md` |
+
+---
+
+### LOG-20260607-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260607-004 |
+| **Fecha**       | 2026-06-07 |
+| **Tipo**        | PLAN |
+| **Contexto**    | El owner pidió abrir un frente para los pendientes SEO diferidos (OG dinámica por vehículo en Linux + micro-fixes) con análisis del proyecto y recomendación antes de implementar. |
+| **Acuerdo/resultado** | Creado `IMP-20260607-002`. Fase 1: OG por vehículo a 1200×630 recortando la foto de Sanity (`@sanity/image-url` ya instalado, `cdn.sanity.io` acepta `?w&h&fit=crop`) **sin `next/og`** (bajo riesgo). Fase 2: micro-fixes (`title.template` muerto, `og:title` home, `noindex` filtros = dejar). Fase 3: OG dinámica branded (`next/og` nativo Next 14) opcional, verificar en Linux. **Fase 4 (P0) agregada**: migración de dominio — Google muestra "Queirolo Mundo 4x4" viejo. Diagnóstico: ~80% caché + 2 fixes reales (`manifest.json` con nombre viejo → "Queirolo Autos"; redirect `/stock`→`/vehiculos` en `next.config`). El resto (favicon/título viejos) es recrawl de Google + GSC (Removals, Solicitar indexación, propiedad de dominio). |
+| **Impacto**     | Camino claro y priorizado para cerrar la deuda SEO restante sin repetir el bug de `@vercel/og` en Windows. Sin cambios de código aún (frente en planning). |
+| **Siguiente paso** | El owner decide qué fases ejecutar. Recomendado: Fase 1 (+ Fase 2 como pulido); Fase 3 solo si se quiere branding en el share. |
+| **Referencias** | `docs/implementation/IMP-20260607-002/IMP.md`, `app/vehiculos/[slug]/page.tsx`, `lib/sanity.ts`, `lib/seo.ts`, `app/layout.tsx` |
+
+---
+
 ### LOG-20260607-003
 
 | Campo           | Valor |

@@ -29,6 +29,15 @@ const nextConfig = {
   // Powered by header
   poweredByHeader: false,
 
+  // Redirects de URLs de la web antigua ("Queirolo Mundo 4x4") al equivalente actual.
+  // 301 permanente: recupera autoridad SEO y le indica a Google que la ruta se movió.
+  async redirects() {
+    return [
+      { source: '/stock', destination: '/vehiculos', permanent: true },
+      { source: '/stock/:path*', destination: '/vehiculos', permanent: true },
+    ]
+  },
+
   // Headers for caching and security
   async headers() {
     return [

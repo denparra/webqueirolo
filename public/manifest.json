@@ -1,7 +1,7 @@
 {
-  "name": "Queirolo Mundo 4x4",
-  "short_name": "Queirolo 4x4",
-  "description": "Vehículos seminuevos certificados con financiamiento directo",
+  "name": "Queirolo Autos",
+  "short_name": "Queirolo Autos",
+  "description": "Más de 60 años vendiendo autos con confianza. Venta de vehículos seminuevos, financiamiento con financieras y consignación en Lo Barnechea, Santiago.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
