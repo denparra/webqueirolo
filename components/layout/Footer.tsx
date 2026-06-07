@@ -126,7 +126,7 @@ export default function Footer() {
               © {new Date().getFullYear()} {siteConfig.company.fullName}. Todos los derechos reservados. Hecho con pasión en Chile.
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 md:justify-end">
-              <Link href="/politica-de-privacidad" className="hover:text-primary-400 transition-colors">
+              <Link href="/privacidad" className="hover:text-primary-400 transition-colors">
                 Política de Privacidad
               </Link>
               <Link href="/terminos-y-condiciones" className="hover:text-primary-400 transition-colors">

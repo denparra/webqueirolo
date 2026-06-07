@@ -70,7 +70,7 @@ const siteConfig = {
         about: '/nosotros',
         contact: '/contacto',
         privacy: '/privacidad',
-        terms: '/terminos',
+        terms: '/terminos-y-condiciones',
     },
 
     // Mensajes predeterminados

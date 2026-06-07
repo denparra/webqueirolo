@@ -12,6 +12,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260607-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260607-003 |
+| **Fecha**       | 2026-06-07 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Análisis SEO detallado (continuación de IMP-20260605-004) detectó 2 quick wins sueltos: la imagen Open Graph por defecto (`/og-image.jpg`) referenciada pero nunca creada → preview rota al compartir el sitio por WhatsApp/redes; y rutas legales que enlazaban URLs con 301. Se aclaró que el bug previo de OG fue por `@vercel/og` en Windows (dinámica), no aplica a una imagen estática. |
+| **Acuerdo/resultado** | **F1:** creado `public/og-image.jpg` (1200×630, branded, logo blanco sobre fondo oscuro + franja roja) con `sharp` (estático, sin `next/og`). Sin cambio de código (ya estaba referenciado). **F2:** sitemap y footer apuntan a `/privacidad` (no al redirect `/politica-de-privacidad`); `config.urls.terms` → `/terminos-y-condiciones`. Creado `IMP-20260607-001`. |
+| **Impacto**     | Share del sitio muestra tarjeta con logo (antes preview rota); URLs legales sin saltos 301. `npm run lint` OK; sin build. |
+| **Siguiente paso** | Post-deploy: validar `og-image.jpg` (200) en Facebook Sharing Debugger / WhatsApp. Diferido: OG dinámica por vehículo en Linux; micro-fixes (dims OG, noindex filtros, title.template). |
+| **Referencias** | `public/og-image.jpg`, `lib/seo.ts`, `app/sitemap.ts`, `components/layout/Footer.tsx`, `config.ts`, `docs/implementation/IMP-20260607-001/IMP.md` |
+
+---
+
 ### LOG-20260607-002
 
 | Campo           | Valor |
