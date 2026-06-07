@@ -35,12 +35,31 @@ function checkRateLimit(ip: string): boolean {
     return true
 }
 
-// Validation schema
+// Validation schema — refleja el contrato `Lead` de `lib/leads.ts` para que el
+// canal futuro (n8n) capture TODOS los campos (incluidos RUT y comuna).
 const leadSchema = z.object({
+    type: z.enum(['contacto', 'financiamiento', 'consignacion']).optional(),
     name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres').max(100),
     email: z.string().email('Email inválido'),
     phone: z.string().min(8, 'Teléfono inválido').max(20),
-    message: z.string().min(10, 'Mensaje debe tener al menos 10 caracteres').max(1000),
+    rut: z.string().max(20).optional(),
+    comuna: z.string().max(100).optional(),
+    vehicle: z
+        .object({
+            brand: z.string().max(60).optional(),
+            model: z.string().max(60).optional(),
+            year: z.string().max(10).optional(),
+            price: z.string().max(20).optional(),
+            km: z.string().max(20).optional(),
+        })
+        .optional(),
+    financing: z
+        .object({
+            downPayment: z.string().max(20).optional(),
+            term: z.string().max(10).optional(),
+        })
+        .optional(),
+    message: z.string().max(2000).optional(),
     vehicleSlug: z.string().optional(),
     honeypot: z.string().optional(), // Anti-spam honeypot field
 })
@@ -73,23 +92,46 @@ export async function POST(request: NextRequest) {
         // Validate data
         const validatedData = leadSchema.parse(body)
 
-        // Log the lead (in production, save to database or send to CRM)
-        console.log('[submit-lead] New lead received:', {
-            name: validatedData.name,
-            email: validatedData.email,
-            phone: validatedData.phone,
-            vehicleSlug: validatedData.vehicleSlug,
-            timestamp: new Date().toISOString(),
-            ip,
-        })
+        // Entrega del lead.
+        //
+        // CANAL ACTIVO HOY: WhatsApp (client-side, ver lib/leads.ts). Este endpoint
+        // NO es el canal de entrega en producción todavía — queda PREPARADO para la
+        // integración futura con n8n.
+        //
+        // MIGRACIÓN A n8n (solo configuración, sin reescribir código):
+        //   1. Setear la env var `N8N_LEAD_WEBHOOK_URL` con la URL del webhook.
+        //   2. Volver los formularios a `POST /api/submit-lead` (en lugar de abrir WhatsApp).
+        // Con la env var presente, cada lead se reenvía al webhook; si falla, no se
+        // rompe la respuesta al usuario. Sin la env var, se registra en logs como respaldo.
+        const webhookUrl = process.env.N8N_LEAD_WEBHOOK_URL
 
-        // TODO: In production, integrate with:
-        // - Sanity CMS (create a 'lead' document)
-        // - Email service (SendGrid, Resend, etc.)
-        // - CRM (HubSpot, Salesforce, etc.)
-        // - Webhook (n8n, Zapier, etc.)
+        if (webhookUrl) {
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...validatedData,
+                        receivedAt: new Date().toISOString(),
+                        ip,
+                    }),
+                })
+            } catch (webhookError) {
+                // Un fallo del webhook no debe impactar la experiencia del usuario.
+                console.error('[submit-lead] Error reenviando a n8n:', webhookError)
+            }
+        } else {
+            console.log('[submit-lead] Lead recibido (sin webhook configurado):', {
+                type: validatedData.type,
+                name: validatedData.name,
+                email: validatedData.email,
+                phone: validatedData.phone,
+                vehicleSlug: validatedData.vehicleSlug,
+                timestamp: new Date().toISOString(),
+                ip,
+            })
+        }
 
-        // For now, just log and return success
         return NextResponse.json({
             success: true,
             message: 'Gracias por tu consulta. Te contactaremos pronto.',

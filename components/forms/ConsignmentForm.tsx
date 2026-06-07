@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getLeadWhatsAppUrl } from '@/lib/leads'
 
 export function ConsignmentForm() {
     const [formData, setFormData] = useState({
@@ -20,56 +21,45 @@ export function ConsignmentForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // Canal transitorio: la solicitud se entrega vía WhatsApp con todos los datos
+    // del vehículo. Migración futura a n8n documentada en lib/leads.ts.
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitting(true)
 
-        try {
-            // Append context to message or use a specific type field if schema allowed it
-            const payload = {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                message: `Solicitud de consignación: ${formData.brand} ${formData.model} ${formData.year} (${formData.km} km) por $${formData.price}. ${formData.message}`,
-                type: 'consignment_request',
-            }
+        const url = getLeadWhatsAppUrl({
+            type: 'consignacion',
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            vehicle: {
+                brand: formData.brand,
+                model: formData.model,
+                year: formData.year,
+                km: formData.km,
+                price: formData.price,
+            },
+            message: formData.message,
+        })
+        window.open(url, '_blank', 'noopener,noreferrer')
 
-            const response = await fetch('/api/submit-lead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+        setIsSubmitting(false)
+        setIsSubmitted(true)
+
+        setTimeout(() => {
+            setIsSubmitted(false)
+            setFormData({
+                name: '',
+                phone: '',
+                email: '',
+                brand: '',
+                model: '',
+                year: '',
+                km: '',
+                price: '',
+                message: '',
             })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al enviar la solicitud')
-            }
-
-            setIsSubmitting(false)
-            setIsSubmitted(true)
-
-            setTimeout(() => {
-                setIsSubmitted(false)
-                setFormData({
-                    name: '',
-                    phone: '',
-                    email: '',
-                    brand: '',
-                    model: '',
-                    year: '',
-                    km: '',
-                    price: '',
-                    message: '',
-                })
-            }, 3000)
-        } catch (error) {
-            console.error('Error submitting consignment form:', error)
-            setIsSubmitting(false)
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
-        }
+        }, 3000)
     }
 
     return (
@@ -95,8 +85,8 @@ export function ConsignmentForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Recibimos tu solicitud! Te contactaremos para coordinar la evaluación de tu vehículo.'}
+                        {isSubmitting && 'Abriendo WhatsApp...'}
+                        {isSubmitted && 'Te abrimos WhatsApp con los datos de tu vehículo. Presiona enviar en el chat para coordinar la evaluación.'}
                     </div>
 
                     {/* Contact Information */}
@@ -262,7 +252,7 @@ export function ConsignmentForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Abriendo WhatsApp...' : isSubmitted ? '¡Abrimos WhatsApp!' : 'Enviar por WhatsApp'}
                     </Button>
                 </form>
             </CardContent>

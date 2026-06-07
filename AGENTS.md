@@ -24,7 +24,7 @@ Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el 
 - `store/` holds Zustand state (favorites, compare).
 - `public/` stores static assets served at the site root (images, icons, manifest).
 - `config.ts` centralizes business data (contact, SEO, brand assets).
-- `claudedocs/` contains internal plans and phase logs.
+- `docs/` contains active governance (logbook, IMPs, analysis). Archive in `docs/archive/`.
 - `tailwind.config.ts`, `postcss.config.js`, and `tsconfig.json` define styling and TypeScript behavior.
 - `.next/` is the build output and should not be edited manually.
 
@@ -42,7 +42,7 @@ Sanity:
 - Schema principal: `sanity/schemaTypes/vehicle.ts`.
 - Frontend consulta en `lib/vehicles.ts` via GROQ y mapea a `Vehicle`.
 - En desarrollo, si falla la conexion o faltan env vars, se usa `lib/data.ts` como fallback; en produccion el fetch falla con error.
-- `app/sitemap.ts` usa `mockVehicles` para URLs de vehiculos (no Sanity).
+- `app/sitemap.ts` consulta Sanity (`getVehicles`), excluye `sold` y sin slug/imágenes (IMP-20260605-003).
 
 ## Build, Test, and Development Commands
 - `npm install` installs dependencies from `package.json` and `package-lock.json`.
@@ -129,11 +129,11 @@ Notes:
 
 ## Co-gobierno de reglas
 
-`AGENTS.md` (este archivo) y `claudedocs/CLAUDE.md` son **co-base entrelazada**.  
+`AGENTS.md` (este archivo) y `CLAUDE.md` (raíz) son **co-base entrelazada**.  
 Ninguno manda sobre el otro; ambos deben reflejar las mismas reglas operativas críticas.
 
 - `AGENTS.md`: reglas operativas completas, alcance, restricciones, trazabilidad y DoD.
-- `claudedocs/CLAUDE.md`: resumen ejecutable, comandos, mapa de rutas, recordatorios críticos.
+- `CLAUDE.md`: resumen ejecutable, comandos, mapa de rutas, recordatorios críticos.
 
 **Regla de consistencia**: toda regla crítica nueva o cambiada debe actualizarse en **ambos** en la misma sesión.  
 Si hay diferencia entre ambos:

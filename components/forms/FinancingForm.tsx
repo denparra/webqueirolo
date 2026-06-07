@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getLeadWhatsAppUrl } from '@/lib/leads'
 
 export function FinancingForm() {
     const [formData, setFormData] = useState({
@@ -22,56 +23,51 @@ export function FinancingForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // Canal transitorio: la solicitud se entrega vía WhatsApp con todos los datos
+    // (incluidos RUT y comuna). Migración futura a n8n documentada en lib/leads.ts.
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitting(true)
 
-        try {
-            // Append type to form data
-            const payload = {
-                ...formData,
-                type: 'financing_request',
-                message: `Solicitud de financiamiento para ${formData.vehicleBrand} ${formData.vehicleModel}. Pie: ${formData.downPayment}, Plazo: ${formData.term} meses.`,
-            }
+        const url = getLeadWhatsAppUrl({
+            type: 'financiamiento',
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            rut: formData.rut,
+            comuna: formData.comuna,
+            vehicle: {
+                brand: formData.vehicleBrand,
+                model: formData.vehicleModel,
+                year: formData.vehicleYear,
+                price: formData.vehiclePrice,
+            },
+            financing: {
+                downPayment: formData.downPayment,
+                term: formData.term,
+            },
+        })
+        window.open(url, '_blank', 'noopener,noreferrer')
 
-            const response = await fetch('/api/submit-lead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+        setIsSubmitting(false)
+        setIsSubmitted(true)
+
+        setTimeout(() => {
+            setIsSubmitted(false)
+            setFormData({
+                name: '',
+                rut: '',
+                email: '',
+                phone: '',
+                comuna: '',
+                vehicleBrand: '',
+                vehicleModel: '',
+                vehicleYear: '',
+                vehiclePrice: '',
+                downPayment: '',
+                term: '48',
             })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al enviar la solicitud')
-            }
-
-            setIsSubmitting(false)
-            setIsSubmitted(true)
-
-            setTimeout(() => {
-                setIsSubmitted(false)
-                setFormData({
-                    name: '',
-                    rut: '',
-                    email: '',
-                    phone: '',
-                    comuna: '',
-                    vehicleBrand: '',
-                    vehicleModel: '',
-                    vehicleYear: '',
-                    vehiclePrice: '',
-                    downPayment: '',
-                    term: '48',
-                })
-            }, 3000)
-        } catch (error) {
-            console.error('Error submitting financing request:', error)
-            setIsSubmitting(false)
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
-        }
+        }, 3000)
     }
 
     return (
@@ -97,8 +93,8 @@ export function FinancingForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Solicitud recibida! Evaluaremos tu caso y te contactaremos en las próximas horas.'}
+                        {isSubmitting && 'Abriendo WhatsApp...'}
+                        {isSubmitted && 'Te abrimos WhatsApp con tu solicitud. Presiona enviar en el chat para que la evaluemos.'}
                     </div>
 
                     {/* Personal Data */}
@@ -288,7 +284,7 @@ export function FinancingForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Abriendo WhatsApp...' : isSubmitted ? '¡Abrimos WhatsApp!' : 'Enviar por WhatsApp'}
                     </Button>
                 </form>
             </CardContent>

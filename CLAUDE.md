@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Co-gobierno**: Este archivo y `AGENTS.md` (raíz) son co-base entrelazada.
+> **Co-gobierno**: `CLAUDE.md` (raíz, este archivo) y `AGENTS.md` (raíz) son co-base entrelazada.
 > Toda regla crítica nueva debe actualizarse en **ambos** en la misma sesión.
 > Si hay diferencia → aplicar la opción más segura + registrar `DECISION` en `docs/logbook.md`.
 > Ver `docs/INDEX.md` para mapa de lectura completo.
@@ -108,11 +108,12 @@ public/                  # Static assets
   images/                # Logo, placeholders
   manifest.json          # PWA manifest
 
-claudedocs/              # Internal documentation and roadmaps
-  00-Analysis-Planning/  # Analysis and design proposals
-  03-Phase3-Enhancement/ # Phase 3 implementation notes
-  04-Phase4-Optimization/# Phase 4 implementation notes
-  05-Phase5-LaunchPreparation/ # Phase 5 deployment guides
+docs/                    # Gobernanza y trazabilidad activa
+  INDEX.md               # Mapa de onboarding
+  logbook.md             # Bitácora de decisiones
+  implementation/        # Iniciativas formales IMP-YYYYMMDD-XXX
+  analysis/              # Análisis y planes activos/recientes
+  archive/               # Frentes terminados (solo lectura)
 
 config.ts                # Business configuration (hours, contact, etc.)
 ```
@@ -129,7 +130,7 @@ config.ts                # Business configuration (hours, contact, etc.)
 - `/studio` - Sanity Studio (CMS admin interface)
 
 **Generated Routes**:
-- `/sitemap.xml` - Dynamic sitemap (currently uses mock data)
+- `/sitemap.xml` - Dynamic sitemap (desde Sanity, excluye `sold`; ver IMP-20260605-003)
 - `/robots.txt` - Robots configuration
 
 ### Business Context
@@ -180,12 +181,13 @@ config.ts                # Business configuration (hours, contact, etc.)
    - Formula: `cuotaMensual = montoFinanciar * (tasaMensual * (1 + tasaMensual)^cuotas) / ((1 + tasaMensual)^cuotas - 1)`
    - Default interest rate: 12% annual
 
-6. **Forms** (currently simulated)
+6. **Forms** (lead delivery vía WhatsApp — canal transitorio)
    - Financing form
    - Consignment form
    - Contact form
-   - Client-side validation
-   - **Pending**: Backend integration for actual submission
+   - Al enviar, abren WhatsApp con el lead pre-cargado (`lib/leads.ts`). Ver IMP-20260606-001.
+   - `/api/submit-lead` valida con Zod + rate-limit y queda **preparado** para n8n (reenvío env-gated a `N8N_LEAD_WEBHOOK_URL`), pero NO es el canal activo todavía.
+   - **Futuro**: integración n8n → correo (setear la env var + volver los forms a `POST /api/submit-lead`).
 
 7. **SEO & PWA**
    - Dynamic metadata per page
@@ -287,8 +289,8 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 1. **Mock data in production**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set without quotes, then rebuild.
 2. **Images not loading**: Check that vehicles have published images in Sanity and `cdn.sanity.io` is in `next.config.js`.
 3. **Studio not loading**: Ensure env vars are set and you're logged into Sanity.
-4. **Sitemap shows mock data**: `app/sitemap.ts` currently uses `mockVehicles`; update to fetch from Sanity for production.
-5. **Forms don't submit**: Forms currently simulate submission; backend integration required for production.
+4. **Sitemap**: `app/sitemap.ts` ya consume Sanity (`getVehicles`), excluye `sold` y registros sin slug/imágenes (IMP-20260605-003).
+5. **Forms**: entrega vía WhatsApp (canal transitorio, IMP-20260606-001). Integración n8n pendiente (`/api/submit-lead` ya preparado).
 
 ### Hosting Recommendations
 
@@ -324,13 +326,13 @@ Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md
 - `docs/INDEX.md` — mapa de onboarding
 - `docs/implementation/` — iniciativas formales
 
-**Documentación interna** en `claudedocs/`:
-- `00-Analysis-Planning/analisis-queirolo-cl.md` - Analysis of original website
-- `00-Analysis-Planning/FRONTEND_DESIGN_PROPOSAL.md` - Design roadmap
-- `03-Phase3-Enhancement/PHASE3_SUMMARY.md` - Phase 3 implementation notes
-- `04-Phase4-Optimization/PHASE4_SUMMARY.md` - Phase 4 optimization notes
-- `05-Phase5-LaunchPreparation/PHASE5_IMPLEMENTATION_GUIDE.md` - Launch preparation guide
-- `CONFIG_README.md` - Configuration guide (actual config in `config.ts`)
+**Análisis activos** en `docs/analysis/`:
+- `2026-06-05-seo-audit-recomendacion.md` — Diagnóstico SEO + decisiones implementadas
+- `2026-06-05-seo-plan-tecnico-implementacion.md` — Plan por fases (completo)
+- `2026-06-05-performance-audit.md` — Auditoría pre-producción
+
+**Frentes archivados** en `docs/archive/` (solo lectura):
+- Fases 01–08, propuesta-web, auditorías previas (ver `docs/archive/`)
 
 ## Troubleshooting
 
@@ -350,17 +352,17 @@ Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md
 **Solution**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set in `.env.local`
 
 **Problem**: Sitemap doesn't reflect real data  
-**Solution**: `app/sitemap.ts` currently uses `mockVehicles`; update to fetch from Sanity for production
+**Solution**: `app/sitemap.ts` ya consume Sanity (`getVehicles`), excluye `sold` y registros sin slug/imágenes (IMP-20260605-003). Si sigue mostrando datos viejos, verificar que `NEXT_PUBLIC_SANITY_PROJECT_ID` esté correcto y reconstruir.
 
 **Problem**: GA4 not tracking  
 **Solution**: Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`
 
 **Problem**: Forms don't send data  
-**Solution**: Forms currently simulate submission; backend integration required for production
+**Solution**: Los forms entregan vía WhatsApp (deep link `wa.me`, canal transitorio — IMP-20260606-001). Si WhatsApp no abre, revisar bloqueador de pop-ups. La integración n8n (`/api/submit-lead` → `N8N_LEAD_WEBHOOK_URL`) está preparada pero no activa.
 
 ## Security Notes
 
-- All form inputs should be validated server-side (currently client-side only)
+- `/api/submit-lead` y `/api/calculate-loan` validan server-side con Zod + rate-limit. Mantener esa validación cuando se active la entrega server-side (n8n)
 - Use HTTPS for all pages (especially forms)
 - Implement rate limiting on form submissions (when backend is integrated)
 - No sensitive data in client-side code

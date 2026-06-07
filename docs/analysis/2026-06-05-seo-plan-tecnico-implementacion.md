@@ -21,7 +21,7 @@
 | 2 | Listado a Server Component (render server del grid) | 🔴 P0 | ✅ | **Medio** · **✅ HECHA (IMP-20260605-002)** |
 | 3 | Cablear JSON-LD (`Car`+`Offer`, `ItemList`, `Breadcrumb`) | 🔴 P0 | Tras F1 ideal | Bajo · **✅ HECHA (IMP-20260605-002)** |
 | 4 | Sitemap desde Sanity + filtro por `status` | 🔴 P0 | ✅ | Bajo · **✅ HECHA (IMP-20260605-003)** |
-| 5 | OG image dinámica por vehículo (`next/og`) | 🟡 P1 | Tras F1 | Bajo · **⚠️ REVERTIDA a OG estática (bug @vercel/og en Windows) — IMP-20260605-004** |
+| 5 | OG image dinámica por vehículo (`next/og`) | 🟡 P1 | Tras F1 | Bajo · **🟦 DECISIÓN (2026-06-06): se mantiene OG estática (`/og-image.jpg` + foto real del auto vía F1). No es deuda técnica. El bug original de `@vercel/og` era solo de dev en Windows; en Railway (Linux) funcionaría, pero se opta por no implementar — IMP-20260605-004** |
 | 6 | FAQ schema en Servicios + tildes del home | 🟡 P1 | ✅ | Muy bajo · **✅ HECHA (IMP-20260605-004)** |
 | 7 | Privacidad (`plate` fuera del payload) + filtros `noindex` | 🟡 P1 | ✅ | Bajo · **✅ HECHA (canonical estático en vez de noindex) — IMP-20260605-004** |
 | 8 | Medición (GSC env var) + redirect de dominio | 🟢 P2 | ✅ | Infra · **✅ HECHA (redirect vía middleware) — IMP-20260605-004** |
@@ -337,3 +337,17 @@ Al renderizar un Client Component desde un Server Component con props, el HTML i
 6. **F0** en cualquier momento (mejor temprano); **F8** cuando haya acceso a GSC/DNS.
 
 > **Build:** por convención del proyecto, no se buildea tras los cambios salvo pedido explícito. Validar con type-check / dev server.
+
+---
+
+## Cierre del plan (2026-06-06)
+
+El plan queda **cerrado y funcionalmente completo**. Estado verificado contra código:
+
+- **F0–F4, F6–F8:** implementadas y verificadas.
+- **F5:** decisión confirmada de mantener OG estática (no se reimplementa `next/og`). Ver fila de la tabla.
+- **F8 (código):** redirect apex→www resuelto vía `middleware.ts` (308); env var GSC cableada en `lib/seo.ts:94`.
+
+**Único pendiente — operativo, NO de código:** poblar `NEXT_PUBLIC_GSC_VERIFICATION` con el valor real cuando el cliente habilite Google Search Console. Sin valor, Next omite el tag sin romper nada.
+
+**Hosting prod:** Railway (Linux).

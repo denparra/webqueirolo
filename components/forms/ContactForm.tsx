@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getLeadWhatsAppUrl } from '@/lib/leads'
 
 export function ContactForm() {
     const [formData, setFormData] = useState({
@@ -15,39 +16,29 @@ export function ContactForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // Canal transitorio: la solicitud se entrega vía WhatsApp con el mensaje
+    // pre-cargado. Migración futura a n8n documentada en lib/leads.ts.
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitting(true)
 
-        try {
-            const response = await fetch('/api/submit-lead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            })
+        const url = getLeadWhatsAppUrl({
+            type: 'contacto',
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            message: formData.message,
+        })
+        window.open(url, '_blank', 'noopener,noreferrer')
 
-            const data = await response.json()
+        setIsSubmitting(false)
+        setIsSubmitted(true)
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al enviar el formulario')
-            }
-
-            setIsSubmitting(false)
-            setIsSubmitted(true)
-
-            // Reset form after 3 seconds
-            setTimeout(() => {
-                setIsSubmitted(false)
-                setFormData({ name: '', email: '', phone: '', message: '' })
-            }, 3000)
-        } catch (error) {
-            console.error('Error submitting form:', error)
-            setIsSubmitting(false)
-            // Error handling UI could be added here
-            alert('No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos directamente al WhatsApp.')
-        }
+        // Reset form after 3 seconds
+        setTimeout(() => {
+            setIsSubmitted(false)
+            setFormData({ name: '', email: '', phone: '', message: '' })
+        }, 3000)
     }
 
     return (
@@ -73,8 +64,8 @@ export function ContactForm() {
                         aria-atomic="true"
                         className="sr-only"
                     >
-                        {isSubmitting && 'Procesando tu solicitud...'}
-                        {isSubmitted && '¡Gracias por escribirnos! Un asesor te contactará pronto.'}
+                        {isSubmitting && 'Abriendo WhatsApp...'}
+                        {isSubmitted && 'Te abrimos WhatsApp para enviar tu consulta. Presiona enviar en el chat.'}
                     </div>
 
                     <div>
@@ -151,7 +142,7 @@ export function ContactForm() {
                         disabled={isSubmitting || isSubmitted}
                         aria-disabled={isSubmitting || isSubmitted}
                     >
-                        {isSubmitting ? 'Enviando...' : isSubmitted ? '¡Enviado!' : 'Enviar Solicitud'}
+                        {isSubmitting ? 'Abriendo WhatsApp...' : isSubmitted ? '¡Abrimos WhatsApp!' : 'Enviar por WhatsApp'}
                     </Button>
                 </form>
             </CardContent>
