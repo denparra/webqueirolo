@@ -56,7 +56,7 @@ export default function AboutPage() {
                         <SlideUp>
                             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
                                 <Image
-                                    src="/images/history.jpg" // Placeholder
+                                    src="/images/history-2026.jpg"
                                     alt="Nuestra Historia"
                                     fill
                                     className="object-cover"
