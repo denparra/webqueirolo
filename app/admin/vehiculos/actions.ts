@@ -18,10 +18,18 @@ function getStringArray(formData: FormData, key: string): string[] {
   return formData.getAll(key).map(String).filter(Boolean)
 }
 
+function isFileLike(value: unknown): value is File {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'arrayBuffer' in value &&
+    'size' in value &&
+    (value as { size: number }).size > 0
+  )
+}
+
 function getFiles(formData: FormData, key: string): File[] {
-  return formData
-    .getAll(key)
-    .filter((value): value is File => value instanceof File && value.size > 0)
+  return formData.getAll(key).filter(isFileLike) as File[]
 }
 
 function errorRedirectPath(formData: FormData, message: string): string {
