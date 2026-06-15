@@ -71,6 +71,7 @@ app/                     # Next.js App Router
   servicios/page.tsx     # Services (tabs: financing/consignment/contact)
   nosotros/page.tsx      # About page
   contacto/page.tsx      # Contact page with embedded map
+  admin/                 # Private owner admin for vehicle management
   studio/[[...tool]]/    # Sanity Studio (embedded)
   sitemap.ts             # Dynamic sitemap
   robots.ts              # Robots.txt
@@ -127,6 +128,7 @@ config.ts                # Business configuration (hours, contact, etc.)
 - `/servicios` - Services page with tabs (financing, consignment, purchase)
 - `/nosotros` - About page (company history, team)
 - `/contacto` - Contact page with embedded Google Maps iframe
+- `/admin` - Private owner admin for vehicle CRUD over Sanity
 - `/studio` - Sanity Studio (CMS admin interface)
 
 **Generated Routes**:
@@ -135,8 +137,8 @@ config.ts                # Business configuration (hours, contact, etc.)
 
 ### Business Context
 
-**Company**: Queirolo Autos 
-**Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile  
+**Company**: Queirolo Autos
+**Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile
 **Business Model**: Vehicle sales, financing, vehicle purchase (including debt), consignment
 
 **Operating Hours**:
@@ -221,10 +223,20 @@ NEXT_PUBLIC_SANITY_API_VERSION=2026-01-16
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
+Required for private `/admin` vehicle management:
+```env
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=replace_with_sha256_hex
+ADMIN_SESSION_SECRET=replace_with_long_random_secret
+SANITY_API_WRITE_TOKEN=replace_with_server_only_sanity_token
+```
+
 **Critical Notes**:
 - `NEXT_PUBLIC_*` variables are embedded at **build time**. Changing them requires a rebuild.
 - Do **not** use quotes around values in `.env.local` (some VPS environments fail with quotes).
 - If env vars are missing, the app falls back to `mockVehicles` from `lib/data.ts`.
+- `/admin` write operations require `SANITY_API_WRITE_TOKEN`; never expose it as `NEXT_PUBLIC_*`.
+- `ADMIN_PASSWORD_HASH` is SHA-256 hex of the password. Generate it outside the repo and never commit the plain password.
 
 ### Running Sanity Studio
 
@@ -245,6 +257,16 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
    - Images (upload via Sanity asset manager)
    - Features (comfort, safety, entertainment, other)
 4. Click **Publish** (drafts are not visible on frontend)
+
+### Creating and Editing Vehicles from `/admin`
+
+1. Configure `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, and `SANITY_API_WRITE_TOKEN`
+2. Run `npm run dev`
+3. Navigate to `http://localhost:3000/admin`
+4. Log in with the configured admin credentials
+5. Use **Nuevo vehículo** or **Editar** to create/update Sanity `vehicle` documents
+
+`/admin` is the business-friendly workflow. `/studio` remains the technical fallback.
 
 ### Data Fetching
 
@@ -336,28 +358,34 @@ Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md
 
 ## Troubleshooting
 
-**Problem**: Seeing mock data on `/vehiculos`  
-**Solution**: 
+**Problem**: Seeing mock data on `/vehiculos`
+**Solution**:
 1. Check `.env.local` has `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` (no quotes)
 2. Rebuild: `npm run build`
 3. Publish vehicles in Sanity Studio
 
-**Problem**: Images not loading or Next.js Image errors  
+**Problem**: Images not loading or Next.js Image errors
 **Solution**:
 1. Verify images are published in Sanity
 2. Check `next.config.js` includes `cdn.sanity.io` in `remotePatterns` (already configured)
 3. If using mock data, ensure `public/images/vehicles/*` exists
 
-**Problem**: Studio won't open or fails to create vehicles  
+**Problem**: Studio won't open or fails to create vehicles
 **Solution**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set in `.env.local`
 
-**Problem**: Sitemap doesn't reflect real data  
+**Problem**: `/admin` login button is disabled
+**Solution**: Configure `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET`
+
+**Problem**: `/admin` lists vehicles but cannot save
+**Solution**: Configure `SANITY_API_WRITE_TOKEN` with server-side write access. Do not prefix it with `NEXT_PUBLIC_`.
+
+**Problem**: Sitemap doesn't reflect real data
 **Solution**: `app/sitemap.ts` ya consume Sanity (`getVehicles`), excluye `sold` y registros sin slug/imágenes (IMP-20260605-003). Si sigue mostrando datos viejos, verificar que `NEXT_PUBLIC_SANITY_PROJECT_ID` esté correcto y reconstruir.
 
-**Problem**: GA4 not tracking  
+**Problem**: GA4 not tracking
 **Solution**: Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`
 
-**Problem**: Forms don't send data  
+**Problem**: Forms don't send data
 **Solution**: Los forms entregan vía WhatsApp (deep link `wa.me`, canal transitorio — IMP-20260606-001). Si WhatsApp no abre, revisar bloqueador de pop-ups. La integración n8n (`/api/submit-lead` → `N8N_LEAD_WEBHOOK_URL`) está preparada pero no activa.
 
 ## Security Notes
@@ -367,6 +395,7 @@ Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md
 - Implement rate limiting on form submissions (when backend is integrated)
 - No sensitive data in client-side code
 - Sanity API tokens should never be exposed (use environment variables)
+- `/admin` is protected by signed `HttpOnly` cookies; keep `ADMIN_SESSION_SECRET` long and private.
 
 ---
 

@@ -12,6 +12,96 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260614-006
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-006 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El owner reportó error de hidratación de React/Next tras usar el admin. Se revisaron los componentes cliente recién agregados y el `VehicleCard`. |
+| **Acuerdo/resultado** | Se endureció el patrón cliente/servidor: el formulario con server action de eliminación queda en Server Component y solo el botón de confirmación queda como Client Component (`DeleteVehicleSubmitButton`). Además, `VehicleCard` ya no calcula `isInCompare()` desde Zustand/localStorage antes de montar; usa `false` hasta `mounted`, igual que favoritos. |
+| **Impacto**     | Reduce fuentes probables de mismatch SSR/cliente sin cambiar UX. La eliminación y la comparación siguen funcionando igual después de hidratación. |
+| **Siguiente paso** | Reiniciar `npm run dev`, recargar sin caché y confirmar la ruta donde aparecía el error. |
+| **Referencias** | `components/admin/DeleteVehicleSubmitButton.tsx`, `components/admin/VehicleForm.tsx`, `app/admin/vehiculos/page.tsx`, `components/vehicles/VehicleCard.tsx` |
+
+---
+
+### LOG-20260614-005
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-005 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El owner publicó un vehículo duplicado y pidió poder eliminarlo desde `/admin`; además pidió poder mover imágenes en edición para escoger cuál queda como portada. |
+| **Acuerdo/resultado** | Implementado borrado seguro de documentos `vehicle` con confirmación desde listado y edición. El borrado elimina el documento del inventario, no los assets de imagen de Sanity. Implementado reordenamiento client-side de galería existente: los hidden inputs `existingAssetIds` se envían en el orden elegido, por lo que `images[0]` queda como portada pública. |
+| **Impacto**     | El owner puede corregir duplicados sin entrar a Studio y controlar la portada del catálogo/ficha desde el admin. No cambia el modelo de datos: se aprovecha el orden existente del array `images`. |
+| **Siguiente paso** | Probar en `/admin/vehiculos`: editar un vehículo, usar “Usar como portada”, guardar y verificar en `/vehiculos`; eliminar el duplicado con el botón “Eliminar”. |
+| **Referencias** | `app/admin/vehiculos/actions.ts`, `lib/admin/vehicles.ts`, `components/admin/DeleteVehicleButton.tsx`, `components/admin/ExistingImagesManager.tsx`, `components/admin/VehicleForm.tsx`, `app/admin/vehiculos/page.tsx` |
+
+---
+
+### LOG-20260614-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-004 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Al cargar imágenes desde `/admin`, Sanity devolvía `Unprocessable Entity - Invalid image, could not process`. El uploader aceptaba cualquier `image/*` y enviaba el MIME del navegador sin normalizar, lo que deja pasar HEIC/iPhone u otros formatos que Sanity puede rechazar. |
+| **Acuerdo/resultado** | Se agregó preparación server-side antes del upload: JPG/PNG/WEBP/GIF se suben directo con MIME inferido por extensión si hace falta; HEIC/HEIF/TIFF/BMP se intentan convertir a JPG con `sharp`; formatos no soportados devuelven un mensaje claro. El input del admin ahora comunica formatos recomendados. |
+| **Impacto**     | Reduce fallos crudos de Sanity y mejora la carga desde celulares/cámaras. Si `sharp` no puede convertir un HEIC específico, el owner recibe instrucción directa para convertirlo a JPG/PNG. |
+| **Siguiente paso** | Reintentar carga con las mismas imágenes. Si son HEIC y falla conversión, convertirlas a JPG antes de subir. |
+| **Referencias** | `lib/admin/vehicles.ts`, `components/admin/VehicleForm.tsx`, `docs/implementation/IMP-20260614-001/IMP.md` |
+
+---
+
+### LOG-20260614-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-003 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | TEST |
+| **Contexto**    | Validación posterior a implementar el frente funcional `/admin` para gestión de vehículos. |
+| **Acuerdo/resultado** | `npm run lint` OK. `npm run test` OK (3 tests). `npx tsc --noEmit --pretty false` inicialmente detectó un import no usado/incompatible en `__tests__/smoke.test.ts` (`screen` desde `@testing-library/react`); se eliminó el import y el type-check quedó OK. No se ejecutó build por regla del proyecto. |
+| **Impacto**     | La implementación queda validada por lint, tests y type-check sin emitir build. El ajuste del test no cambia comportamiento runtime. |
+| **Siguiente paso** | Configurar env vars reales (`ADMIN_*`, `SANITY_API_WRITE_TOKEN`) y hacer verificación manual creando/editando un vehículo en Sanity. |
+| **Referencias** | `__tests__/smoke.test.ts`, `app/admin/`, `lib/admin/`, `components/admin/`, `middleware.ts` |
+
+---
+
+### LOG-20260614-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-002 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Implementación de las fases funcionales del frente `IMP-20260614-001` para dejar operativo un admin privado de vehículos sin reemplazar Sanity Studio. |
+| **Acuerdo/resultado** | Implementado `/admin` con login formal single-owner, cookie `HttpOnly` firmada, protección en `middleware.ts`, listado admin, alta/edición de vehículos contra Sanity, subida de imágenes con `SANITY_API_WRITE_TOKEN`, descripción enriquecida compatible con texto antiguo y badges públicos para `available/reserved/sold`. En edición, los campos opcionales borrados se limpian en Sanity con `null` para evitar valores fantasma. Se documentaron env vars nuevas en `AGENTS.md` y `CLAUDE.md`. |
+| **Impacto**     | El owner obtiene flujo privado de gestión de inventario sobre Sanity. El frontend público mantiene rutas existentes y ahora muestra descripción/estado. `/studio` queda como respaldo técnico. |
+| **Siguiente paso** | Configurar secrets reales en `.env.local`/deploy y probar manualmente `/admin/login`, creación, edición, cambio de estado e imágenes. |
+| **Referencias** | `docs/implementation/IMP-20260614-001/IMP.md`, `app/admin/`, `components/admin/VehicleForm.tsx`, `lib/admin/`, `lib/richText.ts`, `components/shared/RichTextRenderer.tsx`, `components/vehicles/VehicleStatusBadge.tsx`, `app/vehiculos/[slug]/page.tsx`, `components/vehicles/VehicleCard.tsx`, `sanity/schemaTypes/vehicle.ts`, `middleware.ts`, `AGENTS.md`, `CLAUDE.md` |
+
+---
+
+### LOG-20260614-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260614-001 |
+| **Fecha**       | 2026-06-14 |
+| **Tipo**        | PLAN |
+| **Contexto**    | El owner pidió estructurar e implementar un nuevo frente documental/SOT para mejorar la interfaz donde carga vehículos. Hoy la operación depende de bulk o `/studio`; se quiere una ruta privada tipo `/admin` para alta/edición interactiva, manejo de estados (`vendido`, `reservado`) y mejora de la descripción de la ficha. |
+| **Acuerdo/resultado** | Creado `IMP-20260614-001` como fuente de verdad del frente `admin-vehiculos`. Decisiones registradas: admin ligero propio en `/admin`, Sanity sigue como fuente de verdad, `/studio` queda como respaldo técnico, login formal single-owner, v1 incluye alta + edición + imágenes + estado + preview básica, `reserved`/`sold` visibles con badge, y `description` evoluciona a texto enriquecido con fallback. |
+| **Impacto**     | Sin cambios funcionales ni de runtime. Se establece guía implementable y límites para avanzar sin dañar rutas públicas, SEO, leads ni Studio. |
+| **Siguiente paso** | Ejecutar el frente por fases: F0 auth/preparación segura, F1 shell/login, F2 listado admin, F3 alta/edición, F4 imágenes/preview, F5 descripción enriquecida, F6 badges públicos. |
+| **Referencias** | `docs/implementation/IMP-20260614-001/IMP.md`, `sanity/schemaTypes/vehicle.ts`, `lib/vehicles.ts`, `app/vehiculos/[slug]/page.tsx`, `middleware.ts`, `app/studio/[[...tool]]/page.tsx` |
+
+---
+
 ### LOG-20260607-005
 
 | Campo           | Valor |

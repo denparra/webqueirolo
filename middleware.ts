@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cleanEnvVar } from '@/sanity/env-utils'
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin/session'
 
 /**
  * Redirige el dominio apex (queirolo.cl) al canónico con www (www.queirolo.cl).
@@ -10,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server'
  * Si en el futuro se prefiere resolver el redirect a nivel hosting/DNS, este archivo
  * puede eliminarse sin otros cambios.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const host = request.headers.get('host')
 
     if (host === 'queirolo.cl') {
@@ -19,6 +21,29 @@ export function middleware(request: NextRequest) {
         url.hostname = 'www.queirolo.cl'
         url.port = ''
         return NextResponse.redirect(url, 308)
+    }
+
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        const isLoginRoute = request.nextUrl.pathname === '/admin/login'
+        const sessionSecret = cleanEnvVar(process.env.ADMIN_SESSION_SECRET)
+        const session = await verifyAdminSessionToken(
+            request.cookies.get(ADMIN_SESSION_COOKIE)?.value,
+            sessionSecret
+        )
+
+        if (!session && !isLoginRoute) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/admin/login'
+            url.searchParams.set('next', request.nextUrl.pathname)
+            return NextResponse.redirect(url)
+        }
+
+        if (session && isLoginRoute) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/admin/vehiculos'
+            url.search = ''
+            return NextResponse.redirect(url)
+        }
     }
 
     return NextResponse.next()

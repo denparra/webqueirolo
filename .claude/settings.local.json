@@ -35,7 +35,19 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(echo \"PID: $!\")",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_evaluate",
+      "mcp__magic__21st_magic_component_builder",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(grep -v \"^$\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill:*)",
+      "Bash(node scripts/build-favicon.mjs)",
+      "Bash(powershell.exe *)"
     ]
   }
 }

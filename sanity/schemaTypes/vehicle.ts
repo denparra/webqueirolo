@@ -152,7 +152,9 @@ export default defineType({
         defineField({
             name: 'description',
             title: 'Descripción Adicional',
-            type: 'text',
+            type: 'array',
+            of: [{ type: 'block' }],
+            description: 'Descripción pública del vehículo. Permite párrafos y listas.',
             fieldset: 'specs',
         }),
 

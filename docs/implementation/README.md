@@ -40,4 +40,5 @@ docs/implementation/
 | IMP-20260605-003 | 2026-06-05 | SEO Fase 4 (sitemap desde Sanity) | âœ… completado |
 | IMP-20260605-004 | 2026-06-05 | SEO Fases 5-8 (OG, FAQ/tildes, patente/canonical, GSC/dominio) | âœ… completado |
 | IMP-20260606-002 | 2026-06-06 | SOT de imágenes institucionales (/servicios, /nosotros, /contacto) | planning |
+| IMP-20260614-001 | 2026-06-14 | Admin privado para alta/edición interactiva de vehículos | in-progress |
 

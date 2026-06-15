@@ -4,7 +4,7 @@
 1. Define env vars en `.env.local` (ver "Environment Variables").
 2. `npm install`
 3. `npm run dev`
-4. Abre `http://localhost:3000` y `http://localhost:3000/studio`
+4. Abre `http://localhost:3000`, `http://localhost:3000/studio` y, si configuras auth admin, `http://localhost:3000/admin`
 5. Revisa rutas clave: `/vehiculos`, `/vehiculos/[slug]`, `/servicios`, `/nosotros`, `/contacto`.
 
 Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el frontend usa `mockVehicles` (`lib/data.ts`). En produccion, el codigo hace fail-fast (lanza error) si falta `NEXT_PUBLIC_SANITY_PROJECT_ID`.
@@ -61,17 +61,28 @@ Optional:
 - `NEXT_PUBLIC_SANITY_API_VERSION` (default in `sanity/env-utils.ts`)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (enables GA4)
 
+Required for private `/admin` vehicle management:
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD_HASH` (SHA-256 hex of the admin password; never store the plain password)
+- `ADMIN_SESSION_SECRET` (long random secret for signed admin cookies)
+- `SANITY_API_WRITE_TOKEN` (server-only Sanity token with write access)
+
 Example `.env.local` (placeholders, no quotes):
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=replace_with_sha256_hex
+ADMIN_SESSION_SECRET=replace_with_long_random_secret
+SANITY_API_WRITE_TOKEN=replace_with_server_only_sanity_token
 ```
 
 Notes:
 - `NEXT_PUBLIC_*` is build-time; changes require a rebuild in deploy.
 - Avoid quoted env values; VPS setups with quotes can break Sanity config (see `lib/sanity.ts` cleanEnvVar).
+- `/admin` write operations require `SANITY_API_WRITE_TOKEN`; never expose it as `NEXT_PUBLIC_*`.
 
 ## Coding Style & Naming Conventions
 - Use TypeScript/TSX and follow existing file naming (`PascalCase` for React components, `kebab-case` for route folders).
@@ -125,6 +136,8 @@ Notes:
 - Mock data shows in `/vehiculos`: env vars missing/quoted or Sanity not reachable; see Playbook "Debug deploy VPS".
 - Images fail in Next/Image: check `cdn.sanity.io` config and published assets.
 - Studio fails to load: missing `NEXT_PUBLIC_SANITY_*` env vars.
+- `/admin` login disabled: missing `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, or `ADMIN_SESSION_SECRET`.
+- `/admin` can list but cannot save: missing `SANITY_API_WRITE_TOKEN` or token lacks write permission.
 - GA4 not visible: set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and rebuild.
 
 ## Co-gobierno de reglas

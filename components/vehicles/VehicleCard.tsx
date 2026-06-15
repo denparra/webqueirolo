@@ -18,6 +18,7 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid' // Added
 import { useFavorites } from '@/store/useFavorites' // Added
 import { useCompare } from '@/store/useCompare' // Added
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
+import { VehicleStatusBadge } from './VehicleStatusBadge'
 
 interface VehicleCardProps {
     vehicle: Vehicle
@@ -37,7 +38,7 @@ export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
 
     // Compare Store
     const { isInCompare, toggleCompare } = useCompare()
-    const isComparing = isInCompare(vehicle.id)
+    const isComparing = mounted ? isInCompare(vehicle.id) : false
 
     // Handle hydration mismatch for local storage
     useEffect(() => {
@@ -74,11 +75,12 @@ export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
                 />
 
                 {/* Badge */}
-                {vehicle.isNew && (
+                {vehicle.isNew && (!vehicle.status || vehicle.status === 'available') && (
                     <span className="absolute left-3 top-3 rounded-md bg-primary-500 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
                         RECIÉN LLEGADO
                     </span>
                 )}
+                <VehicleStatusBadge status={vehicle.status} className="absolute left-3 top-3 shadow" />
 
                 {/* Quick Actions (show on hover) */}
                 <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

@@ -1,3 +1,5 @@
+import type { VehicleDescription } from './richText'
+
 // Vehicle Types
 export interface Vehicle {
   id: string
@@ -25,7 +27,7 @@ export interface Vehicle {
   safetyFeatures?: string[]
   entertainmentFeatures?: string[]
   otherFeatures?: string[]
-  description?: string
+  description?: VehicleDescription
 }
 
 export interface VehicleSpecs {

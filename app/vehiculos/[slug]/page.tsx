@@ -21,6 +21,9 @@ import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 import siteConfig from '@/config'
 import { SchemaScript } from '@/components/shared/SchemaScript'
 import { generateVehicleSchema, generateBreadcrumbSchema } from '@/lib/seo'
+import { portableTextToPlainText } from '@/lib/richText'
+import { RichTextRenderer } from '@/components/shared/RichTextRenderer'
+import { VehicleStatusBadge } from '@/components/vehicles/VehicleStatusBadge'
 
 export async function generateStaticParams() {
     const vehicles = await getVehicles()
@@ -64,7 +67,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         .join(' · ') +
         `. Disponible en ${siteConfig.company.fullName}, ${siteConfig.contact.address.city}. ` +
         `Desde ${formatCurrency(vehicle.price)}.`
-    const description = toMetaDescription(vehicle.description?.trim() || autoDescription)
+    const publicDescription = portableTextToPlainText(vehicle.description)
+    const description = toMetaDescription(publicDescription.trim() || autoDescription)
 
     const url = `${siteConfig.url}/vehiculos/${vehicle.slug}`
     const ogImage = vehicle.images?.[0] || vehicle.image
@@ -139,6 +143,9 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                         {vehicle.brand}
                                     </p>
                                     <h1 className="text-3xl font-bold text-gray-900">{vehicle.model}</h1>
+                                    <div className="mt-2">
+                                        <VehicleStatusBadge status={vehicle.status} showAvailable />
+                                    </div>
                                     {vehicle.version && (
                                         <p className="mt-1 text-lg font-medium text-gray-700">{vehicle.version}</p>
                                     )}
@@ -190,6 +197,13 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                 )}
                             </div>
                         </div>
+
+                        {portableTextToPlainText(vehicle.description).trim() && (
+                            <section className="mb-6 rounded-lg bg-white p-6 shadow">
+                                <h2 className="mb-4 text-xl font-bold text-gray-900">Descripción</h2>
+                                <RichTextRenderer value={vehicle.description} />
+                            </section>
+                        )}
 
                         {/* Tabs: Specs & Features */}
                         <Tabs defaultValue="specs" className="rounded-lg bg-white shadow">
