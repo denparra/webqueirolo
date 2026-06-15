@@ -1,229 +1,86 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guia ejecutable para trabajar en este repo.
 
-> **Co-gobierno**: `CLAUDE.md` (raíz, este archivo) y `AGENTS.md` (raíz) son co-base entrelazada.
-> Toda regla crítica nueva debe actualizarse en **ambos** en la misma sesión.
-> Si hay diferencia → aplicar la opción más segura + registrar `DECISION` en `docs/logbook.md`.
-> Ver `docs/INDEX.md` para mapa de lectura completo.
+> Co-gobierno: `CLAUDE.md` y `AGENTS.md` son co-base entrelazada. Toda regla critica nueva o cambiada debe actualizarse en ambos en la misma sesion. Si hay conflicto, aplicar la opcion mas segura y registrar `DECISION` en `docs/logbook.md`.
 
-## Project Overview
+## Estado actual
 
-**Queirolo Autos Website** - Modern, mobile-first Next.js website for a Chilean automotive dealership specializing in semi-used 4x4 vehicles, financing, vehicle purchase (including those with debt), and consignment services.
+Queirolo Autos Web es un sitio Next.js 14 para catalogo de vehiculos, SEO, contacto por WhatsApp y administracion privada de inventario.
 
-**Current Status**: Active development. Frontend complete with Sanity CMS integration. Pending: real vehicle data population, backend integration for forms, final deployment configuration.
+Ultimas mejoras relevantes:
 
-**Tech Stack**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Sanity CMS, Zustand, Framer Motion
+- `/admin` implementado para crear, editar, eliminar y ordenar vehiculos sobre Sanity.
+- Portada publica controlada por el orden de imagenes (`images[0]`).
+- Carga de imagenes endurecida: JPG/PNG/WEBP/GIF directo; HEIC/HEIF/TIFF/BMP se intentan convertir con `sharp`.
+- Estados `available/reserved/sold` visibles con badge en catalogo/ficha.
+- Descripcion de ficha visible y compatible con texto antiguo + Portable Text basico.
+- Leads publicos siguen usando WhatsApp como canal activo; n8n esta preparado pero no activado como flujo principal.
 
-## Development Commands
+## Reglas criticas
 
-All commands are defined in `package.json`:
+- Responder en el idioma del usuario.
+- Verificar antes de afirmar.
+- No ejecutar build automaticamente despues de cambios.
+- No agregar `Co-Authored-By` ni atribucion AI a commits.
+- No commitear sin solicitud explicita del owner.
+- Registrar cambios relevantes en `docs/logbook.md`.
+- Para frentes formales, usar `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`.
+- Secretos solo en env vars; nunca en repo.
+
+## Comandos
 
 ```bash
-# Start development server (includes Sanity Studio at /studio)
 npm run dev
-# Access at http://localhost:3000
-# Sanity Studio at http://localhost:3000/studio
-
-# Build for production
-npm run build
-
-# Start production server (after build)
-npm run start
-
-# Run linter
 npm run lint
+npm run test
+npx tsc --noEmit --pretty false
+npm run build   # solo para deploy/verificacion explicita; no automatico tras cambios
+npm run start
 ```
 
-**Note**: No test framework is currently configured.
+## Rutas
 
-## Project Architecture
+| Ruta | Proposito |
+|------|-----------|
+| `/` | Home |
+| `/vehiculos` | Catalogo con filtros |
+| `/vehiculos/[slug]` | Ficha publica |
+| `/servicios` | Servicios |
+| `/nosotros` | Institucional |
+| `/contacto` | Contacto/mapa |
+| `/admin` | Admin privado del owner |
+| `/studio` | Sanity Studio tecnico |
+| `/sitemap.xml` | Sitemap desde Sanity |
+| `/robots.txt` | Robots |
 
-### Tech Stack Details
+## Estructura clave
 
-**Frontend**:
-- Next.js 14 (App Router) with React 18
-- TypeScript for type safety
-- Tailwind CSS + shadcn/ui (Radix components)
-- Heroicons for icons
-- Framer Motion for animations
-
-**State Management**:
-- Zustand (favorites and vehicle comparison)
-
-**CMS**:
-- Sanity.io with embedded Studio at `/studio`
-- `next-sanity` for data fetching
-- `@sanity/image-url` for image optimization
-- Vision plugin for GROQ query testing
-
-**Analytics** (optional):
-- Google Analytics 4 (when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set)
-
-### Directory Structure
-
-```
-app/                     # Next.js App Router
-  page.tsx               # Home
-  vehiculos/             # Vehicle listing and detail pages
-    page.tsx             # Listing with filters
-    [slug]/page.tsx      # Individual vehicle detail
-  servicios/page.tsx     # Services (tabs: financing/consignment/contact)
-  nosotros/page.tsx      # About page
-  contacto/page.tsx      # Contact page with embedded map
-  admin/                 # Private owner admin for vehicle management
-  studio/[[...tool]]/    # Sanity Studio (embedded)
-  sitemap.ts             # Dynamic sitemap
-  robots.ts              # Robots.txt
-  layout.tsx             # Root layout
-  globals.css            # Global styles
-
-components/              # Reusable UI components
-  layout/                # Header, Footer, WhatsAppButton
-  forms/                 # FinancingForm, ConsignmentForm, ContactForm
-  vehicles/              # VehicleCard, VehicleGallery, CompareBar, etc.
-  ui/                    # shadcn/ui components (Button, Dialog, etc.)
-
-lib/                     # Utilities and data fetching
-  vehicles.ts            # Sanity queries for vehicles (with mock fallback)
-  data.ts                # Mock vehicle data
-  calculations.ts        # Loan calculator logic
-  seo.ts                 # SEO helpers and JSON-LD
-  sanity.ts              # Sanity client configuration
-  types.ts               # TypeScript interfaces
-
-sanity/                  # Sanity CMS configuration
-  env.ts                 # Environment variables
-  lib/client.ts          # Sanity client
-  lib/image.ts           # Image URL builder
-  schemaTypes/           # Schema definitions
-    vehicle.ts           # Vehicle schema
-    index.ts             # Schema exports
-  structure.ts           # Studio structure
-
-store/                   # Zustand state stores
-  useFavorites.ts        # Favorites persistence (localStorage)
-  useCompare.ts          # Vehicle comparison state
-
-public/                  # Static assets
-  images/                # Logo, placeholders
-  manifest.json          # PWA manifest
-
-docs/                    # Gobernanza y trazabilidad activa
-  INDEX.md               # Mapa de onboarding
-  logbook.md             # Bitácora de decisiones
-  implementation/        # Iniciativas formales IMP-YYYYMMDD-XXX
-  analysis/              # Análisis y planes activos/recientes
-  archive/               # Frentes terminados (solo lectura)
-
-config.ts                # Business configuration (hours, contact, etc.)
+```txt
+app/admin/                 # login y CRUD privado
+components/admin/          # UI admin
+lib/admin/                 # auth, sesion, Sanity writes
+middleware.ts              # proteccion /admin + redirects
+sanity/schemaTypes/vehicle.ts
+lib/vehicles.ts            # lectura publica Sanity
+lib/richText.ts            # descripcion rich text/texto plano
+components/vehicles/       # catalogo/ficha/badges
+config.ts                  # datos de negocio
+docs/                      # gobernanza, IMPs, logbook
 ```
 
-### Routes
+## Variables de entorno
 
-**Public Routes**:
-- `/` - Homepage with hero, featured vehicles, services
-- `/vehiculos` - Vehicle catalog with filters (brand, price, year, km, transmission, fuel)
-- `/vehiculos/[slug]` - Vehicle detail page with gallery, specs, calculator
-- `/servicios` - Services page with tabs (financing, consignment, purchase)
-- `/nosotros` - About page (company history, team)
-- `/contacto` - Contact page with embedded Google Maps iframe
-- `/admin` - Private owner admin for vehicle CRUD over Sanity
-- `/studio` - Sanity Studio (CMS admin interface)
-
-**Generated Routes**:
-- `/sitemap.xml` - Dynamic sitemap (desde Sanity, excluye `sold`; ver IMP-20260605-003)
-- `/robots.txt` - Robots configuration
-
-### Business Context
-
-**Company**: Queirolo Autos
-**Location**: Av. Las Condes 12461, Local 4A, Las Condes, Santiago - Chile
-**Business Model**: Vehicle sales, financing, vehicle purchase (including debt), consignment
-
-**Operating Hours**:
-- Monday-Friday: 09:30 - 18:00
-- Saturday: By appointment
-
-**Contact Channels**:
-- Primary: WhatsApp (+56 9) 7214-9979
-- Phone: (+56 2) 4367-0362
-- Instagram: Active presence
-
-### Key Features (Implemented)
-
-1. **Vehicle Catalog** (`/vehiculos`)
-   - Dynamic filtering (brand, price, year, km, transmission, fuel)
-   - Filter state synced to URL query parameters
-   - Grid layout with responsive design
-   - "RECIÉN LLEGADO" badges for new arrivals
-   - Fallback to mock data if Sanity not configured
-
-2. **Vehicle Detail Pages** (`/vehiculos/[slug]`)
-   - Image gallery with lightbox and zoom
-   - Tabbed interface (specifications, features)
-   - Real-time loan calculator
-   - WhatsApp contact integration
-   - SEO metadata and JSON-LD structured data
-
-3. **Vehicle Comparison Tool**
-   - Compare up to 3 vehicles side-by-side
-   - Persistent comparison bar (fixed bottom)
-   - Modal with detailed comparison table
-   - State managed via Zustand
-
-4. **Favorites System**
-   - Heart icon on vehicle cards
-   - Persisted in localStorage
-   - Managed via Zustand store
-
-5. **Loan Calculator**
-   - Real-time monthly payment calculation
-   - Configurable: vehicle price, down payment, installments
-   - Formula: `cuotaMensual = montoFinanciar * (tasaMensual * (1 + tasaMensual)^cuotas) / ((1 + tasaMensual)^cuotas - 1)`
-   - Default interest rate: 12% annual
-
-6. **Forms** (lead delivery vía WhatsApp — canal transitorio)
-   - Financing form
-   - Consignment form
-   - Contact form
-   - Al enviar, abren WhatsApp con el lead pre-cargado (`lib/leads.ts`). Ver IMP-20260606-001.
-   - `/api/submit-lead` valida con Zod + rate-limit y queda **preparado** para n8n (reenvío env-gated a `N8N_LEAD_WEBHOOK_URL`), pero NO es el canal activo todavía.
-   - **Futuro**: integración n8n → correo (setear la env var + volver los forms a `POST /api/submit-lead`).
-
-7. **SEO & PWA**
-   - Dynamic metadata per page
-   - JSON-LD structured data for vehicles
-   - Sitemap and robots.txt
-   - PWA manifest
-   - Cache headers configured in `next.config.js`
-
-8. **Analytics** (optional)
-   - Google Analytics 4 integration
-   - Event tracking helpers available (not fully wired in UI)
-
-9. **Floating WhatsApp Button**
-   - Omnipresent on all pages
-   - Direct link to business WhatsApp
-
-## Sanity CMS Integration
-
-### Environment Variables
-
-Required for Sanity Studio and real data:
+Sanity publico/Studio:
 
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 ```
 
-Optional:
-```env
-NEXT_PUBLIC_SANITY_API_VERSION=2026-01-16
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
+Admin privado:
 
-Required for private `/admin` vehicle management:
 ```env
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=replace_with_sha256_hex
@@ -231,192 +88,36 @@ ADMIN_SESSION_SECRET=replace_with_long_random_secret
 SANITY_API_WRITE_TOKEN=replace_with_server_only_sanity_token
 ```
 
-**Critical Notes**:
-- `NEXT_PUBLIC_*` variables are embedded at **build time**. Changing them requires a rebuild.
-- Do **not** use quotes around values in `.env.local` (some VPS environments fail with quotes).
-- If env vars are missing, the app falls back to `mockVehicles` from `lib/data.ts`.
-- `/admin` write operations require `SANITY_API_WRITE_TOKEN`; never expose it as `NEXT_PUBLIC_*`.
-- `ADMIN_PASSWORD_HASH` is SHA-256 hex of the password. Generate it outside the repo and never commit the plain password.
+Opcional:
 
-### Running Sanity Studio
+```env
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+N8N_LEAD_WEBHOOK_URL=https://...
+```
 
-1. Ensure env vars are set in `.env.local`
-2. Run `npm run dev`
-3. Navigate to `http://localhost:3000/studio`
-4. Log in with your Sanity account
+Notas:
 
-### Creating and Publishing Vehicles
+- `NEXT_PUBLIC_*` se resuelve en build.
+- `SANITY_API_WRITE_TOKEN` es server-only.
+- `ADMIN_PASSWORD_HASH` es SHA-256 hex, no password plano.
+- Sin env vars de Sanity, desarrollo puede caer a mock; produccion debe fallar rapido.
 
-1. In Studio, go to **Vehiculos** (Vehicles)
-2. Click **Create** and select `vehicle` document type
-3. Fill required fields:
-   - Name, slug (must be unique)
-   - Brand, model, year
-   - Price, mileage
-   - Transmission, fuel type
-   - Images (upload via Sanity asset manager)
-   - Features (comfort, safety, entertainment, other)
-4. Click **Publish** (drafts are not visible on frontend)
+## Troubleshooting rapido
 
-### Creating and Editing Vehicles from `/admin`
+| Problema | Accion |
+|----------|--------|
+| `/admin` login deshabilitado | Configurar `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` |
+| `/admin` no guarda | Revisar `SANITY_API_WRITE_TOKEN` y permisos Sanity |
+| Imagen invalida en admin | Usar JPG/PNG/WEBP/GIF; si es HEIC y falla, convertir manualmente a JPG |
+| Portada incorrecta | Editar vehiculo y mover la imagen deseada al primer lugar |
+| Duplicado publicado | Eliminar el documento desde `/admin`; los assets quedan en Sanity |
+| Mock data en catalogo | Revisar `NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET`, sin comillas, y rebuild en deploy |
+| Formularios no llegan por backend | Canal activo es WhatsApp; n8n esta preparado pero no activo |
 
-1. Configure `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, and `SANITY_API_WRITE_TOKEN`
-2. Run `npm run dev`
-3. Navigate to `http://localhost:3000/admin`
-4. Log in with the configured admin credentials
-5. Use **Nuevo vehículo** or **Editar** to create/update Sanity `vehicle` documents
+## Documentos fuente
 
-`/admin` is the business-friendly workflow. `/studio` remains the technical fallback.
-
-### Data Fetching
-
-**How it works**:
-- `lib/vehicles.ts` contains `getVehicles()` and `getVehicleBySlug()`
-- Queries use GROQ: `*[_type == "vehicle"]`
-- Results are mapped to `Vehicle` interface
-- Images are fetched as `images[].asset->url` (from `cdn.sanity.io`)
-- If `projectId` is missing or fetch fails, falls back to `mockVehicles`
-
-**Revalidation**:
-- Data is revalidated every 60 seconds (ISR)
-- Configured via `{ next: { revalidate: 60 } }` in fetch options
-
-**Image Handling**:
-- Images are served from `cdn.sanity.io`
-- `next.config.js` includes `cdn.sanity.io` in `remotePatterns`
-- Placeholder SVG used if no images available
-
-## Deployment Notes
-
-### Build-Time Considerations
-
-- `NEXT_PUBLIC_*` env vars are resolved at **build time**
-- If deploying via Docker or VPS, ensure env vars are set **before** `npm run build`
-- Changing env vars in production requires a rebuild
-
-### Sanity CORS Configuration
-
-- Add your production domain to Sanity CORS origins
-- Go to `manage.sanity.io` → Your Project → API → CORS Origins
-- Add your domain (e.g., `https://queirolo.cl`)
-
-### Image Optimization
-
-- Next.js Image component requires `cdn.sanity.io` in `next.config.js` (already configured)
-- Verify images are published in Sanity and URLs resolve to `cdn.sanity.io`
-- If using mock data in production, ensure `public/images/vehicles/*` exists or images will fail
-
-### Common Pitfalls
-
-1. **Mock data in production**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set without quotes, then rebuild.
-2. **Images not loading**: Check that vehicles have published images in Sanity and `cdn.sanity.io` is in `next.config.js`.
-3. **Studio not loading**: Ensure env vars are set and you're logged into Sanity.
-4. **Sitemap**: `app/sitemap.ts` ya consume Sanity (`getVehicles`), excluye `sold` y registros sin slug/imágenes (IMP-20260605-003).
-5. **Forms**: entrega vía WhatsApp (canal transitorio, IMP-20260606-001). Integración n8n pendiente (`/api/submit-lead` ya preparado).
-
-### Hosting Recommendations
-
-- **Vercel** (recommended for Next.js, automatic deployments)
-- **Netlify** (alternative with similar features)
-- **VPS/Docker** (requires manual setup, ensure env vars are set before build)
-
-## Chilean Market Specifics
-
-- **Currency**: Chilean Peso (CLP) - format with thousand separators: `$18.990.000`
-- **Phone Format**: `+56 9 XXXX XXXX` (mobile) or `+56 2 XXXX XXXX` (landline)
-- **RUT Validation**: Use Módulo 11 algorithm for Chilean ID (if collecting)
-- **Language**: Spanish only (Chilean variant)
-
-## Trazabilidad obligatoria
-
-Ante cualquier cambio relevante:
-1. Registrar en `docs/logbook.md` con ID `LOG-YYYYMMDD-XXX`
-2. Para iniciativas formales, crear `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`
-3. Referencias cruzadas log ↔ IMP ↔ artefactos
-
-**Taxonomía:** `DECISION` | `PLAN` | `ACTION` | `TEST` | `RISK` | `BLOCKER` | `SECURITY` | `INCIDENT`
-
-Ver `docs/INDEX.md` para mapa completo. Ver `docs/implementation/IMP-template.md` para template.
-
----
-
-## Reference Documents
-
-**Gobernanza:**
-- `AGENTS.md` (raíz) — co-base de reglas operativas completas
-- `docs/logbook.md` — bitácora de trazabilidad
-- `docs/INDEX.md` — mapa de onboarding
-- `docs/implementation/` — iniciativas formales
-
-**Análisis activos** en `docs/analysis/`:
-- `2026-06-05-seo-audit-recomendacion.md` — Diagnóstico SEO + decisiones implementadas
-- `2026-06-05-seo-plan-tecnico-implementacion.md` — Plan por fases (completo)
-- `2026-06-05-performance-audit.md` — Auditoría pre-producción
-
-**Frentes archivados** en `docs/archive/` (solo lectura):
-- Fases 01–08, propuesta-web, auditorías previas (ver `docs/archive/`)
-
-## Troubleshooting
-
-**Problem**: Seeing mock data on `/vehiculos`
-**Solution**:
-1. Check `.env.local` has `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` (no quotes)
-2. Rebuild: `npm run build`
-3. Publish vehicles in Sanity Studio
-
-**Problem**: Images not loading or Next.js Image errors
-**Solution**:
-1. Verify images are published in Sanity
-2. Check `next.config.js` includes `cdn.sanity.io` in `remotePatterns` (already configured)
-3. If using mock data, ensure `public/images/vehicles/*` exists
-
-**Problem**: Studio won't open or fails to create vehicles
-**Solution**: Verify `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are set in `.env.local`
-
-**Problem**: `/admin` login button is disabled
-**Solution**: Configure `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET`
-
-**Problem**: `/admin` lists vehicles but cannot save
-**Solution**: Configure `SANITY_API_WRITE_TOKEN` with server-side write access. Do not prefix it with `NEXT_PUBLIC_`.
-
-**Problem**: Sitemap doesn't reflect real data
-**Solution**: `app/sitemap.ts` ya consume Sanity (`getVehicles`), excluye `sold` y registros sin slug/imágenes (IMP-20260605-003). Si sigue mostrando datos viejos, verificar que `NEXT_PUBLIC_SANITY_PROJECT_ID` esté correcto y reconstruir.
-
-**Problem**: GA4 not tracking
-**Solution**: Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env.local`
-
-**Problem**: Forms don't send data
-**Solution**: Los forms entregan vía WhatsApp (deep link `wa.me`, canal transitorio — IMP-20260606-001). Si WhatsApp no abre, revisar bloqueador de pop-ups. La integración n8n (`/api/submit-lead` → `N8N_LEAD_WEBHOOK_URL`) está preparada pero no activa.
-
-## Security Notes
-
-- `/api/submit-lead` y `/api/calculate-loan` validan server-side con Zod + rate-limit. Mantener esa validación cuando se active la entrega server-side (n8n)
-- Use HTTPS for all pages (especially forms)
-- Implement rate limiting on form submissions (when backend is integrated)
-- No sensitive data in client-side code
-- Sanity API tokens should never be exposed (use environment variables)
-- `/admin` is protected by signed `HttpOnly` cookies; keep `ADMIN_SESSION_SECRET` long and private.
-
----
-
-## Change Log
-
-### What was improved and why:
-
-- **Removed outdated "to be determined" stack references**: The tech stack is now Next.js 14 + Sanity, not a static site. Updated to reflect actual implementation.
-- **Replaced static server commands with actual npm scripts**: Removed `python -m http.server` and `npx serve` commands; replaced with real `npm run dev/build/start/lint` from `package.json`.
-- **Removed Docker commands**: No Docker configuration exists in the repo; removed misleading Docker examples.
-- **Updated architecture section with real directory structure**: Added accurate file tree based on actual `app/`, `components/`, `lib/`, `sanity/`, `store/` structure.
-- **Added real routes**: Documented actual routes (`/vehiculos`, `/vehiculos/[slug]`, `/servicios`, `/nosotros`, `/contacto`, `/studio`) verified in codebase.
-- **Added Sanity CMS integration section**: Documented how to run Studio, create/publish vehicles, and how data fetching works (GROQ queries, fallback to mock data).
-- **Added environment variables section**: Documented required `NEXT_PUBLIC_SANITY_*` vars, build-time embedding, and common pitfalls (quotes in env vars).
-- **Added deployment notes**: Documented CORS configuration, image optimization with `cdn.sanity.io`, build-time env var resolution, and common deployment pitfalls.
-- **Removed references to non-existent features**: Removed Leaflet/OpenStreetMap (current implementation uses Google Maps iframe), removed n8n webhook references (forms currently simulated).
-- **Added troubleshooting section**: Practical solutions for common issues (mock data, images not loading, Studio errors, sitemap, forms).
-- **Updated reference documents**: Aligned with actual `claudedocs/` structure and removed non-existent files.
-- **Removed backend integration assumptions**: Clarified that forms currently simulate submission and require backend integration for production.
-- **Added tech stack details**: Listed actual dependencies (Tailwind, shadcn/ui, Zustand, Framer Motion, next-sanity, etc.).
-- **Clarified current status**: Changed from "planning/initial development" to "active development" with clear list of what's done vs. pending.
-- **Removed generic modernization priorities**: Kept only business context and Chilean market specifics; removed redundant design recommendations already implemented.
-- **Added change log**: This section documents all improvements for transparency.
-- **LOG-20260405-001**: Added co-governance header, traceability section, and updated Reference Documents to include governance files (IMP-20260405-001).
+- `README.md` - estado funcional actual.
+- `docs/INDEX.md` - mapa de lectura.
+- `docs/logbook.md` - trazabilidad.
+- `docs/implementation/IMP-20260614-001/IMP.md` - admin privado.
+- `AGENTS.md` - reglas completas del repo.

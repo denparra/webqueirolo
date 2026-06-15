@@ -1,37 +1,46 @@
-# docs/INDEX.md — Mapa de lectura
+# docs/INDEX.md - Mapa de lectura
 
-Guía de onboarding para agentes nuevos. Leer en este orden:
+Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 
-## 1. Arrancar rápido
-→ `AGENTS.md` (raíz) — reglas operativas completas, alcance y restricciones  
-→ `CLAUDE.md` (raíz) — resumen ejecutable, comandos, mapa de rutas
+## 1. Arranque obligatorio
 
-## 2. Entender el proyecto
-→ `README.md` (raíz) — presentación general del repo  
-→ `config.ts` — datos de negocio (contacto, SEO, horarios)
+| Documento | Para que sirve |
+|-----------|----------------|
+| `AGENTS.md` | Reglas operativas completas, restricciones, trazabilidad y DoD |
+| `CLAUDE.md` | Resumen ejecutable para agentes y comandos principales |
+| `README.md` | Estado funcional actual del producto |
 
-## 3. Trazabilidad y decisiones
-→ `docs/logbook.md` — bitácora de cambios y decisiones relevantes  
-→ `docs/implementation/` — iniciativas formales (IMP-YYYYMMDD-XXX)
+## 2. Fuente de verdad tecnica
 
-## 4. Análisis y planificación activos
-→ `docs/analysis/` — análisis y planes recientes (SEO, performance, etc.)
+| Area | Archivo/carpeta |
+|------|-----------------|
+| Schema de vehiculos | `sanity/schemaTypes/vehicle.ts` |
+| Queries publicas Sanity | `lib/vehicles.ts` |
+| Admin privado | `app/admin/`, `components/admin/`, `lib/admin/`, `middleware.ts` |
+| Tipos publicos | `lib/types.ts` |
+| Rich text/descripcion | `lib/richText.ts`, `components/shared/RichTextRenderer.tsx` |
+| Configuracion negocio | `config.ts` |
 
-## 5. Frentes archivados (solo lectura)
-→ `docs/archive/` — fases completadas (01–08), propuestas previas, backups históricos
+## 3. Ultimos frentes relevantes
 
-## Fuente de verdad técnica
-- **Schema de vehículos:** `sanity/schemaTypes/vehicle.ts`
-- **Queries GROQ:** `lib/vehicles.ts`
-- **Configuración de negocio:** `config.ts`
-- **Tipos TypeScript:** `lib/types.ts`
+| Frente | Documento | Estado |
+|--------|-----------|--------|
+| Admin privado de vehiculos | `docs/implementation/IMP-20260614-001/IMP.md` | Implementado; pendiente verificacion manual en deploy con env reales |
+| Migracion/SEO recientes | `docs/implementation/IMP-20260605-001` a `IMP-20260607-002` | Ver cada IMP |
+| Institucional/imagenes | `docs/implementation/IMP-20260606-002/` | Parcial / pendiente assets |
+
+## 4. Trazabilidad
+
+- `docs/logbook.md` registra decisiones, acciones, pruebas, riesgos e incidentes.
+- Toda iniciativa formal vive en `docs/implementation/IMP-YYYYMMDD-XXX/`.
+- `docs/archive/` es solo lectura: no crear trabajo nuevo ahi.
+
+## 5. Convenciones para nuevos frentes
+
+- Analisis/propuesta: `docs/analysis/YYYY-MM-DD-tema.md`.
+- Implementacion formal: `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`.
+- Registrar en `docs/logbook.md` antes/durante el trabajo, no al final.
 
 ## Co-gobierno de reglas
-`AGENTS.md` y `CLAUDE.md` (raíz) son co-base entrelazada.  
-Toda regla crítica debe estar actualizada en **ambos** en la misma sesión.  
-Si hay diferencia → aplicar la opción más segura + registrar `DECISION` en logbook.
 
-## Convención para nuevos frentes
-- **Nuevo análisis / propuesta**: `docs/analysis/YYYY-MM-DD-tema.md`
-- **Nueva implementación formal**: `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`
-- **NO** crear carpetas en la raíz del repo ni en `docs/archive/` (es solo lectura)
+`AGENTS.md` y `CLAUDE.md` son co-base entrelazada. Si una regla critica cambia, actualizar ambos en la misma sesion. Si hay conflicto, aplicar la opcion mas segura y registrar una `DECISION` en logbook.

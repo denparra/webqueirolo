@@ -34,12 +34,14 @@ Routes:
 - `/vehiculos` listado con filtros (cliente)
 - `/vehiculos/[slug]` detalle con `notFound()` si no existe
 - `/servicios`, `/nosotros`, `/contacto`
-- `/studio` Sanity Studio (basePath en `sanity.config.ts`)
+- `/admin` admin privado del owner para alta/edicion/eliminacion de vehiculos sobre Sanity
+- `/studio` Sanity Studio tecnico (basePath en `sanity.config.ts`)
 - `/sitemap.xml` y `/robots.txt` desde `app/sitemap.ts` y `app/robots.ts`
 
 Sanity:
 - Studio usa `sanity.config.ts` + `sanity/env.ts` (env vars requeridas).
 - Schema principal: `sanity/schemaTypes/vehicle.ts`.
+- Admin privado escribe en Sanity desde `lib/admin/vehicles.ts` usando `SANITY_API_WRITE_TOKEN`.
 - Frontend consulta en `lib/vehicles.ts` via GROQ y mapea a `Vehicle`.
 - En desarrollo, si falla la conexion o faltan env vars, se usa `lib/data.ts` como fallback; en produccion el fetch falla con error.
 - `app/sitemap.ts` consulta Sanity (`getVehicles`), excluye `sold` y sin slug/imágenes (IMP-20260605-003).
@@ -47,7 +49,7 @@ Sanity:
 ## Build, Test, and Development Commands
 - `npm install` installs dependencies from `package.json` and `package-lock.json`.
 - `npm run dev` starts the local Next.js dev server with hot reloading.
-- `npm run build` creates an optimized production build in `.next/`.
+- `npm run build` creates an optimized production build in `.next/`; agents must not run it automatically after changes unless explicitly requested.
 - `npm run start` serves the production build locally.
 - `npm run lint` runs the Next.js ESLint rules.
 - `npm run test` runs Jest (smoke tests).
@@ -99,14 +101,15 @@ Notes:
 ## Security & Configuration Tips
 - Store local secrets in `.env.local` (not committed).
 - Review any public asset changes under `public/` to avoid leaking sensitive content.
-- `CONFIG_README.md` references `config.js`, but the real file is `config.ts`.
+- `CONFIG_README.md` documents the real source `config.ts`; vehicle inventory lives in Sanity, not in config.
 
 ## Testing Guidelines (Verification)
 - Manual verification checklist:
   - `npm run lint`
   - `npm run test`
-  - `npm run build`
-  - `npm run start` and open key routes (`/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/studio`)
+  - `npx tsc --noEmit --pretty false`
+  - `npm run build` only when explicitly requested for deploy verification
+  - `npm run start` and open key routes (`/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`, `/studio`)
   - Confirm Sanity data loads (or mock fallback is expected).
   - Confirm images resolve from `cdn.sanity.io` in production.
 
@@ -127,8 +130,8 @@ Notes:
 
 ### Validacion rapida antes de push/deploy
 1. `npm run lint`
-2. `npm run build`
-3. `npm run start` and spot-check `/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/studio`.
+2. `npm run build` only when explicitly requested for deploy verification.
+3. `npm run start` and spot-check `/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`, `/studio`.
 4. Verify env vars are set and no secrets are committed.
 5. Check images load (Sanity CDN in prod) and WhatsApp links use `config.ts`.
 
@@ -138,6 +141,9 @@ Notes:
 - Studio fails to load: missing `NEXT_PUBLIC_SANITY_*` env vars.
 - `/admin` login disabled: missing `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, or `ADMIN_SESSION_SECRET`.
 - `/admin` can list but cannot save: missing `SANITY_API_WRITE_TOKEN` or token lacks write permission.
+- Sanity rejects image as invalid: prefer JPG/PNG/WEBP/GIF; HEIC/HEIF/TIFF/BMP are converted with `sharp` when possible, otherwise convert manually before upload.
+- Wrong vehicle cover: edit in `/admin` and move the desired image to first position; public cover uses `images[0]`.
+- Duplicate vehicle: delete the duplicate document from `/admin`; this does not delete image assets from Sanity.
 - GA4 not visible: set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and rebuild.
 
 ## Co-gobierno de reglas
@@ -237,6 +243,7 @@ Se considera completada una iniciativa cuando:
 ---
 
 ## Change log
+- LOG-20260615-001: Documented latest `/admin` improvements, image handling, cover ordering, duplicate deletion, and current validation/deploy notes.
 - Reordered content into quickstart, how-to, verification, and troubleshooting flow.
 - Added env var requirements, build-time notes, and Sanity workflow details.
 - Documented key routes and data flow (Sanity + fallback).
