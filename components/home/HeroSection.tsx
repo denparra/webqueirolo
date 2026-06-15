@@ -26,7 +26,7 @@ export function HeroSection() {
       <div className="container relative z-10 mx-auto px-4 pb-8 pt-32 lg:pb-12">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="mb-6 text-4xl font-bold leading-tight text-white lg:text-6xl">
-            Queirolo Autos: Tu proximo auto con la confianza de siempre
+            Queirolo Autos: Tu próximo auto con la confianza de siempre
           </h1>
           <p className="mb-8 text-lg text-gray-200 lg:text-xl">
             {siteConfig.company.tagline}
@@ -34,7 +34,7 @@ export function HeroSection() {
           <div className="mb-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <Button size="lg" asChild>
               <Link href="/vehiculos">
-                Ver Vehiculos
+                Ver Vehículos
                 <ArrowRightIcon className="ml-2 h-5 w-5" />
               </Link>
             </Button>

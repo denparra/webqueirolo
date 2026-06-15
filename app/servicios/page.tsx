@@ -16,7 +16,7 @@ import { SchemaScript } from '@/components/shared/SchemaScript'
 import { generateFAQSchema } from '@/lib/seo'
 
 export const metadata: Metadata = {
-    title: 'Servicios - Financiamiento y Consignación - Queirolo Autos',
+    title: 'Servicios - Financiamiento y Consignación',
     description: 'Financiamiento con financieras, consignación de vehículos y recepción en parte de pago. Conoce todos nuestros servicios.',
 }
 

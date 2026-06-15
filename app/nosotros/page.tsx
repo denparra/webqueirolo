@@ -6,7 +6,7 @@ import { CheckCircleIcon, StarIcon } from '@heroicons/react/24/solid'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Nuestra Historia - Queirolo Autos',
+    title: 'Nuestra Historia',
     description: 'Conoce la historia de Queirolo Autos. Más de 60 años de tradición familiar, confianza y pasión por los autos en Chile.',
 }
 

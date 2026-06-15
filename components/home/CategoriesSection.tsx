@@ -17,10 +17,10 @@ export function CategoriesSection() {
         <FadeIn>
           <div className="mb-8 text-center">
             <h2 className="mb-3 text-3xl font-bold text-gray-900 lg:text-4xl">
-              Explora por Categoria
+              Explora por Categoría
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">
-              Encuentra el vehiculo ideal segun tu estilo
+              Encuentra el vehículo ideal según tu estilo
             </p>
           </div>
         </FadeIn>

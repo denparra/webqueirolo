@@ -19,7 +19,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: siteConfig.seo.title,
+  // Objeto title con default + template para que las páginas hijas que exportan
+  // un title string reciban el sufijo "| Queirolo Autos" automáticamente.
+  title: {
+    default: siteConfig.seo.title,
+    template: `%s | ${siteConfig.company.fullName}`,
+  },
   description: siteConfig.seo.description,
 }
 

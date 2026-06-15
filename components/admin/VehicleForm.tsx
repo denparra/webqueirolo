@@ -1,5 +1,11 @@
+'use client'
+
+import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { saveVehicleAction } from '@/app/admin/vehiculos/actions'
+import siteConfig from '@/config'
+import { ShareWhatsAppButton } from '@/components/vehicles/ShareWhatsAppButton'
+import { validateVehicleForm } from '@/lib/admin/vehicleFormValidation'
 import {
   CATEGORY_OPTIONS,
   FEATURE_GROUPS,
@@ -19,10 +25,12 @@ function Field({
   label,
   children,
   required = false,
+  error,
 }: {
   label: string
   children: React.ReactNode
   required?: boolean
+  error?: string
 }) {
   return (
     <label className="block">
@@ -30,6 +38,7 @@ function Field({
         {label} {required && <span className="text-red-600">*</span>}
       </span>
       {children}
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </label>
   )
 }
@@ -77,9 +86,46 @@ export function VehicleForm({
     ? `/admin/vehiculos/${encodeURIComponent(vehicle!.id)}/editar`
     : '/admin/vehiculos/nuevo'
 
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  function clearError(field: string) {
+    setErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+  }
+
+  // Validación client-side: previene el envío al server action cuando faltan
+  // campos requeridos o son inválidos, y muestra mensajes inline sin perder
+  // lo editado. El server action conserva su validación como respaldo.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const formData = new FormData(event.currentTarget)
+
+    const next = validateVehicleForm({
+      name: String(formData.get('name') ?? ''),
+      brand: String(formData.get('brand') ?? ''),
+      model: String(formData.get('model') ?? ''),
+      year: String(formData.get('year') ?? ''),
+      price: String(formData.get('price') ?? ''),
+    })
+
+    if (Object.keys(next).length > 0) {
+      event.preventDefault()
+      setErrors(next)
+      const firstField = Object.keys(next)[0]
+      const el = event.currentTarget.querySelector<HTMLElement>(`[name="${firstField}"]`)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el?.focus({ preventScroll: true })
+    }
+  }
+
+  const shareUrl = vehicle?.slug ? `${siteConfig.url}/vehiculos/${vehicle.slug}` : ''
+
   return (
     <>
-      <form action={saveVehicleAction} className="space-y-6">
+      <form action={saveVehicleAction} onSubmit={handleSubmit} noValidate className="space-y-6">
       <input type="hidden" name="returnTo" value={returnTo} />
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
 
@@ -94,11 +140,13 @@ export function VehicleForm({
           <CardTitle>Información principal</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
-          <Field label="Nombre publicado" required>
+          <Field label="Nombre publicado" required error={errors.name}>
             <Input
               name="name"
               defaultValue={vehicle?.name}
               placeholder="Toyota RAV4 2.0 Lujo"
+              aria-invalid={Boolean(errors.name)}
+              onChange={() => clearError('name')}
               required
             />
           </Field>
@@ -116,8 +164,16 @@ export function VehicleForm({
               options={VEHICLE_STATUS_OPTIONS}
             />
           </Field>
-          <Field label="Precio CLP" required>
-            <Input name="price" type="number" min="0" defaultValue={vehicle?.price || ''} required />
+          <Field label="Precio CLP" required error={errors.price}>
+            <Input
+              name="price"
+              type="number"
+              min="0"
+              defaultValue={vehicle?.price || ''}
+              aria-invalid={Boolean(errors.price)}
+              onChange={() => clearError('price')}
+              required
+            />
           </Field>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
             <input
@@ -136,17 +192,38 @@ export function VehicleForm({
           <CardTitle>Especificaciones</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
-          <Field label="Marca" required>
-            <Input name="brand" defaultValue={vehicle?.brand} required />
+          <Field label="Marca" required error={errors.brand}>
+            <Input
+              name="brand"
+              defaultValue={vehicle?.brand}
+              aria-invalid={Boolean(errors.brand)}
+              onChange={() => clearError('brand')}
+              required
+            />
           </Field>
-          <Field label="Modelo" required>
-            <Input name="model" defaultValue={vehicle?.model} required />
+          <Field label="Modelo" required error={errors.model}>
+            <Input
+              name="model"
+              defaultValue={vehicle?.model}
+              aria-invalid={Boolean(errors.model)}
+              onChange={() => clearError('model')}
+              required
+            />
           </Field>
           <Field label="Versión">
             <Input name="version" defaultValue={vehicle?.version} />
           </Field>
-          <Field label="Año" required>
-            <Input name="year" type="number" min="1990" max="2030" defaultValue={vehicle?.year || ''} required />
+          <Field label="Año" required error={errors.year}>
+            <Input
+              name="year"
+              type="number"
+              min="1990"
+              max="2030"
+              defaultValue={vehicle?.year || ''}
+              aria-invalid={Boolean(errors.year)}
+              onChange={() => clearError('year')}
+              required
+            />
           </Field>
           <Field label="Kilometraje">
             <Input name="mileage" type="number" min="0" defaultValue={vehicle?.mileage || ''} />
@@ -260,6 +337,13 @@ export function VehicleForm({
               Preview público
             </Link>
           </Button>
+        )}
+        {vehicle?.slug && (
+          <ShareWhatsAppButton
+            vehicleName={vehicle.name}
+            vehicleUrl={shareUrl}
+            label="Compartir"
+          />
         )}
         <Button type="submit">{isEditing ? 'Guardar cambios' : 'Crear vehículo'}</Button>
       </div>

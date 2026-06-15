@@ -24,6 +24,7 @@ import { generateVehicleSchema, generateBreadcrumbSchema } from '@/lib/seo'
 import { portableTextToPlainText } from '@/lib/richText'
 import { RichTextRenderer } from '@/components/shared/RichTextRenderer'
 import { VehicleStatusBadge } from '@/components/vehicles/VehicleStatusBadge'
+import { ShareWhatsAppButton } from '@/components/vehicles/ShareWhatsAppButton'
 
 export async function generateStaticParams() {
     const vehicles = await getVehicles()
@@ -103,8 +104,14 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
         notFound()
     }
 
-    const whatsappMessage = `Hola, me interesa el ${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
+    const vehicleTitle = `${vehicle.brand} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''} ${vehicle.year}`
+    const vehicleUrl = `${siteConfig.url}/vehiculos/${vehicle.slug}`
+
+    const whatsappMessage = `Hola, me interesa el ${vehicleTitle}`
     const whatsappUrl = getWhatsAppUrl(siteConfig.contact.whatsapp, whatsappMessage)
+
+    const visitMessage = `Hola, quiero agendar una visita para ver el ${vehicleTitle}`
+    const visitUrl = getWhatsAppUrl(siteConfig.contact.whatsapp, visitMessage)
 
     const breadcrumbSchema = generateBreadcrumbSchema([
         { name: 'Vehículos', url: `${siteConfig.url}/vehiculos` },
@@ -351,11 +358,20 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                             Consultar por WhatsApp
                                         </a>
                                     </Button>
-                                    <Button variant="outline" className="w-full">
-                                        Agendar Visita
+                                    <ShareWhatsAppButton
+                                        vehicleName={vehicleTitle}
+                                        vehicleUrl={vehicleUrl}
+                                        className="w-full"
+                                    />
+                                    <Button variant="outline" className="w-full" asChild>
+                                        <a href={visitUrl} target="_blank" rel="noopener noreferrer">
+                                            Agendar Visita
+                                        </a>
                                     </Button>
-                                    <Button variant="outline" className="w-full">
-                                        Consultar Financiamiento
+                                    <Button variant="outline" className="w-full" asChild>
+                                        <a href="/servicios#financiamiento">
+                                            Consultar Financiamiento
+                                        </a>
                                     </Button>
                                 </CardContent>
                             </Card>

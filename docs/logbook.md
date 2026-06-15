@@ -12,6 +12,52 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260615-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260615-003 |
+| **Fecha**       | 2026-06-15 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Implementacion del frente `IMP-20260615-001` en rama `feat/validaciones-compartir-quick-wins`. Validacion client-side en admin, boton compartir por WhatsApp, fix de CTAs muertos, acentos en home, metadata titles y escaping XSS en JSON-LD. |
+| **Acuerdo/resultado** | (1) `VehicleForm` ahora es client component con `onSubmit`+`noValidate`; valida nombre/marca/modelo/ano(1990-2030)/precio(>0) con mensajes inline y foco al primer error, sin tocar el server action. Logica extraida a `lib/admin/vehicleFormValidation.ts` + 8 tests. (2) Nuevo `ShareWhatsAppButton` reutilizable en ficha publica y admin (modo edicion). (3) CTAs "Agendar Visita" (WhatsApp) y "Consultar Financiamiento" (`/servicios#financiamiento`) ahora funcionan. (4) Acentos corregidos en Hero/Categorias. (5) Metadata titles: se detecto causa raiz en `app/layout.tsx` que sobrescribia el objeto `title` con un string y mataba el template `%s | Queirolo Autos`; se restauro el objeto con `template` y se simplificaron los titulos de nosotros/servicios/contacto. (6) `SchemaScript` escapa `<` como `<`. |
+| **Impacto**     | Mejora UX del admin (no se pierde edicion por campos vacios), nuevo canal de comparticion por WhatsApp, CTAs funcionales, branding consistente en titles de TODO el sitio (no solo 3 paginas) y endurecimiento del JSON-LD. Sin nuevas env vars ni rutas. |
+| **Validacion**  | `npx tsc --noEmit` OK · `npm run lint` OK (0 warnings) · `npm run test` OK (2 suites, 11 tests). No se ejecuto build (regla operativa). |
+| **Siguiente paso** | Verificacion manual en `npm run dev` por el owner (ver IMP). Si aprueba, commitear/pushear bajo solicitud explicita. Quick wins restantes (loading.tsx, filtros de categoria, CSP, etc.) quedan para siguiente iteracion. |
+| **Referencias** | `docs/implementation/IMP-20260615-001/IMP.md`, `components/admin/VehicleForm.tsx`, `lib/admin/vehicleFormValidation.ts`, `__tests__/vehicleFormValidation.test.ts`, `components/vehicles/ShareWhatsAppButton.tsx`, `app/vehiculos/[slug]/page.tsx`, `app/layout.tsx`, `components/shared/SchemaScript.tsx` |
+
+---
+
+### LOG-20260615-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260615-002 |
+| **Fecha**       | 2026-06-15 |
+| **Tipo**        | PLAN |
+| **Contexto**    | El owner identifico que el formulario admin no da feedback cuando hay campos vacios y que no existe boton para compartir vehiculos por WhatsApp. Se realizo analisis del codigo y se detectaron ademas quick wins de alto valor/bajo riesgo. |
+| **Acuerdo/resultado** | Se crea frente `IMP-20260615-001` con tres mejoras principales: (1) validacion client-side en `VehicleForm` para mostrar errores inline sin redirigir, (2) boton "Compartir por WhatsApp" en ficha publica de cada vehiculo, (3) acceso "Ver en sitio" desde el admin en modo edicion. Ademas se incluyen quick wins: CTAs muertos en ficha, acentos en home, metadata titles duplicados, escaping XSS en SchemaScript. |
+| **Impacto**     | Sin impacto de runtime hasta implementacion. El frente queda documentado como SOT. |
+| **Siguiente paso** | Implementar segun plan en `docs/implementation/IMP-20260615-001/IMP.md`. |
+| **Referencias** | `docs/implementation/IMP-20260615-001/IMP.md`, `components/admin/VehicleForm.tsx`, `app/vehiculos/[slug]/page.tsx` |
+
+---
+
+### LOG-20260615-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260615-001 |
+| **Fecha**       | 2026-06-15 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El owner pidio actualizar toda la documentacion para dejar claras las ultimas mejoras del frente admin de vehiculos. Se verifico que `README.md`, `ProyectoWeb.md`, `CONFIG_README.md`, `CLAUDE.md`, `docs/INDEX.md`, `docs/implementation/README.md` y el SOT `IMP-20260614-001` tenian referencias desactualizadas o insuficientes. |
+| **Acuerdo/resultado** | Documentacion actualizada para reflejar `/admin`, auth single-owner, Sanity como fuente de verdad, carga/conversion de imagenes, eliminacion de duplicados, orden de portada, badges de estado, descripcion rich text, validaciones ejecutadas y pendientes de verificacion manual en deploy. Tambien se alinearon `AGENTS.md` y `CLAUDE.md` en los puntos criticos. |
+| **Impacto**     | La fuente documental ahora coincide con el estado funcional reciente y reduce riesgo de operar con instrucciones viejas como `config.js`, `claudedocs`, forms simulados o sitemap mock. No hay cambios funcionales de runtime. |
+| **Siguiente paso** | Revisar visualmente la documentacion si se quiere pulir redaccion; si el owner lo solicita, commitear y pushear estos cambios documentales. |
+| **Referencias** | `README.md`, `ProyectoWeb.md`, `CONFIG_README.md`, `CLAUDE.md`, `AGENTS.md`, `docs/INDEX.md`, `docs/implementation/README.md`, `docs/implementation/IMP-20260614-001/IMP.md` |
+
+---
+
 ### LOG-20260614-006
 
 | Campo           | Valor |
