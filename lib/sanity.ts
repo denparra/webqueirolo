@@ -7,12 +7,10 @@ export const projectId = cleanEnvVar(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID)
 export const dataset = cleanEnvVar(process.env.NEXT_PUBLIC_SANITY_DATASET) || 'production'
 export { apiVersion }
 
-// Log configuration on server startup (only in development or when debugging)
-if (typeof window === 'undefined') {
-    const configStatus = projectId
-        ? `Sanity configured: projectId=${projectId}, dataset=${dataset}`
-        : 'WARNING: Sanity projectId not configured - will use mock data'
-    console.log(`[Sanity] ${configStatus}`)
+// Solo se advierte cuando falta configuración (señal útil). El log de éxito se
+// quitó porque se imprimía en cada render server-side y solo generaba ruido.
+if (typeof window === 'undefined' && !projectId) {
+    console.warn('[Sanity] WARNING: Sanity projectId not configured - will use mock data')
 }
 
 export const client = createClient({

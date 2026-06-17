@@ -12,6 +12,54 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260616-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260616-003 |
+| **Fecha**       | 2026-06-16 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Iteracion 2 del frente `IMP-20260616-001`. Tras verificar la iteracion 1, el owner reporto guardado aun lento (POST /editar con fotos ~39,5s en log de dev) e interfaz /admin pesada al navegar. Analisis del log + codigo: no era "solo conexion con Sanity" sino subida secuencial de imagenes + sobre-fetch del listado + round-trips en serie + ruido de compilacion de dev. |
+| **Acuerdo/resultado** | 5 mejoras aplicadas en `main`: (5.1) `uploadImages` ahora sube en paralelo con limite de concurrencia 3 via nuevo helper `lib/admin/concurrency.ts` (`mapWithConcurrency`, preserva orden -> portada intacta); (5.2) listado usa proyeccion liviana `ADMIN_VEHICLE_LIST_FIELDS` + tipo `AdminVehicleListItem` (solo `images[0...1]` y campos visibles), el query pesado queda solo para editar; (5.3) `ensureUniqueSlug` y `uploadImages` corren con `Promise.all` en `saveAdminVehicle`; (5.4) `lib/sanity.ts` ya no imprime el log de exito en cada render, solo warning si falta projectId; (5.5) aclaracion documental: medir en `build`/deploy, no en dev (el `✓ Compiling` es costo unico de dev; la latencia por navegacion es en parte inherente al `force-dynamic`+`useCdn:false` que da datos frescos). |
+| **Impacto**     | Guardado con varias fotos ~3x mas rapido esperado (paralelizacion). Listado mas liviano por menos datos traidos de Sanity. Log del servidor mas limpio. Front publico sin cambios. Sintaxis GROQ `images[0...1]` verificada contra doc oficial via context7 (/sanity-io/groq). |
+| **Validacion**  | `npx tsc --noEmit` exit 0 · `npx next lint` sin warnings/errores · `npx jest` 24 tests / 4 suites OK (18 previos + 6 nuevos de concurrency). No se ejecuto build (regla operativa). |
+| **Siguiente paso** | Owner mide el guardado con varias fotos tras la paralelizacion, idealmente en `npm run build && npm run start` o en deploy para descartar el costo de compilacion de dev. Commit/push solo bajo solicitud explicita. |
+| **Referencias** | `docs/implementation/IMP-20260616-001/IMP.md` (seccion Iteracion 2), `lib/admin/concurrency.ts`, `__tests__/concurrency.test.ts`, `lib/admin/vehicles.ts`, `lib/sanity.ts` |
+
+---
+
+### LOG-20260616-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260616-002 |
+| **Fecha**       | 2026-06-16 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Implementacion del frente `IMP-20260616-001` (optimizacion de imagenes en /admin). El owner pidio crear primero un punto de restauracion, implementar las mejoras directo en `main`, resguardar lo funcional y correr los tests. |
+| **Acuerdo/resultado** | (0) Tag de respaldo `backup-pre-optimizacion-imagenes-20260616` creado en HEAD pre-cambios. (1) Capa cliente: `components/admin/VehicleForm.tsx` ahora comprime/redimensiona imagenes en el navegador (canvas) al seleccionarlas via `onChange`, reemplaza `input.files` con `DataTransfer`, muestra "Optimizando imagenes..." y deshabilita el submit mientras procesa. Logica en `lib/admin/clientImageCompression.ts` (solo APIs nativas, sin deps nuevas). (2) Capa servidor: `prepareImageForSanity` en `lib/admin/vehicles.ts` ahora redimensiona (max 2400px, fit inside, sin agrandar) + recomprime a JPEG q82 mozjpeg + auto-rotacion EXIF para JPG/PNG/WEBP/HEIC/HEIF/TIFF/BMP; GIF pasa sin tocar para no aplanar animaciones; si sharp falla en un raster directo, sube el original (no bloquea). (3) Config: `experimental.serverActions.bodySizeLimit: '15mb'` en `next.config.js`. (4) Helper puro `lib/admin/imageResize.ts` (`computeTargetDimensions` + constantes) con 7 tests nuevos. |
+| **Impacto**     | Reduce drasticamente los bytes que viajan en la subida desde /admin (cuello de botella en produccion sobre VPS Hostinger). Defensa en profundidad: si la capa cliente no corre (navegador sin soporte), el servidor optimiza igual; el `bodySizeLimit` evita 413 latente. Front publico sin cambios. Desviacion vs plan: GIF se preserva sin convertir a JPEG por seguridad de comportamiento. |
+| **Validacion**  | `npx tsc --noEmit` exit 0 · `npx next lint` sin warnings/errores · `npx jest` 18 tests / 3 suites OK (11 previos + 7 nuevos de imageResize). No se ejecuto build (regla operativa). |
+| **Siguiente paso** | Verificacion manual del owner en `npm run dev`: subir foto pesada (>5MB) y medir mejora, probar foto rotada de celular, HEIC de iPhone, edicion agregando foto sin reemplazar galeria, y revisar peso del payload en el inspector de red. Commit/push solo bajo solicitud explicita del owner. |
+| **Referencias** | `docs/implementation/IMP-20260616-001/IMP.md`, `lib/admin/imageResize.ts`, `lib/admin/clientImageCompression.ts`, `lib/admin/vehicles.ts`, `components/admin/VehicleForm.tsx`, `next.config.js`, `__tests__/imageResize.test.ts`, tag `backup-pre-optimizacion-imagenes-20260616` |
+
+---
+
+### LOG-20260616-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260616-001 |
+| **Fecha**       | 2026-06-16 |
+| **Tipo**        | PLAN |
+| **Contexto**    | Owner reporto /admin lento en produccion (VPS Hostinger + EasyPanel) vs local al editar/crear vehiculos y subir imagenes, sospechando que fotos mas pesadas eran la causa. Analisis de codigo confirmo: `prepareImageForSanity` (`lib/admin/vehicles.ts`) no redimensiona ni recomprime JPG/PNG/WEBP/GIF, solo convierte HEIC/HEIF/TIFF/BMP a JPEG q90 sin resize; el upload viaja por Server Action (`'use server'`) duplicando el salto de red. Se verifico ademas contra documentacion oficial de Next.js 14 que `experimental.serverActions.bodySizeLimit` por defecto es 1MB y este repo no lo sobreescribe — limite latente, no causante de errores hoy segun confirmo el owner ("solo lento, siempre termina guardando"), pero riesgo de 413 con fotos mas pesadas. |
+| **Acuerdo/resultado** | Owner elige estrategia "defensa en profundidad": (1) compresion/resize client-side en `VehicleForm.tsx` via canvas antes de enviar, (2) resize+recompresion+auto-rotacion EXIF server-side con `sharp` en `prepareImageForSanity` para todos los formatos (no solo convertibles), (3) subir `bodySizeLimit` a `15mb` en `next.config.js` como red de seguridad. Se crea `IMP-20260616-001` con el plan completo; el front publico (catalogo/ficha) queda fuera de alcance porque ya esta bien optimizado via `next/image` + CDN de Sanity. Reprocesar imagenes ya existentes en Sanity queda fuera de alcance para una iteracion futura. |
+| **Impacto**     | Documento de planificacion unicamente; no se modifico codigo todavia. Define alcance, archivos a tocar, riesgos y plan de validacion para la siguiente sesion de implementacion. |
+| **Validacion**  | No aplica (no hay codigo nuevo en esta entrada). |
+| **Siguiente paso** | Implementar las 3 capas descritas en `IMP-20260616-001`, crear rama `feat/optimizacion-imagenes-admin`, correr `npm run lint`, `npm run test`, `npx tsc --noEmit` y pasar la verificacion manual de 6 puntos antes de pedir aprobacion del owner. |
+| **Referencias** | `docs/implementation/IMP-20260616-001/IMP.md`, `lib/admin/vehicles.ts`, `components/admin/VehicleForm.tsx`, `next.config.js` |
+
+---
+
 ### LOG-20260615-003
 
 | Campo           | Valor |

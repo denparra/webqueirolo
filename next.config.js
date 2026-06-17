@@ -6,6 +6,12 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
     serverComponentsExternalPackages: ['require-in-the-middle'],
+    // Margen para la subida de imágenes desde /admin. El default de Server
+    // Actions es 1MB; con compresión cliente + sharp en servidor el payload
+    // real es mucho menor, pero esto evita un 413 si la capa cliente no corre.
+    serverActions: {
+      bodySizeLimit: '15mb',
+    },
   },
 
   // Image optimization

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import Link from 'next/link'
 import { saveVehicleAction } from '@/app/admin/vehiculos/actions'
 import siteConfig from '@/config'
 import { ShareWhatsAppButton } from '@/components/vehicles/ShareWhatsAppButton'
 import { validateVehicleForm } from '@/lib/admin/vehicleFormValidation'
+import { compressImageFiles } from '@/lib/admin/clientImageCompression'
 import {
   CATEGORY_OPTIONS,
   FEATURE_GROUPS,
@@ -87,6 +88,29 @@ export function VehicleForm({
     : '/admin/vehiculos/nuevo'
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [processingImages, setProcessingImages] = useState(false)
+
+  // Comprime/redimensiona las imágenes en el navegador apenas se seleccionan y
+  // reemplaza los archivos del input por las versiones livianas, conservando el
+  // name="images" que el server action espera. Si algo falla, quedan los
+  // originales y la capa de servidor (sharp) los optimiza igual.
+  async function handleImagesChange(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const files = input.files ? Array.from(input.files) : []
+    if (files.length === 0) return
+
+    setProcessingImages(true)
+    try {
+      const compressed = await compressImageFiles(files)
+      const dataTransfer = new DataTransfer()
+      compressed.forEach((file) => dataTransfer.items.add(file))
+      input.files = dataTransfer.files
+    } catch {
+      // Se conservan los archivos originales; el servidor los optimiza.
+    } finally {
+      setProcessingImages(false)
+    }
+  }
 
   function clearError(field: string) {
     setErrors((prev) => {
@@ -288,11 +312,16 @@ export function VehicleForm({
               accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif"
               multiple
               required={!isEditing}
+              onChange={handleImagesChange}
             />
           </Field>
+          {processingImages && (
+            <p className="text-xs font-medium text-primary-700">Optimizando imágenes…</p>
+          )}
           <p className="text-xs text-gray-500">
-            Formatos recomendados: JPG, PNG, WEBP o GIF. Las fotos HEIC/HEIF de iPhone se intentan convertir a JPG
-            automáticamente; si fallan, conviértelas antes de subir.
+            Formatos recomendados: JPG, PNG, WEBP o GIF. Las fotos se optimizan automáticamente (se reducen de tamaño y
+            peso) antes de subirse para acelerar la carga. Las HEIC/HEIF de iPhone se convierten a JPG; si fallan,
+            conviértelas antes de subir.
           </p>
         </CardContent>
       </Card>
@@ -345,7 +374,9 @@ export function VehicleForm({
             label="Compartir"
           />
         )}
-        <Button type="submit">{isEditing ? 'Guardar cambios' : 'Crear vehículo'}</Button>
+        <Button type="submit" disabled={processingImages}>
+          {processingImages ? 'Optimizando imágenes…' : isEditing ? 'Guardar cambios' : 'Crear vehículo'}
+        </Button>
       </div>
       </form>
 

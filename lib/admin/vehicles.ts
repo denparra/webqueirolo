@@ -4,6 +4,12 @@ import { dataset, projectId, apiVersion } from '@/lib/sanity'
 import { cleanEnvVar } from '@/sanity/env-utils'
 import { generateSlug } from '@/lib/utils'
 import { portableTextToPlainText, textToPortableText, type VehicleDescription } from '@/lib/richText'
+import { SERVER_MAX_EDGE, SERVER_JPEG_QUALITY } from '@/lib/admin/imageResize'
+import { mapWithConcurrency } from '@/lib/admin/concurrency'
+
+// Máximo de imágenes que se procesan y suben a Sanity en paralelo. Equilibra
+// velocidad (vs subida secuencial) contra uso de memoria/red del servidor.
+const UPLOAD_CONCURRENCY = 3
 
 export interface AdminVehicleImage {
   assetId: string
@@ -125,6 +131,21 @@ function inferImageMimeType(filename: string, mimeType: string): string {
   return mimeType
 }
 
+// Redimensiona y recomprime a JPEG optimizado, respetando la orientación EXIF
+// (.rotate() sin argumentos) y sin agrandar imágenes pequeñas.
+async function resizeToOptimizedJpeg(buffer: Buffer): Promise<Buffer> {
+  return sharp(buffer)
+    .rotate()
+    .resize({
+      width: SERVER_MAX_EDGE,
+      height: SERVER_MAX_EDGE,
+      fit: 'inside',
+      withoutEnlargement: true,
+    })
+    .jpeg({ quality: SERVER_JPEG_QUALITY, mozjpeg: true })
+    .toBuffer()
+}
+
 async function prepareImageForSanity(file: File): Promise<{
   buffer: Buffer
   filename: string
@@ -134,18 +155,38 @@ async function prepareImageForSanity(file: File): Promise<{
   const extension = getFileExtension(file.name)
   const inferredContentType = inferImageMimeType(file.name, file.type)
 
-  if (DIRECT_UPLOAD_MIME_TYPES.has(inferredContentType)) {
+  // GIF se sube sin tocar para no aplanar animaciones ni alterar el flujo actual.
+  if (inferredContentType === 'image/gif') {
     return {
       buffer: originalBuffer,
       filename: file.name,
-      contentType: inferredContentType,
+      contentType: 'image/gif',
     }
   }
 
+  // JPG/PNG/WEBP: se redimensionan y recomprimen a JPEG. Si sharp falla por
+  // cualquier motivo, se sube el original para no bloquear al owner.
+  if (DIRECT_UPLOAD_MIME_TYPES.has(inferredContentType)) {
+    try {
+      return {
+        buffer: await resizeToOptimizedJpeg(originalBuffer),
+        filename: file.name.replace(/\.[^.]+$/, '.jpg'),
+        contentType: 'image/jpeg',
+      }
+    } catch {
+      return {
+        buffer: originalBuffer,
+        filename: file.name,
+        contentType: inferredContentType,
+      }
+    }
+  }
+
+  // HEIC/HEIF/TIFF/BMP: se convierten, redimensionan y recomprimen a JPEG.
   if (CONVERTIBLE_EXTENSIONS.has(extension) || file.type === 'image/heic' || file.type === 'image/heif') {
     try {
       return {
-        buffer: await sharp(originalBuffer).rotate().jpeg({ quality: 90 }).toBuffer(),
+        buffer: await resizeToOptimizedJpeg(originalBuffer),
         filename: file.name.replace(/\.[^.]+$/, '.jpg'),
         contentType: 'image/jpeg',
       }
@@ -197,6 +238,46 @@ function mapAdminVehicle(raw: any): AdminVehicle {
   }
 }
 
+// Versión liviana para el listado de /admin/vehiculos: solo los campos que la
+// tabla realmente muestra. Evita traer descripción, equipamiento y toda la
+// galería de cada vehículo en cada carga del listado.
+export interface AdminVehicleListItem {
+  id: string
+  name: string
+  slug: string
+  status: 'available' | 'reserved' | 'sold'
+  price: number
+  brand: string
+  model: string
+  version?: string
+  year: number
+  mileage?: number
+  images: AdminVehicleImage[]
+}
+
+function mapAdminVehicleListItem(raw: any): AdminVehicleListItem {
+  return {
+    id: raw._id,
+    name: raw.name || '',
+    slug: raw.slug || '',
+    status: raw.status || 'available',
+    price: raw.price || 0,
+    brand: raw.brand || '',
+    model: raw.model || '',
+    version: raw.version || undefined,
+    year: raw.year || 0,
+    mileage: raw.mileage || undefined,
+    images: Array.isArray(raw.images)
+      ? raw.images
+          .filter((image: any) => image?.asset?._id && image?.asset?.url)
+          .map((image: any) => ({
+            assetId: image.asset._id,
+            url: image.asset.url,
+          }))
+      : [],
+  }
+}
+
 const ADMIN_VEHICLE_FIELDS = `
   _id,
   name,
@@ -225,14 +306,32 @@ const ADMIN_VEHICLE_FIELDS = `
   }
 `
 
-export async function getAdminVehicles(): Promise<AdminVehicle[]> {
+// Proyección mínima para el listado: solo la primera imagen (portada) y los
+// campos visibles en la tabla.
+const ADMIN_VEHICLE_LIST_FIELDS = `
+  _id,
+  name,
+  "slug": slug.current,
+  status,
+  price,
+  brand,
+  model,
+  version,
+  year,
+  mileage,
+  "images": images[0...1]{
+    asset->{ _id, url }
+  }
+`
+
+export async function getAdminVehicles(): Promise<AdminVehicleListItem[]> {
   assertSanityConfigured()
   const results = await adminReadClient.fetch<any[]>(
-    `*[_type == "vehicle"] | order(_createdAt desc) { ${ADMIN_VEHICLE_FIELDS} }`,
+    `*[_type == "vehicle"] | order(_createdAt desc) { ${ADMIN_VEHICLE_LIST_FIELDS} }`,
     {},
     { next: { revalidate: 0 } }
   )
-  return results.map(mapAdminVehicle)
+  return results.map(mapAdminVehicleListItem)
 }
 
 export async function getAdminVehicleById(id: string): Promise<AdminVehicle | null> {
@@ -266,28 +365,27 @@ async function ensureUniqueSlug(baseSlug: string, currentId?: string): Promise<s
 
 async function uploadImages(files: File[]) {
   const client = getAdminWriteClient()
-  const imageRefs = []
+  const validFiles = files.filter((file) => file && file.size > 0)
 
-  for (const file of files) {
-    if (!file || file.size === 0) continue
-
+  // Se procesan y suben en paralelo (con límite de concurrencia) en vez de una
+  // por una. mapWithConcurrency preserva el orden, así images[0] sigue siendo
+  // la portada elegida por el owner.
+  return mapWithConcurrency(validFiles, UPLOAD_CONCURRENCY, async (file) => {
     const image = await prepareImageForSanity(file)
     const asset = await client.assets.upload('image', image.buffer, {
       filename: image.filename,
       contentType: image.contentType,
     })
 
-    imageRefs.push({
+    return {
       _type: 'image',
       _key: asset._id,
       asset: {
         _type: 'reference',
         _ref: asset._id,
       },
-    })
-  }
-
-  return imageRefs
+    }
+  })
 }
 
 export async function saveAdminVehicle(input: SaveVehicleInput) {
@@ -295,8 +393,13 @@ export async function saveAdminVehicle(input: SaveVehicleInput) {
   const client = getAdminWriteClient()
 
   const generatedSlug = generateSlug(input.brand, `${input.model} ${input.version || ''}`.trim(), input.year)
-  const slug = await ensureUniqueSlug(input.slug || generatedSlug, input.id)
-  const uploadedImageRefs = await uploadImages(input.imageFiles)
+
+  // El chequeo de slug y la subida de imágenes son independientes: se corren en
+  // paralelo para no sumar el round-trip del slug al tiempo de subida.
+  const [slug, uploadedImageRefs] = await Promise.all([
+    ensureUniqueSlug(input.slug || generatedSlug, input.id),
+    uploadImages(input.imageFiles),
+  ])
   const existingImageRefs = input.replaceImages
     ? []
     : input.existingAssetIds.map((assetId) => ({
