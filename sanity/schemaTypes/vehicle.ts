@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '../../lib/constants/vehicleBrands'
 
 export default defineType({
     name: 'vehicle',
@@ -65,7 +66,11 @@ export default defineType({
         defineField({
             name: 'brand',
             title: 'Marca',
-            type: 'string', // Podría ser un dropdown si prefieres estandarizar
+            type: 'string',
+            options: {
+                list: [...VEHICLE_BRANDS, OTHER_BRAND_OPTION],
+            },
+            description: 'Si la marca no aparece en la lista, escribe el nombre directamente en este campo.',
             validation: (Rule) => Rule.required(),
             fieldset: 'specs',
         }),

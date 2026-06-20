@@ -8,12 +8,14 @@ import { ShareWhatsAppButton } from '@/components/vehicles/ShareWhatsAppButton'
 import { validateVehicleForm } from '@/lib/admin/vehicleFormValidation'
 import { compressImageFiles } from '@/lib/admin/clientImageCompression'
 import {
+  BRAND_OPTIONS,
   CATEGORY_OPTIONS,
   FEATURE_GROUPS,
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
   VEHICLE_STATUS_OPTIONS,
 } from '@/lib/admin/vehicleOptions'
+import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '@/lib/constants/vehicleBrands'
 import type { AdminVehicle } from '@/lib/admin/vehicles'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -89,6 +91,15 @@ export function VehicleForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [processingImages, setProcessingImages] = useState(false)
+
+  // El select de marca muestra "Otra" cuando el vehículo tiene una marca que
+  // no está en el catálogo fijo (ej. cargada antes de existir el dropdown),
+  // para no perder el valor real y dejar que el usuario decida si lo normaliza.
+  const knownBrands: readonly string[] = VEHICLE_BRANDS
+  const initialBrandIsKnown = !vehicle?.brand || knownBrands.includes(vehicle.brand)
+  const [brandSelection, setBrandSelection] = useState(
+    initialBrandIsKnown ? vehicle?.brand || '' : OTHER_BRAND_OPTION
+  )
 
   // Comprime/redimensiona las imágenes en el navegador apenas se seleccionan y
   // reemplaza los archivos del input por las versiones livianas, conservando el
@@ -217,13 +228,35 @@ export function VehicleForm({
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <Field label="Marca" required error={errors.brand}>
-            <Input
-              name="brand"
-              defaultValue={vehicle?.brand}
+            <select
+              name={brandSelection === OTHER_BRAND_OPTION ? undefined : 'brand'}
+              value={brandSelection}
+              onChange={(event) => {
+                setBrandSelection(event.target.value)
+                clearError('brand')
+              }}
               aria-invalid={Boolean(errors.brand)}
-              onChange={() => clearError('brand')}
+              className="h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
-            />
+            >
+              <option value="">Seleccionar</option>
+              {BRAND_OPTIONS.map((brand) => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
+              ))}
+            </select>
+            {brandSelection === OTHER_BRAND_OPTION && (
+              <Input
+                name="brand"
+                defaultValue={initialBrandIsKnown ? '' : vehicle?.brand}
+                placeholder="Escribe la marca"
+                aria-invalid={Boolean(errors.brand)}
+                onChange={() => clearError('brand')}
+                required
+                className="mt-2"
+              />
+            )}
           </Field>
           <Field label="Modelo" required error={errors.model}>
             <Input

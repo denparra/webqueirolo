@@ -1,3 +1,7 @@
+import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '@/lib/constants/vehicleBrands'
+
+export const BRAND_OPTIONS = [...VEHICLE_BRANDS, OTHER_BRAND_OPTION]
+
 export const VEHICLE_STATUS_OPTIONS = [
   { value: 'available', label: 'Disponible' },
   { value: 'reserved', label: 'Reservado' },

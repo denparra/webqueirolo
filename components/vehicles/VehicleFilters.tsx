@@ -27,11 +27,13 @@ export function VehicleFilters({ filters, onFiltersChange, resultCount, allVehic
     const brandOptions = useMemo(() => {
         if (!allVehicles || !allVehicles.length) return []
         const brands = Array.from(new Set(allVehicles.map((v) => v.brand)))
-        return brands.map((brand) => ({
-            id: brand.toLowerCase(),
-            name: brand,
-            count: allVehicles.filter((v) => v.brand.toLowerCase() === brand.toLowerCase()).length,
-        }))
+        return brands
+            .map((brand) => ({
+                id: brand.toLowerCase(),
+                name: brand,
+                count: allVehicles.filter((v) => v.brand.toLowerCase() === brand.toLowerCase()).length,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }))
     }, [allVehicles])
 
     const transmissionOptions = useMemo(() => {
