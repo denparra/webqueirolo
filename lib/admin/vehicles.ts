@@ -69,6 +69,8 @@ export interface SaveVehicleInput {
   existingAssetIds: string[]
   replaceImages: boolean
   imageFiles: File[]
+  originalSlug?: string
+  imagesOrderChanged: boolean
 }
 
 const adminReadClient = createClient({
@@ -393,28 +395,43 @@ export async function saveAdminVehicle(input: SaveVehicleInput) {
   const client = getAdminWriteClient()
 
   const generatedSlug = generateSlug(input.brand, `${input.model} ${input.version || ''}`.trim(), input.year)
+  const candidateSlug = input.slug || generatedSlug
 
-  // El chequeo de slug y la subida de imágenes son independientes: se corren en
-  // paralelo para no sumar el round-trip del slug al tiempo de subida.
+  // Edición sin cambios de marca/modelo/versión/año/slug: el slug candidato es
+  // igual al que ya está guardado, así que no hace falta pagar el round-trip
+  // de unicidad contra Sanity.
+  const slugUnchanged = Boolean(input.id) && candidateSlug === input.originalSlug
+
+  // Edición sin tocar la galería (sin archivos nuevos, sin reemplazo, sin
+  // reordenar): evita reconstruir y reescribir el array `images` completo en
+  // el patch, que es el costo real de "cualquier guardado toca las fotos".
+  const imagesChanged =
+    !input.id || input.replaceImages || input.imageFiles.length > 0 || input.imagesOrderChanged
+
   const [slug, uploadedImageRefs] = await Promise.all([
-    ensureUniqueSlug(input.slug || generatedSlug, input.id),
-    uploadImages(input.imageFiles),
+    slugUnchanged ? Promise.resolve(candidateSlug) : ensureUniqueSlug(candidateSlug, input.id),
+    imagesChanged ? uploadImages(input.imageFiles) : Promise.resolve([]),
   ])
-  const existingImageRefs = input.replaceImages
-    ? []
-    : input.existingAssetIds.map((assetId) => ({
-        _type: 'image',
-        _key: assetId,
-        asset: {
-          _type: 'reference',
-          _ref: assetId,
-        },
-      }))
 
-  const images = [...existingImageRefs, ...uploadedImageRefs]
+  let images: Array<{ _type: string; _key: string; asset: { _type: string; _ref: string } }> | undefined
 
-  if (images.length === 0) {
-    throw new Error('Debes subir al menos una imagen del vehículo.')
+  if (imagesChanged) {
+    const existingImageRefs = input.replaceImages
+      ? []
+      : input.existingAssetIds.map((assetId) => ({
+          _type: 'image',
+          _key: assetId,
+          asset: {
+            _type: 'reference',
+            _ref: assetId,
+          },
+        }))
+
+    images = [...existingImageRefs, ...uploadedImageRefs]
+
+    if (images.length === 0) {
+      throw new Error('Debes subir al menos una imagen del vehículo.')
+    }
   }
 
   const vehicleFields = {
@@ -442,7 +459,7 @@ export async function saveAdminVehicle(input: SaveVehicleInput) {
     entertainmentFeatures: input.entertainmentFeatures,
     otherFeatures: input.otherFeatures,
     isFeatured: input.isFeatured,
-    images,
+    ...(images !== undefined ? { images } : {}),
   }
 
   if (input.id) {

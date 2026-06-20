@@ -69,6 +69,8 @@ export async function saveVehicleAction(formData: FormData) {
     existingAssetIds: getStringArray(formData, 'existingAssetIds'),
     replaceImages: formData.get('replaceImages') === 'on',
     imageFiles: getFiles(formData, 'images'),
+    originalSlug: getString(formData, 'originalSlug') || undefined,
+    imagesOrderChanged: formData.get('imagesOrderChanged') === 'true',
   }
 
   if (!input.name || !input.brand || !input.model || !input.year || !input.price) {

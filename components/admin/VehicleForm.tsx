@@ -163,6 +163,7 @@ export function VehicleForm({
       <form action={saveVehicleAction} onSubmit={handleSubmit} noValidate className="space-y-6">
       <input type="hidden" name="returnTo" value={returnTo} />
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
+      {vehicle && <input type="hidden" name="originalSlug" value={vehicle.slug} />}
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">

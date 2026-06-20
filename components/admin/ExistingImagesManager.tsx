@@ -13,11 +13,21 @@ function moveItem<T>(items: T[], from: number, to: number): T[] {
 
 export function ExistingImagesManager({ images }: { images: AdminVehicleImage[] }) {
   const [orderedImages, setOrderedImages] = React.useState(images)
+  // Solo se marca "cambiada" la galería si el usuario reordena algo. Así el
+  // server puede saltar la reescritura del array `images` cuando el guardado
+  // no tocó fotos (ej. solo cambiar el precio).
+  const [dirty, setDirty] = React.useState(false)
+
+  function reorder(updater: (current: AdminVehicleImage[]) => AdminVehicleImage[]) {
+    setOrderedImages(updater)
+    setDirty(true)
+  }
 
   if (orderedImages.length === 0) return null
 
   return (
     <div>
+      {dirty && <input type="hidden" name="imagesOrderChanged" value="true" />}
       <p className="mb-2 text-sm font-medium text-gray-700">Galería actual</p>
       <p className="mb-3 text-xs text-gray-500">
         La primera imagen será la portada del catálogo y la ficha. Puedes mover cualquier imagen al inicio.
@@ -39,7 +49,7 @@ export function ExistingImagesManager({ images }: { images: AdminVehicleImage[] 
                 type="button"
                 className="rounded-md border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
                 disabled={index === 0}
-                onClick={() => setOrderedImages((current) => moveItem(current, index, index - 1))}
+                onClick={() => reorder((current) => moveItem(current, index, index - 1))}
               >
                 Subir
               </button>
@@ -47,7 +57,7 @@ export function ExistingImagesManager({ images }: { images: AdminVehicleImage[] 
                 type="button"
                 className="rounded-md border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
                 disabled={index === orderedImages.length - 1}
-                onClick={() => setOrderedImages((current) => moveItem(current, index, index + 1))}
+                onClick={() => reorder((current) => moveItem(current, index, index + 1))}
               >
                 Bajar
               </button>
@@ -55,7 +65,7 @@ export function ExistingImagesManager({ images }: { images: AdminVehicleImage[] 
                 type="button"
                 className="col-span-2 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
                 disabled={index === 0}
-                onClick={() => setOrderedImages((current) => moveItem(current, index, 0))}
+                onClick={() => reorder((current) => moveItem(current, index, 0))}
               >
                 Usar como portada
               </button>
