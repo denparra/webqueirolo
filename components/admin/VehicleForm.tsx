@@ -4,7 +4,6 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import Link from 'next/link'
 import { saveVehicleAction } from '@/app/admin/vehiculos/actions'
 import siteConfig from '@/config'
-import { ShareWhatsAppButton } from '@/components/vehicles/ShareWhatsAppButton'
 import { validateVehicleForm } from '@/lib/admin/vehicleFormValidation'
 import { compressImageFiles } from '@/lib/admin/clientImageCompression'
 import {
@@ -24,6 +23,7 @@ import { ExistingImagesManager } from './ExistingImagesManager'
 import { deleteVehicleAction } from '@/app/admin/vehiculos/actions'
 import { DeleteVehicleSubmitButton } from './DeleteVehicleSubmitButton'
 import { VehicleSubmitButton } from './VehicleSubmitButton'
+import { VehicleFormSecondaryActions } from './VehicleFormSecondaryActions'
 
 function Field({
   label,
@@ -392,23 +392,11 @@ export function VehicleForm({
       </Card>
 
       <div className="sticky bottom-0 flex flex-col gap-3 border-t border-gray-200 bg-white/95 p-4 backdrop-blur md:flex-row md:justify-end">
-        <Button variant="outline" asChild>
-          <Link href="/admin/vehiculos">Cancelar</Link>
-        </Button>
-        {vehicle?.slug && (
-          <Button variant="secondary" asChild>
-            <Link href={`/vehiculos/${vehicle.slug}`} target="_blank">
-              Preview público
-            </Link>
-          </Button>
-        )}
-        {vehicle?.slug && (
-          <ShareWhatsAppButton
-            vehicleName={vehicle.name}
-            vehicleUrl={shareUrl}
-            label="Compartir"
-          />
-        )}
+        <VehicleFormSecondaryActions
+          vehicleSlug={vehicle?.slug}
+          vehicleName={vehicle?.name}
+          shareUrl={shareUrl}
+        />
         <VehicleSubmitButton isEditing={isEditing} processingImages={processingImages} />
       </div>
       </form>
