@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { ExistingImagesManager } from './ExistingImagesManager'
 import { deleteVehicleAction } from '@/app/admin/vehiculos/actions'
 import { DeleteVehicleSubmitButton } from './DeleteVehicleSubmitButton'
+import { VehicleSubmitButton } from './VehicleSubmitButton'
 
 function Field({
   label,
@@ -408,9 +409,7 @@ export function VehicleForm({
             label="Compartir"
           />
         )}
-        <Button type="submit" disabled={processingImages}>
-          {processingImages ? 'Optimizando imágenes…' : isEditing ? 'Guardar cambios' : 'Crear vehículo'}
-        </Button>
+        <VehicleSubmitButton isEditing={isEditing} processingImages={processingImages} />
       </div>
       </form>
 
