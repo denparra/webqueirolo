@@ -11,7 +11,7 @@ export const VEHICLE_COLORS = [
   'ROJO',
   'VERDE',
   'AMARILLO',
-  'NARANJO',
+  'NARANJA',
   'CAFE',
   'BEIGE',
   'DORADO',
