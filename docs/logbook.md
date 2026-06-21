@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260620-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260620-001 |
+| **Fecha**       | 2026-06-20 |
+| **Tipo**        | ACTION |
+| **Contexto**    | Tras el fix de catalogo fijo de marcas (`aa2e18a`), el owner pidio replicar el mismo patron para `category` (Categoria) y `bodyType` (Carroceria), mas normalizar lo ya cargado en Sanity. Verificacion previa via Sanity MCP (`query_documents`) sobre 46 vehiculos: solo 9 tenian `category` y 11 `bodyType`, con valores inconsistentes en mayuscula/minuscula y con/sin tilde (`AUTOMOVIL`, `COUPE`, `STATION WAGON` vs `Coupe`, `Camioneta`). El owner pidio ademas que el catalogo de ambos campos se guarde en MAYUSCULAS, igual que `VEHICLE_BRANDS`. |
+| **Acuerdo/resultado** | (1) Nuevos catalogos fuente unica `lib/constants/vehicleCategories.ts` (`VEHICLE_CATEGORIES` + `OTHER_CATEGORY_OPTION = 'Otra'`) y `lib/constants/vehicleBodyTypes.ts` (`VEHICLE_BODY_TYPES` + `OTHER_BODYTYPE_OPTION = 'Otra'`), ambos en mayusculas. (2) `lib/admin/vehicleOptions.ts`: `CATEGORY_OPTIONS` y nuevo `BODYTYPE_OPTIONS` derivados de esos catalogos. (3) `sanity/schemaTypes/vehicle.ts`: campos `category` y `bodyType` ahora usan `options.list` con el catalogo + "Otra" (antes `bodyType` era texto libre sin lista). (4) `components/admin/VehicleForm.tsx`: select controlado + fallback de texto libre para Categoria y Carroceria, mismo patron que Marca (estado `categorySelection`/`bodyTypeSelection`, cae en "Otra" si el valor guardado no esta en el catalogo). (5) Normalizacion de datos existentes via Sanity MCP (`patch_documents` + `publish_documents`) sobre 6 documentos: `SEDÁN`/`COUPÉ`/`CAMIONETA`/`PICKUP` reemplazan a `Sedán`/`Coupé`/`Camioneta`/`Pickup`/`AUTOMOVIL`/`COUPE` segun mapeo legacy->catalogo. Verificado con `array::unique` post-publish: solo quedan valores del catalogo fijo o `null`. El filtro publico de `/vehiculos` no se modifico (fuera de alcance, acordado con el owner). |
+| **Impacto**     | Categoria y Carroceria dejan de ser texto libre/inconsistente en altas nuevas desde `/admin`; datos historicos quedan alineados al catalogo. Sin cambios en el front publico ni en `lib/vehicles.ts`/`lib/types.ts`. |
+| **Validacion**  | `npx tsc --noEmit --pretty false` exit 0 (dos veces, antes y despues de pasar catalogos a mayusculas) · `npm run lint` sin warnings/errores · verificacion de datos en Sanity con `query_documents` antes/despues del patch. No se ejecuto build (regla operativa). |
+| **Siguiente paso** | Owner revisa en `/studio` y en `/admin/vehiculos/[id]/editar` que los dropdowns muestren los valores correctos. Commit/push solo bajo solicitud explicita. |
+| **Referencias** | `lib/constants/vehicleCategories.ts`, `lib/constants/vehicleBodyTypes.ts`, `lib/admin/vehicleOptions.ts`, `sanity/schemaTypes/vehicle.ts`, `components/admin/VehicleForm.tsx`, proyecto Sanity `4124jngl`/dataset `production` |
+
+---
+
 ### LOG-20260616-003
 
 | Campo           | Valor |

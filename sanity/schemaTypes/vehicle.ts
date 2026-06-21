@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '../../lib/constants/vehicleBrands'
+import { OTHER_CATEGORY_OPTION, VEHICLE_CATEGORIES } from '../../lib/constants/vehicleCategories'
+import { OTHER_BODYTYPE_OPTION, VEHICLE_BODY_TYPES } from '../../lib/constants/vehicleBodyTypes'
 
 export default defineType({
     name: 'vehicle',
@@ -100,15 +102,19 @@ export default defineType({
             title: 'Categoría',
             type: 'string',
             options: {
-                list: ['SUV', 'Camioneta', 'Sedán', 'Hatchback', 'Coupé', 'Convertible', 'Comercial', 'Moto'],
+                list: [...VEHICLE_CATEGORIES, OTHER_CATEGORY_OPTION],
             },
+            description: 'Si la categoría no aparece en la lista, escribe el nombre directamente en este campo.',
             fieldset: 'specs',
         }),
         defineField({
             name: 'bodyType',
             title: 'Carrocería',
             type: 'string',
-            description: 'Ej: Station Wagon, Pickup, etc.',
+            options: {
+                list: [...VEHICLE_BODY_TYPES, OTHER_BODYTYPE_OPTION],
+            },
+            description: 'Si la carrocería no aparece en la lista, escribe el nombre directamente en este campo.',
             fieldset: 'specs',
         }),
         defineField({

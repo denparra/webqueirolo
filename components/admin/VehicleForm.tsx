@@ -7,6 +7,7 @@ import siteConfig from '@/config'
 import { validateVehicleForm } from '@/lib/admin/vehicleFormValidation'
 import { compressImageFiles } from '@/lib/admin/clientImageCompression'
 import {
+  BODYTYPE_OPTIONS,
   BRAND_OPTIONS,
   CATEGORY_OPTIONS,
   FEATURE_GROUPS,
@@ -15,6 +16,8 @@ import {
   VEHICLE_STATUS_OPTIONS,
 } from '@/lib/admin/vehicleOptions'
 import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '@/lib/constants/vehicleBrands'
+import { OTHER_CATEGORY_OPTION, VEHICLE_CATEGORIES } from '@/lib/constants/vehicleCategories'
+import { OTHER_BODYTYPE_OPTION, VEHICLE_BODY_TYPES } from '@/lib/constants/vehicleBodyTypes'
 import type { AdminVehicle } from '@/lib/admin/vehicles'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -100,6 +103,21 @@ export function VehicleForm({
   const initialBrandIsKnown = !vehicle?.brand || knownBrands.includes(vehicle.brand)
   const [brandSelection, setBrandSelection] = useState(
     initialBrandIsKnown ? vehicle?.brand || '' : OTHER_BRAND_OPTION
+  )
+
+  // Mismo patrón que marca: si la categoría/carrocería guardada no está en el
+  // catálogo fijo (ej. cargada antes de existir el dropdown), el select cae
+  // en "Otra" para no perder el valor real.
+  const knownCategories: readonly string[] = VEHICLE_CATEGORIES
+  const initialCategoryIsKnown = !vehicle?.category || knownCategories.includes(vehicle.category)
+  const [categorySelection, setCategorySelection] = useState(
+    initialCategoryIsKnown ? vehicle?.category || '' : OTHER_CATEGORY_OPTION
+  )
+
+  const knownBodyTypes: readonly string[] = VEHICLE_BODY_TYPES
+  const initialBodyTypeIsKnown = !vehicle?.bodyType || knownBodyTypes.includes(vehicle.bodyType)
+  const [bodyTypeSelection, setBodyTypeSelection] = useState(
+    initialBodyTypeIsKnown ? vehicle?.bodyType || '' : OTHER_BODYTYPE_OPTION
   )
 
   // Comprime/redimensiona las imágenes en el navegador apenas se seleccionan y
@@ -291,10 +309,50 @@ export function VehicleForm({
             <Input name="doors" type="number" min="0" defaultValue={vehicle?.doors || ''} />
           </Field>
           <Field label="Categoría">
-            <SelectField name="category" defaultValue={vehicle?.category} options={CATEGORY_OPTIONS} />
+            <select
+              name={categorySelection === OTHER_CATEGORY_OPTION ? undefined : 'category'}
+              value={categorySelection}
+              onChange={(event) => setCategorySelection(event.target.value)}
+              className="h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">Seleccionar</option>
+              {CATEGORY_OPTIONS.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            {categorySelection === OTHER_CATEGORY_OPTION && (
+              <Input
+                name="category"
+                defaultValue={initialCategoryIsKnown ? '' : vehicle?.category}
+                placeholder="Escribe la categoría"
+                className="mt-2"
+              />
+            )}
           </Field>
           <Field label="Carrocería">
-            <Input name="bodyType" defaultValue={vehicle?.bodyType} placeholder="Station Wagon, Pickup..." />
+            <select
+              name={bodyTypeSelection === OTHER_BODYTYPE_OPTION ? undefined : 'bodyType'}
+              value={bodyTypeSelection}
+              onChange={(event) => setBodyTypeSelection(event.target.value)}
+              className="h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">Seleccionar</option>
+              {BODYTYPE_OPTIONS.map((bodyType) => (
+                <option key={bodyType} value={bodyType}>
+                  {bodyType}
+                </option>
+              ))}
+            </select>
+            {bodyTypeSelection === OTHER_BODYTYPE_OPTION && (
+              <Input
+                name="bodyType"
+                defaultValue={initialBodyTypeIsKnown ? '' : vehicle?.bodyType}
+                placeholder="Escribe la carrocería"
+                className="mt-2"
+              />
+            )}
           </Field>
           <Field label="Color">
             <Input name="color" defaultValue={vehicle?.color} />

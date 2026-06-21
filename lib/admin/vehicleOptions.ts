@@ -1,4 +1,6 @@
 import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '@/lib/constants/vehicleBrands'
+import { OTHER_CATEGORY_OPTION, VEHICLE_CATEGORIES } from '@/lib/constants/vehicleCategories'
+import { OTHER_BODYTYPE_OPTION, VEHICLE_BODY_TYPES } from '@/lib/constants/vehicleBodyTypes'
 
 export const BRAND_OPTIONS = [...VEHICLE_BRANDS, OTHER_BRAND_OPTION]
 
@@ -8,16 +10,8 @@ export const VEHICLE_STATUS_OPTIONS = [
   { value: 'sold', label: 'Vendido' },
 ] as const
 
-export const CATEGORY_OPTIONS = [
-  'SUV',
-  'Camioneta',
-  'Sedán',
-  'Hatchback',
-  'Coupé',
-  'Convertible',
-  'Comercial',
-  'Moto',
-]
+export const CATEGORY_OPTIONS = [...VEHICLE_CATEGORIES, OTHER_CATEGORY_OPTION]
+export const BODYTYPE_OPTIONS = [...VEHICLE_BODY_TYPES, OTHER_BODYTYPE_OPTION]
 
 export const FUEL_OPTIONS = ['Bencina', 'Diésel', 'Híbrido', 'Eléctrico', 'Gas']
 export const TRANSMISSION_OPTIONS = ['Automática', 'Manual']
