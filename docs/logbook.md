@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260620-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260620-002 |
+| **Fecha**       | 2026-06-20 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El owner pidio replicar el mismo fix (catalogo fijo + normalizacion) tambien para `color`, que era texto libre en schema/admin. Verificacion previa via Sanity MCP (`query_documents`) sobre 46 vehiculos: solo 11 tenian `color` cargado, valores `BLANCO`, `CAFE`, `GRIS`, `PLATA` ya en mayuscula salvo un documento (`vehicle-47`) con `Plata` (minuscula inicial). |
+| **Acuerdo/resultado** | (1) Nuevo catalogo fuente unica `lib/constants/vehicleColors.ts` (`VEHICLE_COLORS`: BLANCO, NEGRO, GRIS, PLATA, AZUL, ROJO, VERDE, AMARILLO, NARANJO, CAFE, BEIGE, DORADO, VINO + `OTHER_COLOR_OPTION = 'Otra'`), mismo patron en mayusculas que marca/categoria/carroceria. (2) `lib/admin/vehicleOptions.ts`: nuevo `COLOR_OPTIONS`. (3) `sanity/schemaTypes/vehicle.ts`: campo `color` pasa de texto libre a `options.list` con el catalogo + "Otra". (4) `components/admin/VehicleForm.tsx`: select controlado + fallback de texto libre para Color, mismo patron que Marca/Categoria/Carroceria (`colorSelection`, cae en "Otra" si el valor guardado no esta en el catalogo). (5) Normalizacion de dato existente via Sanity MCP (`patch_documents` + `publish_documents`): `vehicle-47` color `Plata` -> `PLATA`. Verificado con `array::unique` post-publish: solo quedan `BLANCO`/`CAFE`/`GRIS`/`PLATA`/`null`. |
+| **Impacto**     | Color deja de ser texto libre en altas nuevas desde `/admin`; el unico dato historico inconsistente queda alineado al catalogo. Sin cambios en el front publico ni en `lib/vehicles.ts`/`lib/types.ts`. |
+| **Validacion**  | `npx tsc --noEmit --pretty false` exit 0 · `npm run lint` sin warnings/errores · verificacion de datos en Sanity con `query_documents` antes/despues del patch. No se ejecuto build (regla operativa). |
+| **Siguiente paso** | Owner revisa en `/studio` y en `/admin/vehiculos/[id]/editar` que el dropdown de Color muestre los valores correctos. Commit/push solo bajo solicitud explicita. |
+| **Referencias** | `lib/constants/vehicleColors.ts`, `lib/admin/vehicleOptions.ts`, `sanity/schemaTypes/vehicle.ts`, `components/admin/VehicleForm.tsx`, proyecto Sanity `4124jngl`/dataset `production` |
+
+---
+
 ### LOG-20260620-001
 
 | Campo           | Valor |

@@ -2,6 +2,7 @@ import { defineField, defineType } from 'sanity'
 import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '../../lib/constants/vehicleBrands'
 import { OTHER_CATEGORY_OPTION, VEHICLE_CATEGORIES } from '../../lib/constants/vehicleCategories'
 import { OTHER_BODYTYPE_OPTION, VEHICLE_BODY_TYPES } from '../../lib/constants/vehicleBodyTypes'
+import { OTHER_COLOR_OPTION, VEHICLE_COLORS } from '../../lib/constants/vehicleColors'
 
 export default defineType({
     name: 'vehicle',
@@ -151,6 +152,10 @@ export default defineType({
             name: 'color',
             title: 'Color',
             type: 'string',
+            options: {
+                list: [...VEHICLE_COLORS, OTHER_COLOR_OPTION],
+            },
+            description: 'Si el color no aparece en la lista, escribe el nombre directamente en este campo.',
             fieldset: 'specs',
         }),
         defineField({

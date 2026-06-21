@@ -10,6 +10,7 @@ import {
   BODYTYPE_OPTIONS,
   BRAND_OPTIONS,
   CATEGORY_OPTIONS,
+  COLOR_OPTIONS,
   FEATURE_GROUPS,
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
@@ -18,6 +19,7 @@ import {
 import { OTHER_BRAND_OPTION, VEHICLE_BRANDS } from '@/lib/constants/vehicleBrands'
 import { OTHER_CATEGORY_OPTION, VEHICLE_CATEGORIES } from '@/lib/constants/vehicleCategories'
 import { OTHER_BODYTYPE_OPTION, VEHICLE_BODY_TYPES } from '@/lib/constants/vehicleBodyTypes'
+import { OTHER_COLOR_OPTION, VEHICLE_COLORS } from '@/lib/constants/vehicleColors'
 import type { AdminVehicle } from '@/lib/admin/vehicles'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -118,6 +120,12 @@ export function VehicleForm({
   const initialBodyTypeIsKnown = !vehicle?.bodyType || knownBodyTypes.includes(vehicle.bodyType)
   const [bodyTypeSelection, setBodyTypeSelection] = useState(
     initialBodyTypeIsKnown ? vehicle?.bodyType || '' : OTHER_BODYTYPE_OPTION
+  )
+
+  const knownColors: readonly string[] = VEHICLE_COLORS
+  const initialColorIsKnown = !vehicle?.color || knownColors.includes(vehicle.color)
+  const [colorSelection, setColorSelection] = useState(
+    initialColorIsKnown ? vehicle?.color || '' : OTHER_COLOR_OPTION
   )
 
   // Comprime/redimensiona las imágenes en el navegador apenas se seleccionan y
@@ -355,7 +363,27 @@ export function VehicleForm({
             )}
           </Field>
           <Field label="Color">
-            <Input name="color" defaultValue={vehicle?.color} />
+            <select
+              name={colorSelection === OTHER_COLOR_OPTION ? undefined : 'color'}
+              value={colorSelection}
+              onChange={(event) => setColorSelection(event.target.value)}
+              className="h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">Seleccionar</option>
+              {COLOR_OPTIONS.map((color) => (
+                <option key={color} value={color}>
+                  {color}
+                </option>
+              ))}
+            </select>
+            {colorSelection === OTHER_COLOR_OPTION && (
+              <Input
+                name="color"
+                defaultValue={initialColorIsKnown ? '' : vehicle?.color}
+                placeholder="Escribe el color"
+                className="mt-2"
+              />
+            )}
           </Field>
           <Field label="Combustible">
             <SelectField name="fuel" defaultValue={vehicle?.fuel} options={FUEL_OPTIONS} />
