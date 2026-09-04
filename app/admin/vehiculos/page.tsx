@@ -8,15 +8,24 @@ import { AdminShell } from '@/components/admin/AdminShell'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency, formatKilometers } from '@/lib/utils'
-import { deleteVehicleAction } from './actions'
+import { clearFeaturedVehiclesAction, deleteVehicleAction } from './actions'
 import { DeleteVehicleSubmitButton } from '@/components/admin/DeleteVehicleSubmitButton'
+import { ClearFeaturedVehiclesButton } from '@/components/admin/ClearFeaturedVehiclesButton'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminVehiclesPage({
   searchParams,
 }: {
-  searchParams: { q?: string; status?: string; saved?: string; deleted?: string; error?: string }
+  searchParams: {
+    q?: string
+    status?: string
+    featured?: string
+    saved?: string
+    deleted?: string
+    featuredCleared?: string
+    error?: string
+  }
 }) {
   await requireAdminSession()
 
@@ -24,6 +33,7 @@ export default async function AdminVehiclesPage({
   const vehicles = await getAdminVehicles()
   const query = (searchParams.q || '').toLowerCase().trim()
   const statusFilter = searchParams.status || ''
+  const featuredFilter = searchParams.featured || ''
   const filteredVehicles = vehicles.filter((vehicle) => {
     const matchesQuery =
       !query ||
@@ -33,7 +43,8 @@ export default async function AdminVehiclesPage({
         .toLowerCase()
         .includes(query)
     const matchesStatus = !statusFilter || vehicle.status === statusFilter
-    return matchesQuery && matchesStatus
+    const matchesFeatured = !featuredFilter || (featuredFilter === 'yes' ? vehicle.isFeatured : !vehicle.isFeatured)
+    return matchesQuery && matchesStatus && matchesFeatured
   })
 
   return (
@@ -43,9 +54,14 @@ export default async function AdminVehiclesPage({
           <h1 className="text-3xl font-bold text-gray-900">Vehículos</h1>
           <p className="text-gray-600">Alta, edición y estado del inventario publicado.</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/vehiculos/nuevo">Nuevo vehículo</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <form action={clearFeaturedVehiclesAction}>
+            <ClearFeaturedVehiclesButton />
+          </form>
+          <Button asChild>
+            <Link href="/admin/vehiculos/nuevo">Nuevo vehículo</Link>
+          </Button>
+        </div>
       </div>
 
       {!config.writeTokenConfigured && (
@@ -66,6 +82,12 @@ export default async function AdminVehiclesPage({
         </div>
       )}
 
+      {searchParams.featuredCleared && (
+        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+          Se quitaron los destacados de {searchParams.featuredCleared} vehículos.
+        </div>
+      )}
+
       {searchParams.error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {searchParams.error}
@@ -81,16 +103,27 @@ export default async function AdminVehiclesPage({
               placeholder="Buscar por marca, modelo, versión o slug"
               className="h-11 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
-            <select
-              name="status"
-              defaultValue={statusFilter}
-              className="h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">Todos los estados</option>
-              <option value="available">Disponible</option>
-              <option value="reserved">Reservado</option>
-              <option value="sold">Vendido</option>
-            </select>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <select
+                name="status"
+                defaultValue={statusFilter}
+                className="h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Todos los estados</option>
+                <option value="available">Disponible</option>
+                <option value="reserved">Reservado</option>
+                <option value="sold">Vendido</option>
+              </select>
+              <select
+                name="featured"
+                defaultValue={featuredFilter}
+                className="h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Todos</option>
+                <option value="yes">Destacados</option>
+                <option value="no">No destacados</option>
+              </select>
+            </div>
             <Button type="submit" variant="secondary">
               Filtrar
             </Button>
@@ -118,6 +151,11 @@ export default async function AdminVehiclesPage({
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <h2 className="font-semibold text-gray-900">{vehicle.name}</h2>
                   <VehicleStatusBadge status={vehicle.status} showAvailable />
+                  {vehicle.isFeatured && (
+                    <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
+                      Destacado
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-600">
                   {vehicle.brand} {vehicle.model} {vehicle.version ? `· ${vehicle.version}` : ''} · {vehicle.year}

@@ -19,8 +19,8 @@ export interface FeaturedVehicle {
 }
 
 const FEATURED_QUERY = `
-  *[_type == "vehicle" && status == "available"]
-  | order(isFeatured desc, _createdAt desc) [0...6] {
+  *[_type == "vehicle" && status == "available" && isFeatured == true]
+  | order(_createdAt desc) [0...6] {
     _id,
     "slug": slug.current,
     price,

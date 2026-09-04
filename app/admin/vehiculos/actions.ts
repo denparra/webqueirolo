@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdminSession } from '@/lib/admin/auth'
-import { deleteAdminVehicle, saveAdminVehicle, type SaveVehicleInput } from '@/lib/admin/vehicles'
+import {
+  clearFeaturedVehicles,
+  deleteAdminVehicle,
+  saveAdminVehicle,
+  type SaveVehicleInput,
+} from '@/lib/admin/vehicles'
 
 function getString(formData: FormData, key: string): string {
   return String(formData.get(key) || '').trim()
@@ -85,8 +90,24 @@ export async function saveVehicleAction(formData: FormData) {
   }
 
   revalidatePath('/vehiculos')
+  revalidatePath('/')
   revalidatePath('/admin/vehiculos')
   redirect('/admin/vehiculos?saved=1')
+}
+
+export async function clearFeaturedVehiclesAction() {
+  await requireAdminSession()
+
+  try {
+    const clearedCount = await clearFeaturedVehicles()
+    revalidatePath('/')
+    revalidatePath('/vehiculos')
+    revalidatePath('/admin/vehiculos')
+    redirect(`/admin/vehiculos?featuredCleared=${clearedCount}`)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudieron quitar los destacados.'
+    redirect(`/admin/vehiculos?error=${encodeURIComponent(message)}`)
+  }
 }
 
 export async function deleteVehicleAction(formData: FormData) {
@@ -103,6 +124,7 @@ export async function deleteVehicleAction(formData: FormData) {
   }
 
   revalidatePath('/vehiculos')
+  revalidatePath('/')
   revalidatePath('/admin/vehiculos')
   if (slug) {
     revalidatePath(`/vehiculos/${slug}`)

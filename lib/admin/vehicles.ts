@@ -254,6 +254,7 @@ export interface AdminVehicleListItem {
   version?: string
   year: number
   mileage?: number
+  isFeatured: boolean
   images: AdminVehicleImage[]
 }
 
@@ -269,6 +270,7 @@ function mapAdminVehicleListItem(raw: any): AdminVehicleListItem {
     version: raw.version || undefined,
     year: raw.year || 0,
     mileage: raw.mileage || undefined,
+    isFeatured: Boolean(raw.isFeatured),
     images: Array.isArray(raw.images)
       ? raw.images
           .filter((image: any) => image?.asset?._id && image?.asset?.url)
@@ -321,6 +323,7 @@ const ADMIN_VEHICLE_LIST_FIELDS = `
   version,
   year,
   mileage,
+  isFeatured,
   "images": images[0...1]{
     asset->{ _id, url }
   }
@@ -334,6 +337,23 @@ export async function getAdminVehicles(): Promise<AdminVehicleListItem[]> {
     { next: { revalidate: 0 } }
   )
   return results.map(mapAdminVehicleListItem)
+}
+
+export async function clearFeaturedVehicles(): Promise<number> {
+  assertSanityConfigured()
+  const client = getAdminWriteClient()
+  const featuredIds = await adminReadClient.fetch<string[]>(
+    '*[_type == "vehicle" && isFeatured == true]._id',
+    {},
+    { next: { revalidate: 0 } }
+  )
+
+  if (featuredIds.length === 0) return 0
+
+  const transaction = client.transaction()
+  featuredIds.forEach((id) => transaction.patch(id, { set: { isFeatured: false } }))
+  await transaction.commit()
+  return featuredIds.length
 }
 
 export async function getAdminVehicleById(id: string): Promise<AdminVehicle | null> {
