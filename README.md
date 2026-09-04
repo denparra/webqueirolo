@@ -11,7 +11,7 @@ Sitio web Next.js para Queirolo Autos, enfocado en inventario de vehiculos, fich
 | Admin privado | Implementado en `/admin` para crear, editar, eliminar y ordenar vehiculos |
 | Studio tecnico | Disponible en `/studio` como respaldo CMS |
 | Leads | Formularios abren WhatsApp con mensaje precargado; endpoint n8n queda preparado pero no es canal activo |
-| Validacion reciente | `npm run lint`, `npm run test`, `npx tsc --noEmit --pretty false` OK antes del commit `9d36085` |
+| Validacion | Ejecutar `npm run lint`, `npm run test` y `npx tsc --noEmit --pretty false` antes de integrar cambios |
 
 ## Ultimas mejoras importantes
 
@@ -82,6 +82,7 @@ sanity/schemaTypes/
 store/                    # Zustand
 config.ts                 # Datos de negocio, contacto y SEO base
 docs/                     # Trazabilidad, analisis e implementaciones formales
+scripts/                  # Utilidades manuales que no participan en el runtime
 ```
 
 ## Setup local
@@ -199,4 +200,8 @@ Checklist manual:
 - `docs/logbook.md` - bitacora obligatoria.
 - `docs/implementation/IMP-20260614-001/IMP.md` - SOT del admin privado.
 - `AGENTS.md` y `CLAUDE.md` - reglas operativas co-gobernadas.
-- `CONFIG_README.md` - guia para ajustar datos de negocio en `config.ts`.
+- `docs/reference/configuration.md` - guia para ajustar datos de negocio en `config.ts`.
+- `docs/reference/project-overview.md` - referencia corta del proyecto.
+- `docs/reference/project-reference.md` - panorama tecnico integral: arquitectura, tecnologias, backend, frontend, Sanity, imagenes y documentacion.
+- `docs/reference/automotive-platform-specification.md` - especificacion base para construir nuevas webs automotrices, incluyendo arquitectura, imagenes, dominio, despliegue, seguridad, backups y disponibilidad.
+- `docs/implementation/IMP-20260825-004/IMP.md` - SOT del Centro de Control en `app/panel-web-automotoras/`, separado del `/admin` del cliente.

@@ -1,4 +1,4 @@
-# ProyectoWeb.md
+# Resumen del proyecto
 
 Este archivo queda como referencia corta. La documentacion activa y actualizada esta en:
 

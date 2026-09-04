@@ -10,6 +10,15 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | `CLAUDE.md` | Resumen ejecutable para agentes y comandos principales |
 | `README.md` | Estado funcional actual del producto |
 
+## 1.1. Referencias auxiliares
+
+| Documento | Para que sirve |
+|-----------|----------------|
+| `docs/reference/configuration.md` | Guia para ajustar datos de negocio en `config.ts` |
+| `docs/reference/project-overview.md` | Referencia corta y enlaces documentales |
+| `docs/reference/project-reference.md` | Panorama tecnico integral del proyecto |
+| `docs/reference/automotive-platform-specification.md` | Especificacion reusable de arquitectura, construccion y operacion |
+
 ## 2. Fuente de verdad tecnica
 
 | Area | Archivo/carpeta |
@@ -21,13 +30,14 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | Rich text/descripcion | `lib/richText.ts`, `components/shared/RichTextRenderer.tsx` |
 | Configuracion negocio | `config.ts` |
 
-## 3. Ultimos frentes relevantes
+## 3. Iniciativas relevantes
 
 | Frente | Documento | Estado |
 |--------|-----------|--------|
-| Admin privado de vehiculos | `docs/implementation/IMP-20260614-001/IMP.md` | Implementado; pendiente verificacion manual en deploy con env reales |
-| Migracion/SEO recientes | `docs/implementation/IMP-20260605-001` a `IMP-20260607-002` | Ver cada IMP |
-| Institucional/imagenes | `docs/implementation/IMP-20260606-002/` | Parcial / pendiente assets |
+| Admin privado de vehiculos | `docs/implementation/IMP-20260614-001/IMP.md`, `IMP-20260615-001`, `IMP-20260616-001` | Implementado; verificar en deploy con env reales |
+| SEO, sitemap y rutas publicas | `docs/implementation/IMP-20260605-001` a `IMP-20260607-002` | Implementado; revisar IMPs para detalle |
+| Institucional e imagenes | `docs/implementation/IMP-20260606-002/` | Revisar estado y assets pendientes |
+| Centro de Control automotriz | `docs/implementation/IMP-20260825-004/IMP.md` | Planning; `app/panel-web-automotoras/`; `/admin` cliente preservado |
 
 ## 4. Trazabilidad
 
@@ -39,6 +49,7 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 
 - Analisis/propuesta: `docs/analysis/YYYY-MM-DD-tema.md`.
 - Implementacion formal: `docs/implementation/IMP-YYYYMMDD-XXX/IMP.md`.
+- Referencias auxiliares: `docs/reference/<tema>.md`.
 - Registrar en `docs/logbook.md` antes/durante el trabajo, no al final.
 
 ## Co-gobierno de reglas

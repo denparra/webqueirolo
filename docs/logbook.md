@@ -12,6 +12,102 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260904-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260904-001 |
+| **Fecha**       | 2026-09-04 |
+| **Tipo**        | ACTION |
+| **Contexto**    | La sección “Autos Destacados” completaba hasta seis vehículos disponibles aunque no estuvieran seleccionados con `isFeatured`. El owner solicitó limpiar todos los actuales y controlar la selección desde cada ficha. |
+| **Acuerdo/resultado** | Se creó el tag Git `pre-manual-featured-20260904` sobre el estado previo. Se implementó filtro estricto por `isFeatured`, acción masiva protegida para desmarcar todos, indicador y filtro en el listado admin, y revalidación del home al guardar, limpiar o eliminar. |
+| **Impacto**     | El home dejará de mostrar vehículos no seleccionados. La limpieza masiva no elimina documentos ni imágenes; solo cambia el booleano de destacado. |
+| **Validacion**  | `npm run lint` OK; `npm run test` OK (24 tests / 4 suites); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK. No se ejecutó build. |
+| **Siguiente paso** | Ejecutar desde `/admin/vehiculos` el botón “Quitar todos los destacados” y luego marcar las fichas elegidas. |
+| **Referencias** | `docs/implementation/IMP-20260904-001/IMP.md`, `lib/featured-vehicles.ts`, `lib/admin/vehicles.ts`, `app/admin/vehiculos/actions.ts` |
+
+---
+
+### LOG-20260825-005
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260825-005 |
+| **Fecha**       | 2026-08-25 |
+| **Tipo**        | DECISION |
+| **Contexto**    | Se aclaro que `/panel-web-automotoras` identifica la carpeta/módulo donde vivirá el Centro de Control, no una superficie operativa del sitio de Queirolo. |
+| **Acuerdo/resultado** | El Centro de Control se planifica en `app/panel-web-automotoras/`; su ruta UI futura será `/panel-web-automotoras`. El Centro de Control incluirá a Queirolo Autos como la primera empresa ya funcionando que será registrada y administrada junto con las futuras webs automotrices. |
+| **Impacto**     | Se elimina la ambigüedad entre estructura de código, ruta futura y proyecto administrado. `/admin` continúa siendo el panel operativo de Queirolo y no se reemplaza. |
+| **Validacion**  | Se actualizaron el SOT, roadmap, evidencia, índice documental, README y registro de iniciativas para usar la distinción carpeta/módulo versus ruta UI. |
+| **Siguiente paso** | Definir el contrato de persistencia, autenticación y secretos del Centro de Control antes de crear `app/panel-web-automotoras/`. |
+| **Referencias** | `docs/implementation/IMP-20260825-004/IMP.md`, `ROADMAP.md`, `EVIDENCE.md`, `docs/INDEX.md`, `README.md` |
+
+---
+
+### LOG-20260825-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260825-004 |
+| **Fecha**       | 2026-08-25 |
+| **Tipo**        | PLAN |
+| **Contexto**    | El owner definio que `/admin` debe conservarse como panel operativo de cada cliente y que se necesita un dashboard separado para administrar la plataforma reusable de webs automotrices. |
+| **Acuerdo/resultado** | Se creo `docs/implementation/IMP-20260825-004/IMP.md` como SOT de `/panel-web-automotoras`, con `ROADMAP.md`, `EVIDENCE.md` y `ROLLBACK.md`. El panel de plataforma tendra auth, cookie, permisos, metadata, configuracion de marca, referencias de secretos, proyectos Sanity, despliegues, dominios, checklist y auditoria separados del `/admin`. Queirolo se registra como primer proyecto existente sin tocar su runtime, dataset ni panel funcional. |
+| **Impacto**     | Se establece una frontera clara entre operacion del cliente y provisionamiento de la plataforma. Se evita exponer API keys en el navegador o guardar secretos en texto plano. |
+| **Validacion**  | SOT revisado contra `app/admin/`, `middleware.ts`, `lib/admin/auth.ts`, `lib/admin/session.ts`, `lib/admin/vehicles.ts`, `config.ts` y la especificacion tecnica reusable. No se agrego codigo runtime en esta fase. |
+| **Siguiente paso** | Aprobar contratos de proyecto, autenticacion separada, persistencia de metadata y estrategia de secretos antes de implementar el shell de `/panel-web-automotoras`. |
+| **Referencias** | `docs/implementation/IMP-20260825-004/IMP.md`, `ROADMAP.md`, `EVIDENCE.md`, `ROLLBACK.md`, `docs/reference/automotive-platform-specification.md` |
+
+---
+
+### LOG-20260825-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260825-003 |
+| **Fecha**       | 2026-08-25 |
+| **Tipo**        | DECISION |
+| **Contexto**    | Se definio que la documentacion base debe centrarse en la construccion tecnica y operacion de una plataforma web automotriz reusable, sin incluir modelo comercial, precios ni condiciones de suscripcion. Tambien se evaluo como mantener el sitio siempre disponible sin cambiar prematuramente el flujo actual de uploads. |
+| **Acuerdo/resultado** | Se creo `docs/reference/automotive-platform-specification.md`. Sanity queda como CMS y proveedor inicial de imagenes; Cloudflare R2 queda como alternativa futura que requiere una capa completa de media. Railway queda recomendado como despliegue primario para la implementacion actual porque conserva Server Actions de hasta 15 MB y procesamiento `sharp`; Vercel queda condicionado a rediseñar el upload por su limite documentado de 4.5 MB en Functions; VPS queda como alternativa de mayor control con mayor carga operativa. Se documentaron dominio, DNS, SSL, health checks, backups, seguridad, observabilidad, escalamiento y proceso para nuevas webs. |
+| **Impacto**     | Existe una especificacion tecnica reusable y separada del estado factual de Queirolo Autos. No se modifico codigo de runtime ni infraestructura. |
+| **Validacion**  | Contraste con `next.config.js`, `lib/admin/vehicles.ts`, `lib/admin/imageResize.ts`, `lib/vehicles.ts`, `middleware.ts`, `package.json`, rutas y documentacion oficial de Sanity, Next.js, Vercel, Railway y Cloudflare. |
+| **Siguiente paso** | Revisar la especificacion con el owner y convertir sus decisiones adoptadas en iniciativas de implementacion solo cuando corresponda. |
+| **Referencias** | `docs/reference/automotive-platform-specification.md`, `docs/reference/project-reference.md`, `README.md`, `docs/INDEX.md`, `next.config.js`, `lib/admin/vehicles.ts` |
+
+---
+
+### LOG-20260825-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260825-002 |
+| **Fecha**       | 2026-08-25 |
+| **Tipo**        | ACTION |
+| **Contexto**    | La documentacion activa tenia desfases respecto del codigo actual: validacion ligada a un commit antiguo, iniciativas con estados viejos y ausencia de un panorama unico de arquitectura, APIs, Sanity y almacenamiento de imagenes. |
+| **Acuerdo/resultado** | Se creo `docs/reference/project-reference.md` como referencia tecnica integral y se enlazo desde `README.md`, `docs/INDEX.md` y `CLAUDE.md`. Se actualizaron `README.md`, `AGENTS.md`, `CLAUDE.md` y `docs/INDEX.md` con rutas, endpoints, tecnologias, fuente de inventario, ubicacion de fotos y estado operativo actual. Se agregaron practicas concretas y agnosticas al modelo para agentes IA: inspeccion previa, no inventar, cambios minimos, proteccion de secretos, verificacion, trazabilidad y limites explicitos. |
+| **Impacto**     | La documentacion distingue claramente frontend, backend dentro de Next.js, CMS Sanity, APIs, assets locales de fallback y fotos reales en Sanity. No se modifico codigo de runtime ni contratos publicos. |
+| **Validacion**  | Revision cruzada contra `package.json`, rutas de `app/`, `lib/`, `sanity/`, `config.ts`, `middleware.ts`, schema `vehicle` y arbol de `public/images/`. `npm run lint` sin warnings/errores; `npm run test` 24 tests / 4 suites OK; `npx tsc --noEmit --pretty false` exit 0; `git diff --check` exit 0. No se ejecuto build. |
+| **Siguiente paso** | Mantener `docs/reference/project-reference.md` actualizado cuando cambien rutas, integraciones, pipeline de imagenes o variables de entorno. |
+| **Referencias** | `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/INDEX.md`, `docs/reference/project-reference.md`, `package.json`, `lib/vehicles.ts`, `lib/admin/vehicles.ts`, `sanity/schemaTypes/vehicle.ts` |
+
+---
+
+### LOG-20260825-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260825-001 |
+| **Fecha**       | 2026-08-25 |
+| **Tipo**        | ACTION |
+| **Contexto**    | La raiz del repositorio mezclaba la documentacion auxiliar con configuraciones requeridas por Next.js, Jest, PostCSS y Sanity, ademas de un script manual de placeholders. El owner pidio reducir el ruido visual sin afectar el funcionamiento. |
+| **Acuerdo/resultado** | Se movieron `CONFIG_README.md` y `ProyectoWeb.md` a `docs/reference/` con nombres descriptivos, y `create-placeholders.js` a `scripts/`. El script conserva su comportamiento ajustando la ruta relativa a `public/images/vehicles`. Se mantuvieron en la raiz `README.md`, `AGENTS.md`, `CLAUDE.md`, manifiestos y archivos de configuracion que las herramientas descubren automaticamente. |
+| **Impacto**     | Orden organizacional de la raiz, sin cambios de rutas publicas, imports de runtime ni contratos de Next.js/Sanity/Jest. |
+| **Validacion**  | No quedaron referencias activas a las rutas antiguas; `node --check scripts/create-placeholders.js` exit 0; `npm run lint` sin warnings/errores; `npm run test` 24 tests / 4 suites OK; `npx tsc --noEmit --pretty false` exit 0. No se ejecuto build por regla del proyecto. |
+| **Siguiente paso** | Revisar visualmente la raiz y usar `scripts/create-placeholders.js` solo cuando se necesiten assets de prueba. |
+| **Referencias** | `docs/reference/configuration.md`, `docs/reference/project-overview.md`, `scripts/create-placeholders.js`, `README.md`, `docs/INDEX.md` |
+
+---
+
 ### LOG-20260620-002
 
 | Campo           | Valor |

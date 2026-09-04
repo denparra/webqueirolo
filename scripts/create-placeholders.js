@@ -18,7 +18,7 @@ const createPlaceholderSVG = (text, width = 800, height = 600) => {
 </svg>`;
 };
 
-const vehiclesDir = path.join(__dirname, 'public', 'images', 'vehicles');
+const vehiclesDir = path.join(__dirname, '..', 'public', 'images', 'vehicles');
 
 // Create directory if it doesn't exist
 if (!fs.existsSync(vehiclesDir)) {

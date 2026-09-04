@@ -24,7 +24,8 @@ Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el 
 - `store/` holds Zustand state (favorites, compare).
 - `public/` stores static assets served at the site root (images, icons, manifest).
 - `config.ts` centralizes business data (contact, SEO, brand assets).
-- `docs/` contains active governance (logbook, IMPs, analysis). Archive in `docs/archive/`.
+- `docs/` contains active governance, technical reference, logbook, IMPs and analysis. Archive in `docs/archive/`.
+- `scripts/` contains manual utilities that are not part of the Next.js runtime.
 - `tailwind.config.ts`, `postcss.config.js`, and `tsconfig.json` define styling and TypeScript behavior.
 - `.next/` is the build output and should not be edited manually.
 
@@ -37,6 +38,8 @@ Routes:
 - `/admin` admin privado del owner para alta/edicion/eliminacion de vehiculos sobre Sanity
 - `/studio` Sanity Studio tecnico (basePath en `sanity.config.ts`)
 - `/sitemap.xml` y `/robots.txt` desde `app/sitemap.ts` y `app/robots.ts`
+- `/api/health`, `/api/calculate-loan` y `/api/submit-lead` son endpoints HTTP en `app/api/`
+- `/privacidad`, `/politica-de-privacidad`, `/terminos`, `/terminos-y-condiciones` y `/eliminacion-de-datos` son paginas legales existentes
 
 Sanity:
 - Studio usa `sanity.config.ts` + `sanity/env.ts` (env vars requeridas).
@@ -62,6 +65,7 @@ Required for Studio and real data:
 Optional:
 - `NEXT_PUBLIC_SANITY_API_VERSION` (default in `sanity/env-utils.ts`)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (enables GA4)
+- `N8N_LEAD_WEBHOOK_URL` (optional; future lead forwarding from `/api/submit-lead`)
 
 Required for private `/admin` vehicle management:
 - `ADMIN_USERNAME`
@@ -93,15 +97,49 @@ Notes:
 - Avoid unused exports; keep helpers colocated in `lib/` or near the component that uses them.
 - Update business content via `config.ts` instead of hardcoding in pages.
 
+## AI Agent Working Practices
+
+Estas reglas son agnosticas al modelo (Claude, GPT, Gemini, Copilot u otro). El modelo puede cambiar; el contrato de trabajo del repositorio no.
+
+### Before editing
+
+- Read the relevant source files, configuration and tests before proposing a change.
+- Search for all references before renaming, moving or deleting a file.
+- Treat `sanity/schemaTypes/vehicle.ts`, `lib/vehicles.ts`, `lib/types.ts`, `config.ts` and `docs/reference/project-reference.md` as sources of truth for their areas.
+- State uncertainty explicitly. Do not infer a route, integration, environment variable or business rule that is not present in the repository.
+
+### While editing
+
+- Make the smallest change that satisfies the request; do not refactor unrelated code.
+- Preserve public routes, import paths, environment variable names, data contracts and image behavior unless the task explicitly changes them.
+- Keep server-only secrets and write tokens out of client components and `NEXT_PUBLIC_*` variables.
+- Use `apply_patch` for manual edits and do not modify `.next/`, `node_modules/`, generated files or user changes outside the task.
+- Prefer existing helpers and patterns over introducing a parallel abstraction.
+
+### Before reporting completion
+
+- Re-read changed files and inspect `git diff`/`git status`.
+- Verify changed references and run focused checks plus `npm run lint`, `npm run test` and `npx tsc --noEmit --pretty false` when applicable.
+- Do not run `npm run build` unless the owner explicitly requests deploy/build verification.
+- Report what was verified, what was not verified and any remaining risk. Never claim a route or integration was tested if it was only inspected.
+- Record relevant decisions, documentation changes, tests and risks in `docs/logbook.md`.
+
+### Scope and collaboration
+
+- Do not commit, amend, push or change Git configuration without explicit owner request.
+- Do not revert unrelated worktree changes; inspect and preserve them.
+- Ask one concise question and stop if the requested change has an unresolved product or security decision.
+
 ## Commit & Pull Request Guidelines
-- No Git history is present in this folder, so no commit message convention is enforced.
-- Recommended: use Conventional Commits (`feat: ...`, `fix: ...`, `chore: ...`) for clarity.
+- Follow the repository Git history when it is available; use Conventional Commits (`feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`) for clarity.
 - PRs should include a short summary, screenshots for UI changes, and a note on any new dependencies or scripts.
 
 ## Security & Configuration Tips
 - Store local secrets in `.env.local` (not committed).
 - Review any public asset changes under `public/` to avoid leaking sensitive content.
-- `CONFIG_README.md` documents the real source `config.ts`; vehicle inventory lives in Sanity, not in config.
+- `docs/reference/configuration.md` documents the real source `config.ts`; vehicle inventory lives in Sanity, not in config.
+- `docs/reference/project-reference.md` documents the current architecture, routes, APIs, image storage and documentation map.
+- `docs/reference/automotive-platform-specification.md` defines the reusable platform baseline, domain, deployment, security, backups and availability rules.
 
 ## Testing Guidelines (Verification)
 - Manual verification checklist:
@@ -152,7 +190,7 @@ Notes:
 Ninguno manda sobre el otro; ambos deben reflejar las mismas reglas operativas críticas.
 
 - `AGENTS.md`: reglas operativas completas, alcance, restricciones, trazabilidad y DoD.
-- `CLAUDE.md`: resumen ejecutable, comandos, mapa de rutas, recordatorios críticos.
+- `CLAUDE.md`: resumen ejecutable para agentes, comandos principales y practicas compactas de trabajo.
 
 **Regla de consistencia**: toda regla crítica nueva o cambiada debe actualizarse en **ambos** en la misma sesión.  
 Si hay diferencia entre ambos:
@@ -165,6 +203,8 @@ Si hay diferencia entre ambos:
 - Queries: `lib/vehicles.ts`
 - Configuración negocio: `config.ts`
 - Tipos: `lib/types.ts`
+- Panorama tecnico: `docs/reference/project-reference.md`
+- Especificacion reusable: `docs/reference/automotive-platform-specification.md`
 
 ---
 
@@ -243,6 +283,7 @@ Se considera completada una iniciativa cuando:
 ---
 
 ## Change log
+- LOG-20260825-002: Reconciled active documentation with the current repository and documented model-agnostic AI agent practices, architecture, APIs and image storage.
 - LOG-20260615-001: Documented latest `/admin` improvements, image handling, cover ordering, duplicate deletion, and current validation/deploy notes.
 - Reordered content into quickstart, how-to, verification, and troubleshooting flow.
 - Added env var requirements, build-time notes, and Sanity workflow details.

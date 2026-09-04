@@ -42,3 +42,4 @@ docs/implementation/
 | IMP-20260607-002 | 2026-06-07 | Pendientes SEO/dominio | Parcial |
 | IMP-20260614-001 | 2026-06-14 | Admin privado para alta/edicion interactiva de vehiculos | Implementado; pendiente verificacion manual en deploy |
 | IMP-20260615-001 | 2026-06-15 | Validaciones admin, boton compartir WhatsApp y quick wins | Pendiente de implementacion |
+| IMP-20260825-004 | 2026-08-25 | Centro de Control en `app/panel-web-automotoras/`, separado del `/admin` cliente | Planning |
