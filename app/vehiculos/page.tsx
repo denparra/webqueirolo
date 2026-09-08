@@ -1,4 +1,5 @@
 import { getVehicles } from '@/lib/vehicles'
+import { describeSanityError } from '@/lib/sanityErrors'
 import { Vehicle } from '@/lib/types'
 import { VehicleListingClient } from '@/components/vehicles/VehicleListingClient'
 import { SchemaScript } from '@/components/shared/SchemaScript'
@@ -14,7 +15,7 @@ export default async function VehiculosPage() {
     try {
         vehicles = await getVehicles()
     } catch (error) {
-        console.error('[VehiculosPage] Error cargando vehículos:', error)
+        console.error('[VehiculosPage] Error cargando vehículos:', describeSanityError(error))
         loadError = true
     }
 

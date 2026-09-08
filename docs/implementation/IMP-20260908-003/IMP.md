@@ -100,10 +100,48 @@ Sanity (`attemptNumber: 5` en los logs). Una carga de pagina podia encadenar ~10
   del buildId. El ID aleatorio por build que Next genera por defecto es el comportamiento
   correcto aca, y con un solo contenedor no hay skew entre replicas que justifique fijarlo.
 
+### Legibilidad de logs
+
+- `lib/sanityErrors.ts` (nuevo): `describeSanityError()` resume un fallo de Sanity/red en UNA
+  linea (mensaje + `code` de la causa + `statusCode` + host/pathname sin querystring). Antes se
+  logueaba el objeto crudo, y el cliente de Sanity le adjunta el `request` completo con la query
+  GROQ URL-encoded: ~200 lineas por fallo. Durante este mismo incidente la evidencia decisiva
+  quedo enterrada en ese muro de texto.
+
+  Ejemplo de salida:
+  `fetch failed | code=UND_ERR_CONNECT_TIMEOUT | url=4124jngl.api.sanity.io/v2025-01-01/data/query/production`
+
+  Es un modulo SIN dependencias a proposito: `lib/sanity.ts` importa `next-sanity`, que es ESM y
+  Jest no puede parsear. Mismo criterio que `lib/admin/imageResize.ts`.
+
+- Call sites actualizados: `lib/vehicles.ts:129` y `:178`, `app/vehiculos/page.tsx:18`,
+  `app/sitemap.ts:87`.
+
+## Confirmaciones del deploy 5398c87 (2026-09-08 22:07 UTC)
+
+- `setup | nodejs_22, npm-9_x, openssl`: runtime correcto.
+- `start | node_modules/.bin/next start`: el Start Command tomo efecto; npm dejo de ser PID 1.
+- El warning de Docker `SecretsUsedInArgOrEnv: ... ENV "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"`
+  **prueba que la clave llego al `next build`**. Queda respondida la duda abierta: EasyPanel SI
+  propaga las variables de Environment al build de Nixpacks.
+- `Generating static pages (37/37)`: los fetches a Sanity en build funcionaron.
+
+### Como datar un error en el log de runtime
+
+Los `UND_ERR_CONNECT_TIMEOUT` visibles tras el deploy eran del contenedor viejo. Tres señales:
+
+| Señal | Build viejo | Build nuevo |
+|---|---|---|
+| Host | `4124jngl.api.sanity.io` | `apicdn.sanity.io` (por `useCdn: true`) |
+| `timeout` | `{ connect: 300000 }` | `{ connect: 15000 }` |
+| Posicion | antes de `Ready in ...` | despues |
+
+Un error con `api.sanity.io` y `connect: 300000` es historial, no un fallo nuevo.
+
 ## Validacion
 
 - `npm run lint` OK, sin warnings.
-- `npm test -- --runInBand` OK: 42 tests en 5 suites (24 previos + 18 nuevos).
+- `npm test -- --runInBand` OK: 53 tests en 6 suites (24 previos + 18 del bypass + 11 del logger).
 - `npx tsc --noEmit --pretty false` OK.
 - No se ejecuto `npm run build` por la regla operativa del repositorio.
 - **Pendiente y no verificado**: la prueba end-to-end en el VPS. Es la unica que confirma el
@@ -166,6 +204,7 @@ los logs y la web publica respondiendo durante todo el guardado.
 
 Tag `pre-threadpool-fix-20260908` sobre el commit `d20f7a7`. Los cambios de codigo son locales a
 `lib/sanity.ts`, `lib/vehicles.ts`, `lib/admin/vehicles.ts`, `lib/admin/imageResize.ts`,
-`components/admin/VehicleForm.tsx` y `app/vehiculos/[slug]/error.tsx`. `next.config.js` queda
+`components/admin/VehicleForm.tsx`, `lib/sanityErrors.ts`, `app/sitemap.ts`,
+`app/vehiculos/page.tsx` y `app/vehiculos/[slug]/error.tsx`. `next.config.js` queda
 sin cambios respecto de `main`. Las
 variables de entorno son reversibles desde EasyPanel sin redeploy de codigo.

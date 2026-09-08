@@ -1,4 +1,5 @@
 import { client, projectId } from './sanity'
+import { describeSanityError } from './sanityErrors'
 import { Vehicle } from './types'
 import { mockVehicles } from './data'
 import { estimateMonthlyPayment } from './calculations'
@@ -126,7 +127,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
         const sanityVehicles = await fetchVehicleData<any[]>(query, {})
         return sanityVehicles.map(mapSanityVehicle)
     } catch (error) {
-        console.error('Error fetching vehicles from Sanity:', error)
+        console.error('[getVehicles] Sanity:', describeSanityError(error))
         if (isProd) {
             throw error
         }
@@ -175,7 +176,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefine
         const vehicle = await fetchVehicleData<any | null>(query, { slug })
         return vehicle ? mapSanityVehicle(vehicle) : undefined
     } catch (error) {
-        console.error('Error fetching vehicle by slug:', error)
+        console.error(`[getVehicleBySlug] slug=${slug} Sanity:`, describeSanityError(error))
         if (isProd) {
             throw error
         }

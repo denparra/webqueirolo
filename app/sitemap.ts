@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getVehicles } from '@/lib/vehicles'
+import { describeSanityError } from '@/lib/sanityErrors'
 import config from '@/config'
 
 // Revalida con la misma cadencia que el fetch de Sanity para reflejar el stock real.
@@ -83,7 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
   } catch (error) {
     // Si Sanity falla, el sitemap igual responde con las páginas estáticas.
-    console.error('[sitemap] Error obteniendo vehículos de Sanity:', error)
+    console.error('[sitemap] Error obteniendo vehículos de Sanity:', describeSanityError(error))
   }
 
   return [...staticPages, ...vehiclePages]
