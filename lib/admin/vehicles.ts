@@ -4,12 +4,23 @@ import { dataset, projectId, apiVersion } from '@/lib/sanity'
 import { cleanEnvVar } from '@/sanity/env-utils'
 import { generateSlug } from '@/lib/utils'
 import { portableTextToPlainText, textToPortableText, type VehicleDescription } from '@/lib/richText'
-import { SERVER_MAX_EDGE, SERVER_JPEG_QUALITY } from '@/lib/admin/imageResize'
+import { SERVER_MAX_EDGE, SERVER_JPEG_QUALITY, shouldSkipServerResize } from '@/lib/admin/imageResize'
 import { mapWithConcurrency } from '@/lib/admin/concurrency'
 
-// Máximo de imágenes que se procesan y suben a Sanity en paralelo. Equilibra
-// velocidad (vs subida secuencial) contra uso de memoria/red del servidor.
-const UPLOAD_CONCURRENCY = 3
+// sharp corre sobre el threadpool de libuv, el MISMO que usa `dns.lookup()` de
+// Node (getaddrinfo es sincrónico y se despacha a hilos). Con el default de 4
+// hilos, varias conversiones simultáneas dejan al DNS sin slots y todo fetch a
+// Sanity muere con UND_ERR_CONNECT_TIMEOUT a los 10s, tumbando la web pública
+// mientras el owner guarda un vehículo. Acotar libvips a 1 hilo por operación
+// evita que una sola imagen se coma el pool entero.
+sharp.concurrency(1)
+
+// Máximo de imágenes que se procesan y suben a Sanity en paralelo.
+// Se bajó de 3 a 1: en un VPS de 1-2 vCPU tres conversiones mozjpeg
+// simultáneas no dan velocidad, dan contención de CPU y de threadpool.
+// Con el bypass de sharp (ver prepareImageForSanity) el camino normal ni
+// siquiera decodifica, así que el costo real en tiempo de guardado es mínimo.
+const UPLOAD_CONCURRENCY = 1
 
 export interface AdminVehicleImage {
   assetId: string
@@ -73,11 +84,15 @@ export interface SaveVehicleInput {
   imagesOrderChanged: boolean
 }
 
+// Lectura del admin: `useCdn: false` a propósito. El panel tiene que ver el
+// estado real inmediatamente después de guardar, no una copia de borde.
 const adminReadClient = createClient({
   projectId,
   dataset,
   apiVersion,
   useCdn: false,
+  maxRetries: 2,
+  timeout: 15000,
 })
 
 function getSanityWriteToken(): string {
@@ -95,6 +110,11 @@ function getAdminWriteClient() {
     apiVersion,
     useCdn: false,
     token: getSanityWriteToken(),
+    // Timeout más holgado que el de lectura: `assets.upload` manda varios MB y
+    // 15s cortaría subidas legítimas en conexiones lentas. Los reintentos sí se
+    // acotan, para no encadenar cinco subidas fallidas del mismo archivo.
+    maxRetries: 2,
+    timeout: 60000,
   })
 }
 
@@ -148,6 +168,25 @@ async function resizeToOptimizedJpeg(buffer: Buffer): Promise<Buffer> {
     .toBuffer()
 }
 
+/**
+ * Lee solo la cabecera de la imagen (`.metadata()` no decodifica el bitmap, así
+ * que cuesta milisegundos frente a un decode + encode mozjpeg completo) y
+ * delega la decisión en `shouldSkipServerResize`.
+ *
+ * Ante cualquier duda (metadata ilegible) devuelve false y deja que sharp haga
+ * su trabajo: preferimos gastar CPU antes que subir una imagen rota.
+ */
+async function canUploadJpegAsIs(buffer: Buffer, contentType: string): Promise<boolean> {
+  if (contentType !== 'image/jpeg') return false
+
+  try {
+    const { width, height, orientation } = await sharp(buffer).metadata()
+    return shouldSkipServerResize({ contentType, width, height, orientation })
+  } catch {
+    return false
+  }
+}
+
 async function prepareImageForSanity(file: File): Promise<{
   buffer: Buffer
   filename: string
@@ -169,6 +208,20 @@ async function prepareImageForSanity(file: File): Promise<{
   // JPG/PNG/WEBP: se redimensionan y recomprimen a JPEG. Si sharp falla por
   // cualquier motivo, se sube el original para no bloquear al owner.
   if (DIRECT_UPLOAD_MIME_TYPES.has(inferredContentType)) {
+    // El navegador ya redujo a CLIENT_MAX_EDGE (2000px) y comprimió a JPEG
+    // antes de subir. Como CLIENT_MAX_EDGE < SERVER_MAX_EDGE (2400px), el
+    // resize del servidor no cambiaría un solo píxel: solo decodificaría y
+    // re-comprimiría con mozjpeg, quemando CPU y threadpool a cambio de nada
+    // (y degradando calidad por doble compresión). Si la imagen ya cumple, se
+    // sube tal cual.
+    if (await canUploadJpegAsIs(originalBuffer, inferredContentType)) {
+      return {
+        buffer: originalBuffer,
+        filename: file.name,
+        contentType: 'image/jpeg',
+      }
+    }
+
     try {
       return {
         buffer: await resizeToOptimizedJpeg(originalBuffer),

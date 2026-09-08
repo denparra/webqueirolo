@@ -6,16 +6,14 @@ import { getFeatureLabel } from './constants/featureLabels'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-async function fetchWithRetry<T>(query: string, params: Record<string, unknown>) {
-    try {
-        return await client.fetch<T>(query, params, { next: { revalidate: 60 } })
-    } catch (error) {
-        if (!isProd) {
-            throw error
-        }
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        return await client.fetch<T>(query, params, { next: { revalidate: 60 } })
-    }
+// El cliente Sanity ya reintenta por su cuenta (`maxRetries: 2` en lib/sanity.ts).
+// Antes esta función agregaba OTRO reintento encima, así que un fallo de red
+// encadenaba hasta ~10 intentos y dejaba la request colgada casi dos minutos,
+// ocupando slots del threadpool de libuv y arrastrando al resto del proceso.
+// Ahora solo centraliza la política de revalidación; el reintento vive en una
+// sola capa, la del cliente.
+async function fetchVehicleData<T>(query: string, params: Record<string, unknown>) {
+    return client.fetch<T>(query, params, { next: { revalidate: 60 } })
 }
 
 // Safe placeholder - uses a gray SVG data URI that works without external files
@@ -125,7 +123,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
   }`
 
     try {
-        const sanityVehicles = await fetchWithRetry<any[]>(query, {})
+        const sanityVehicles = await fetchVehicleData<any[]>(query, {})
         return sanityVehicles.map(mapSanityVehicle)
     } catch (error) {
         console.error('Error fetching vehicles from Sanity:', error)
@@ -174,7 +172,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | undefine
     }`
 
     try {
-        const vehicle = await fetchWithRetry<any | null>(query, { slug })
+        const vehicle = await fetchVehicleData<any | null>(query, { slug })
         return vehicle ? mapSanityVehicle(vehicle) : undefined
     } catch (error) {
         console.error('Error fetching vehicle by slug:', error)

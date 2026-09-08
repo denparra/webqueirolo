@@ -97,6 +97,9 @@ export function VehicleForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [processingImages, setProcessingImages] = useState(false)
+  // El envío murió por causas ajenas a la validación (típicamente un redeploy
+  // que invalidó el ID del server action). Ver submitVehicle().
+  const [submitFailed, setSubmitFailed] = useState(false)
 
   // El select de marca muestra "Otra" cuando el vehículo tiene una marca que
   // no está en el catálogo fijo (ej. cargada antes de existir el dropdown),
@@ -163,6 +166,7 @@ export function VehicleForm({
   // campos requeridos o son inválidos, y muestra mensajes inline sin perder
   // lo editado. El server action conserva su validación como respaldo.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    setSubmitFailed(false)
     const formData = new FormData(event.currentTarget)
 
     const next = validateVehicleForm({
@@ -183,11 +187,37 @@ export function VehicleForm({
     }
   }
 
+  // Envoltorio del server action para sobrevivir a un "version skew".
+  //
+  // Los IDs de Server Action de Next 14 son un hash atado al build. Si el
+  // contenedor se redespliega o reinicia mientras este formulario está abierto,
+  // el POST viaja con un ID que el servidor nuevo ya no conoce y falla con
+  // "Failed to find Server Action". Sin esto el formulario moría mudo y el owner
+  // perdía todo lo cargado sin entender por qué.
+  //
+  // `redirect()` y `notFound()` de Next se implementan LANZANDO un error con un
+  // `digest` propio. Se relanzan sí o sí: tragárselos rompería el guardado
+  // exitoso, que es justamente el camino feliz.
+  async function submitVehicle(formData: FormData) {
+    try {
+      await saveVehicleAction(formData)
+    } catch (error) {
+      const digest = (error as { digest?: unknown })?.digest
+      if (typeof digest === 'string' && (digest.startsWith('NEXT_REDIRECT') || digest === 'NEXT_NOT_FOUND')) {
+        throw error
+      }
+
+      console.error('[VehicleForm] Falló el envío del formulario:', error)
+      setSubmitFailed(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   const shareUrl = vehicle?.slug ? `${siteConfig.url}/vehiculos/${vehicle.slug}` : ''
 
   return (
     <>
-      <form action={saveVehicleAction} onSubmit={handleSubmit} noValidate className="space-y-6">
+      <form action={submitVehicle} onSubmit={handleSubmit} noValidate className="space-y-6">
       <input type="hidden" name="returnTo" value={returnTo} />
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
       {vehicle && <input type="hidden" name="originalSlug" value={vehicle.slug} />}
@@ -195,6 +225,30 @@ export function VehicleForm({
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {error}
+        </div>
+      )}
+
+      {submitFailed && (
+        <div
+          role="alert"
+          className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          <p className="font-semibold">No se pudo enviar el formulario.</p>
+          <p className="mt-1">
+            Es muy probable que la aplicación se haya actualizado mientras tenías esta
+            página abierta. Recargá la página y volvé a guardar: los datos que cargaste
+            en este formulario se pierden al recargar, así que copiá lo que necesites
+            antes.
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            className="mt-3"
+            onClick={() => window.location.reload()}
+          >
+            Recargar la página
+          </Button>
         </div>
       )}
 

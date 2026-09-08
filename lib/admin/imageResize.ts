@@ -42,3 +42,40 @@ export function computeTargetDimensions(
     height: Math.round(height * scale),
   }
 }
+
+/**
+ * Decide si una imagen ya cumple los requisitos del servidor y puede subirse
+ * a Sanity sin pasar por sharp.
+ *
+ * Existe porque el navegador ya reduce a CLIENT_MAX_EDGE (2000px) y comprime a
+ * JPEG antes de subir. Como CLIENT_MAX_EDGE < SERVER_MAX_EDGE (2400px), el
+ * resize del servidor no cambiaría un solo píxel: solo decodificaría y
+ * re-comprimiría con mozjpeg, quemando CPU y bloqueando el threadpool de libuv
+ * que Node comparte con `dns.lookup()`. El costo era real y el beneficio, cero.
+ *
+ * Se mantiene pura (sin sharp, sin Buffer) para poder testearla en aislamiento;
+ * quien la llama se encarga de leer los metadatos.
+ */
+export function shouldSkipServerResize(metadata: {
+  contentType: string
+  width?: number
+  height?: number
+  /** Flag EXIF de orientación: `undefined` si la imagen no lo trae. */
+  orientation?: number
+}): boolean {
+  // Solo JPEG: cualquier otro formato hay que convertirlo igual.
+  if (metadata.contentType !== 'image/jpeg') return false
+
+  // Sin dimensiones legibles no hay decisión posible: que resuelva sharp.
+  if (!metadata.width || !metadata.height) return false
+
+  // Si excede el lado máximo, el resize sí hace trabajo útil.
+  if (Math.max(metadata.width, metadata.height) > SERVER_MAX_EDGE) return false
+
+  // El resize del servidor usa .rotate() para hornear la orientación EXIF en
+  // los píxeles. Saltearlo con un flag distinto de 1 dejaría fotos de celular
+  // giradas en cualquier cliente que ignore el EXIF.
+  if (metadata.orientation !== undefined && metadata.orientation !== 1) return false
+
+  return true
+}

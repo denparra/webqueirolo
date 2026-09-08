@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260908-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260908-002 |
+| **Fecha**       | 2026-09-08 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El sitio publico caia con `UND_ERR_CONNECT_TIMEOUT` contra `api.sanity.io` y `cdn.sanity.io` cada vez que se guardaba un vehiculo con fotos desde `/admin`. Evidencia: el cliente Sanity pedia `connect: 300000` pero fallaba a `10000ms`, el default de undici, o sea por debajo de la capa HTTP. Causa raiz: `sharp` y `dns.lookup()` comparten el threadpool de libuv (4 hilos por default); 3 conversiones mozjpeg en paralelo dejaban al DNS sin slots. Lo disparaba trabajo inutil: `CLIENT_MAX_EDGE` (2000px) < `SERVER_MAX_EDGE` (2400px), asi que el resize del servidor no cambiaba un pixel pero igual decodificaba y recomprimia. |
+| **Acuerdo/resultado** | Bypass de sharp para JPEG que ya cumplen (nueva funcion pura `shouldSkipServerResize`), `sharp.concurrency(1)`, `UPLOAD_CONCURRENCY` 3 a 1. Cliente publico a `useCdn: true` con `maxRetries: 2`/`timeout: 15000`; admin sigue en `useCdn: false`. Eliminado el reintento duplicado de `fetchWithRetry` (ahora `fetchVehicleData`). Nuevo boundary `app/vehiculos/[slug]/error.tsx`. Envoltorio en `VehicleForm` para el version skew de Server Actions. Se evaluo y descarto `generateBuildId`: con el header `immutable` de un anio en `/_next/static/:path*`, un buildId constante envenena la cache del cliente, y ademas no ataca el error reportado (el ID de un Server Action es independiente del buildId). |
+| **Impacto**     | Guardar fotos deja de bloquear el DNS del proceso y de tumbar la web publica. Lecturas publicas pasan por CDN de borde. Un fallo de Sanity ya no rompe la ficha de vehiculo. No cambian rutas ni el schema de Sanity. |
+| **Validacion**  | `npm run lint` OK sin warnings; `npm test -- --runInBand` OK (42 tests / 5 suites, 18 nuevos); `npx tsc --noEmit --pretty false` OK. No se ejecuto build. **La prueba end-to-end en el VPS queda pendiente y es la unica que confirma el diagnostico.** |
+| **Siguiente paso** | En EasyPanel: setear `UV_THREADPOOL_SIZE=16`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` (fija, generada una vez; es variable de BUILD, requiere Deploy completo y no restart), NO setear `BUILD_ID`, y cambiar el arranque a `node_modules/.bin/next start`. Luego correr la prueba e2e: guardar 8+ fotos con `/vehiculos` abierto en otra pestaña y confirmar cero `UND_ERR_CONNECT_TIMEOUT`. |
+| **Referencias** | `docs/implementation/IMP-20260908-003/IMP.md`, `lib/admin/vehicles.ts`, `lib/admin/imageResize.ts`, `lib/sanity.ts`, `lib/vehicles.ts`, `components/admin/VehicleForm.tsx`, `next.config.js`, tag `pre-threadpool-fix-20260908` |
+
+---
+
 ### LOG-20260908-001
 
 | Campo           | Valor |
