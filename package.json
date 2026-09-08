@@ -2,6 +2,10 @@
   "name": "queirolo-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.12.0 <23",
+    "npm": ">=10 <12"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

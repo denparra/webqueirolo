@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260908-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260908-001 |
+| **Fecha**       | 2026-09-08 |
+| **Tipo**        | ACTION |
+| **Contexto**    | EasyPanel/Nixpacks construía la aplicación con Node 18, mientras las dependencias actuales reportaban `EBADENGINE` y requerían Node 20.19+ o Node 22.12+. |
+| **Acuerdo/resultado** | Se creó el tag `pre-node22-20260908` sobre `246ec12`. Se fijaron `engines.node` en `>=22.12.0 <23` y `engines.npm` en `>=10 <12` en `package.json` y `package-lock.json`. No se actualizaron dependencias. |
+| **Impacto**     | El siguiente build de Nixpacks debe seleccionar Node 22 y eliminar los avisos de engine incompatibles. El cambio no modifica rutas ni lógica de negocio. |
+| **Validacion**  | `npm run lint` OK; `npm test -- --runInBand` OK (24 tests / 4 suites); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK. No se ejecutó build local. |
+| **Siguiente paso** | Publicar el cambio y ejecutar un Force Rebuild en EasyPanel. Confirmar `setup | nodejs_22` y ausencia de `EBADENGINE`. |
+| **Referencias** | `docs/implementation/IMP-20260908-001/IMP.md`, `package.json`, `package-lock.json`, tag `pre-node22-20260908` |
+
+---
+
 ### LOG-20260904-001
 
 | Campo           | Valor |
