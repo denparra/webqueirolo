@@ -28,6 +28,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260908-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260908-002 |
+| **Fecha**       | 2026-09-08 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El inventario de Sanity contenía vehículos históricos vendidos mezclados con el stock activo. El owner indicó que solo 15 vehículos mostrados en capturas deben quedar disponibles. |
+| **Acuerdo/resultado** | Se actualizaron 58 documentos consultados: los 15 identificados quedaron `available` y los demás quedaron `sold`; se modificó únicamente `status`. La consulta pública `getVehicles()` ahora filtra `status == "available"`. |
+| **Impacto**     | El catálogo público y futuros warm-ups trabajarán solo con los 15 vehículos activos. Los registros históricos, sus slugs e imágenes permanecen en Sanity. |
+| **Validacion**  | Consulta posterior en Sanity: 15 `available`, 42 `sold`, sin estados inesperados. Validaciones de código pendientes. Se creó el tag `pre-active-inventory-20260908`. |
+| **Siguiente paso** | Ejecutar lint, tests y TypeScript; publicar el cambio y validar `/vehiculos`, sitemap y fichas en producción. |
+| **Referencias** | `docs/implementation/IMP-20260908-002/IMP.md`, `lib/vehicles.ts`, tag `pre-active-inventory-20260908` |
+
+---
+
 ### LOG-20260904-001
 
 | Campo           | Valor |

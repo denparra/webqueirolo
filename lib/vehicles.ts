@@ -97,7 +97,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
         return mockVehicles
     }
 
-    const query = `*[_type == "vehicle"] | order(_createdAt desc) {
+    const query = `*[_type == "vehicle" && status == "available"] | order(_createdAt desc) {
     _id,
     name,
     "slug": slug.current,
