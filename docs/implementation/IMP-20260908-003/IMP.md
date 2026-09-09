@@ -1,5 +1,8 @@
 # IMP-20260908-003 - Estabilizar produccion: threadpool y timeouts a Sanity
 
+**Estado: CERRADO Y VERIFICADO EN PRODUCCION** (2026-09-08).
+Commits `5398c87` y `2dfb8b3` en `main`. Deuda derivada en `docs/reference/deuda-tecnica.md`.
+
 ## Objetivo
 
 Cortar la cadena que hacia caer el sitio publico cada vez que el owner guardaba un
@@ -144,23 +147,48 @@ Un error con `api.sanity.io` y `connect: 300000` es historial, no un fallo nuevo
 - `npm test -- --runInBand` OK: 53 tests en 6 suites (24 previos + 18 del bypass + 11 del logger).
 - `npx tsc --noEmit --pretty false` OK.
 - No se ejecuto `npm run build` por la regla operativa del repositorio.
-- **Pendiente y no verificado**: la prueba end-to-end en el VPS. Es la unica que confirma el
-  diagnostico; ver "Pendientes".
+### VERIFICADO EN PRODUCCION (2026-09-08, post-deploy 2dfb8b3)
 
-## Pendientes (requieren acceso al VPS, no se hicieron en esta sesion)
+El owner corrio la prueba end-to-end en el VPS. **Los `UND_ERR_CONNECT_TIMEOUT` desaparecieron.**
+El diagnostico del threadpool queda CONFIRMADO: sharp y `dns.lookup()` compartian el pool de
+libuv, y el bypass lo resolvio. Este frente se cierra.
 
-Confirmar el diagnostico desde una shell dentro del contenedor, en reposo y durante un guardado
-con 5+ fotos:
+Metodo usado para separar log nuevo de historial: el owner coloco un divider en el visor de
+EasyPanel y leyo de ahi hacia abajo. Mas simple y sin riesgo frente a truncar archivos en el host.
 
-```bash
-time node -e "require('dns').lookup('api.sanity.io',(e,a)=>console.log(e||a))"
-getent ahosts api.sanity.io
-ip -6 route show default
-```
+## CORRECCION IMPORTANTE sobre NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 
-Si en reposo resuelve en <100ms y durante el guardado se va a >10s, el diagnostico queda
-confirmado. Si ademas hay registro AAAA sin ruta IPv6 por defecto, agregar
-`require('dns').setDefaultResultOrder('ipv4first')` en `instrumentation.ts`.
+Durante esta sesion se afirmo que esa clave era la cura del `Failed to find Server Action`.
+**Es incorrecto.** Documentacion oficial (`docs/01-app/02-guides/server-actions.mdx`):
+
+> "Each Server Action is identified by a unique action ID generated during the build process.
+> New deployments typically generate new IDs, which can lead to a 'Failed to find Server Action'
+> error."
+
+La clave protege las **variables de closure**, para que instancias del mismo build puedan
+descifrarse entre si. **No estabiliza los IDs de action**: esos cambian en cada deploy por diseno.
+Eran dos mecanismos distintos. La clave sigue siendo correcta y necesaria y NO debe sacarse, pero
+no ataca ese error.
+
+La opcion de Next para eso es `deploymentId`, que no evita el skew sino que lo detecta y dispara
+un hard reload del cliente. Se evaluo y se descarto: ver D-004 en
+`docs/reference/deuda-tecnica.md`.
+
+### Comportamiento observado del Server Action (2026-09-08, post-deploy)
+
+Aparecio la linea en el log, pero **el vehiculo se guardo correctamente y no hubo aviso en
+pantalla**. Es el servidor rechazando un ID invalido, que es lo que debe hacer. Sin impacto
+funcional.
+
+Solo `saveVehicleAction` esta envuelto por `submitVehicle()`; los otros cinco formularios llaman
+al server action directo (`logoutAction`, `deleteVehicleAction` x2, `clearFeaturedVehiclesAction`,
+`loginAction`). Fue deliberado: son acciones de un clic sin datos que perder. Si el POST rechazado
+vino de alguno de esos desde una pestana previa al deploy, encaja exactamente con lo observado.
+
+Doble envio descartado: `VehicleSubmitButton` usa `useFormStatus` y deshabilita el boton mientras
+la accion esta pendiente.
+
+## Configuracion aplicada en EasyPanel
 
 Configurar en EasyPanel:
 
@@ -179,9 +207,22 @@ Configurar en EasyPanel:
 - Comando de arranque: `node_modules/.bin/next start` en lugar de `npm start`. Saca a npm de
   PID 1, hace que SIGTERM llegue limpio a Next y elimina el ruido `npm error command failed`.
 
-Prueba end-to-end: con el sitio publico abierto en otra pestaña navegando `/vehiculos`, guardar
-un vehiculo con 8+ fotos desde `/admin`. Criterio de exito: cero `UND_ERR_CONNECT_TIMEOUT` en
-los logs y la web publica respondiendo durante todo el guardado.
+Todo lo anterior quedo aplicado y confirmado en el build del 2026-09-08 22:30:43 GMT.
+
+La prueba end-to-end se ejecuto y paso: cero `UND_ERR_CONNECT_TIMEOUT`.
+
+**La fase de diagnostico IPv6 quedo sin necesidad de ejecutarse** y no aplica, porque los timeouts
+desaparecieron con el arreglo del threadpool. Si alguna vez reaparecen, los comandos de
+diagnostico son:
+
+```bash
+time node -e "require('dns').lookup('api.sanity.io',(e,a)=>console.log(e||a))"
+getent ahosts api.sanity.io
+ip -6 route show default
+```
+
+Si hay registro AAAA sin ruta IPv6 por defecto, agregar
+`require('dns').setDefaultResultOrder('ipv4first')` en `instrumentation.ts`.
 
 ## Riesgos y notas
 
@@ -194,11 +235,9 @@ los logs y la web publica respondiendo durante todo el guardado.
 - El envoltorio `submitVehicle` es un mitigante, no una cura: solo
   `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` evita el version skew de raiz. Su comportamiento exacto
   ante el error real todavia no se verifico contra produccion.
-- Deuda registrada, fuera de alcance: `status == "available"` en `lib/vehicles.ts` excluye tambien
-  `reserved` (hoy sin impacto: 58 vehiculos / 15 available / 43 sold / 0 reserved, verificado en
-  Sanity); `output: 'standalone'` para bajar el peso del contenedor; `withSentryConfig` nunca se
-  invoca en `next.config.js` pese a que `@sentry/nextjs` esta instalado y `instrumentation.ts`
-  carga los configs.
+- **Toda la deuda detectada en esta sesion quedo registrada en `docs/reference/deuda-tecnica.md`**
+  (D-001 a D-006, mas la seccion "Anti-deuda" con las decisiones que NO hay que revertir). Ese es
+  el punto de entrada para retomar el trabajo en otra sesion.
 
 ## Rollback
 

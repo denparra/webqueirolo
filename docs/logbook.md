@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260908-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260908-003 |
+| **Fecha**       | 2026-09-08 |
+| **Tipo**        | DECISION |
+| **Contexto**    | Verificacion en produccion de `5398c87` + `2dfb8b3`. Los `UND_ERR_CONNECT_TIMEOUT` desaparecieron: el diagnostico del threadpool de libuv queda CONFIRMADO. Persiste `Failed to find Server Action` en el log, pero sin impacto funcional (el vehiculo se guardo, no hubo aviso en pantalla). |
+| **Acuerdo/resultado** | Se CORRIGE un dato afirmado antes: `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` NO estabiliza los IDs de Server Action (solo protege variables de closure); segun la doc oficial, cada deploy genera IDs nuevos. La clave se mantiene igual porque sigue siendo necesaria. Se evaluo `deploymentId` y se DESCARTO: exige un valor unico por deploy identico en build y runtime, y EasyPanel no expone SHA automatico; si se olvida actualizarlo queda constante y no detecta nada. Se decide NO cambiar codigo. Toda la deuda se centraliza en el nuevo `docs/reference/deuda-tecnica.md`. |
+| **Impacto**     | Frente IMP-20260908-003 cerrado. Sin cambios de codigo en esta entrada; solo documentacion. |
+| **Validacion**  | Prueba e2e en produccion ejecutada por el owner: guardado de vehiculo con fotos + navegacion del catalogo en paralelo, cero `UND_ERR_CONNECT_TIMEOUT`. Metodo para separar log nuevo de historial: divider en el visor de EasyPanel. |
+| **Siguiente paso** | Decidir D-001 (vehiculos `reserved` invisibles en el catalogo publico); es la deuda con mas probabilidad de morder. Ver `docs/reference/deuda-tecnica.md`. |
+| **Referencias** | `docs/reference/deuda-tecnica.md`, `docs/implementation/IMP-20260908-003/IMP.md`, commits `5398c87` y `2dfb8b3` |
+
+---
+
 ### LOG-20260908-002
 
 | Campo           | Valor |

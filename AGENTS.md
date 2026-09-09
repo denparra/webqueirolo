@@ -205,6 +205,7 @@ Si hay diferencia entre ambos:
 - Tipos: `lib/types.ts`
 - Panorama tecnico: `docs/reference/project-reference.md`
 - Especificacion reusable: `docs/reference/automotive-platform-specification.md`
+- Deuda tecnica y decisiones que NO revertir: `docs/reference/deuda-tecnica.md` (**leer antes de proponer mejoras**; su seccion "Anti-deuda" documenta opciones que ya se probaron y se descartaron con motivo)
 
 ---
 

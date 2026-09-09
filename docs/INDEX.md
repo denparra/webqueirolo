@@ -17,6 +17,7 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | `docs/reference/configuration.md` | Guia para ajustar datos de negocio en `config.ts` |
 | `docs/reference/project-overview.md` | Referencia corta y enlaces documentales |
 | `docs/reference/project-reference.md` | Panorama tecnico integral del proyecto |
+| `docs/reference/deuda-tecnica.md` | Registro unico de deuda conocida y decisiones que NO hay que revertir |
 | `docs/reference/automotive-platform-specification.md` | Especificacion reusable de arquitectura, construccion y operacion |
 
 ## 2. Fuente de verdad tecnica
@@ -38,6 +39,7 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | SEO, sitemap y rutas publicas | `docs/implementation/IMP-20260605-001` a `IMP-20260607-002` | Implementado; revisar IMPs para detalle |
 | Institucional e imagenes | `docs/implementation/IMP-20260606-002/` | Revisar estado y assets pendientes |
 | Centro de Control automotriz | `docs/implementation/IMP-20260825-004/IMP.md` | Planning; `app/panel-web-automotoras/`; `/admin` cliente preservado |
+| Estabilidad de produccion (threadpool y timeouts a Sanity) | `docs/implementation/IMP-20260908-003/IMP.md` | Cerrado y verificado en produccion 2026-09-08; deuda derivada en `docs/reference/deuda-tecnica.md` |
 
 ## 4. Trazabilidad
 

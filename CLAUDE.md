@@ -142,6 +142,7 @@ Estas reglas aplican igual a Claude, GPT, Gemini, Copilot u otro modelo:
 - `docs/logbook.md` - trazabilidad.
 - `docs/implementation/IMP-20260614-001/IMP.md` - admin privado.
 - `docs/reference/project-reference.md` - panorama tecnico integral.
+- `docs/reference/deuda-tecnica.md` - deuda conocida y decisiones que NO revertir. **Leer antes de proponer mejoras.**
 - `docs/reference/configuration.md` - datos de negocio en `config.ts`.
 - `docs/reference/automotive-platform-specification.md` - especificacion reusable de construccion y despliegue.
 - `AGENTS.md` - reglas completas del repo.
