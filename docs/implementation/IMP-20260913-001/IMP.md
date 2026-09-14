@@ -26,7 +26,10 @@ por lo que el problema es intermitente y esta asociado a la carga concurrente.
 - Cada fila del listado administrativo usa `next/image` y puede pasar por `/_next/image`.
 - `AdminShell` mantiene un enlace explicito a `/studio` aunque el owner no lo utiliza.
 - `generateStaticParams` pertenece al build y no explica el fan-out al entrar al admin.
-- `NODE_ENV` esta vacio en el contenedor de produccion y debe corregirse en EasyPanel.
+- `NODE_ENV` vacio en el contenedor **no es un defecto**. `next/dist/bin/next` ejecuta
+  `process.env.NODE_ENV = process.env.NODE_ENV || defaultEnv` con `defaultEnv = "production"`
+  para todo comando que no sea `dev`, asi que `next build` y `next start` ya corren en
+  produccion. Verlo vacio con `docker exec env` es cosmetico.
 
 ## Alcance
 
@@ -39,7 +42,7 @@ Incluido:
 - Revisar dependencias y archivos exclusivos de Studio antes de eliminarlos.
 - Reducir trafico del optimizador de imagenes en miniaturas administrativas.
 - Anadir pruebas de render y regresion para el fan-out.
-- Documentar y verificar `NODE_ENV=production` en el despliegue.
+- Documentar por que `NODE_ENV` NO debe fijarse en EasyPanel (ver `LOG-20260913-003`).
 - Implementar el filtro de `Next-Action` invalido si las pruebas confirman que no rompe acciones reales.
 
 Excluido:
@@ -58,7 +61,7 @@ Excluido:
 - El listado no genera una rafaga descontrolada de `/_next/image`.
 - Login, alta, edicion, eliminacion, destacados y logout siguen funcionando.
 - No aparecen nuevos timeouts Sanity durante una prueba administrativa normal.
-- `NODE_ENV` queda configurado como `production` en el contenedor.
+- `NODE_ENV` NO queda definido como variable del servicio en EasyPanel.
 - Lint, tests y TypeScript pasan.
 - El cambio puede revertirse con la rama y el rollback documentados.
 
@@ -70,8 +73,10 @@ Excluido:
   sigue siendo posible desde el proyecto de Sanity si se necesita una emergencia.
 - Separar layouts mediante route groups seria mas limpio, pero aumenta el alcance y
   se mantiene como fase posterior si la correccion minima no alcanza.
-- `NODE_ENV` es configuracion de EasyPanel, no una correccion que deba simularse en
-  codigo.
+- Fijar `NODE_ENV` en EasyPanel rompe el build: Nixpacks inyecta las variables del servicio
+  como `ARG`/`ENV` en tiempo de build, npm deriva `omit=dev` y `npm ci` saltea las
+  devDependencies (`autoprefixer`, `typescript`, `tailwindcss-animate`). Ocurrio el
+  2026-09-13; mitigado con `.npmrc` (`include=dev`). Ver `LOG-20260913-003`.
 
 ## Validacion
 

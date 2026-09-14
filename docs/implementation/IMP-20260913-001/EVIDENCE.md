@@ -5,7 +5,8 @@
 - VPS: Node `22.14.0`, Next `14.2.35`.
 - Un contenedor de `web-queirolo`, sin reinicios.
 - `UV_THREADPOOL_SIZE=16`.
-- `NODE_ENV` vacio.
+- `NODE_ENV` vacio (esperado: `next start` lo fija a `production` dentro del proceso;
+  ver `next/dist/bin/next`). No es un defecto y no debe definirse en EasyPanel.
 - Consulta Sanity directa desde contenedor: `200` en `282 ms`.
 - Rutas publicas comprobadas: todas `200`, entre `49 ms` y `260 ms`.
 - En la rafaga observada: respuestas RSC de hasta `40 s`, imagenes `499` y timeouts

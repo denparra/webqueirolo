@@ -23,7 +23,7 @@
 
 ## Fase 3 - Robustez de despliegue
 
-- Configurar `NODE_ENV=production` en EasyPanel.
+- No fijar `NODE_ENV` en EasyPanel: Next ya lo resuelve y definirlo rompe `npm ci` en build.
 - Revisar `UV_THREADPOOL_SIZE=16`.
 - Anadir guard para `Next-Action` invalido, con tests.
 - No introducir `BUILD_ID` fijo.

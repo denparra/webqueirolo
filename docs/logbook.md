@@ -42,6 +42,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260913-003
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260913-003 |
+| **Fecha**       | 2026-09-13 |
+| **Tipo**        | INCIDENT |
+| **Contexto**    | Tras fusionar `fix/admin-request-fanout` y aplicar la fase 3 del `IMP-20260913-001`, el deploy de EasyPanel fallo en `npm run build` con `Cannot find module 'autoprefixer'` y `Module not found: Can't resolve '@/components/ui/button'` y `'@/config'`. El codigo de aplicacion del commit `6861c23` no tenia ningun defecto. |
+| **Acuerdo/resultado** | Causa raiz: la propia fase 3 del IMP indicaba configurar `NODE_ENV=production` en EasyPanel. Nixpacks inyecta las variables del servicio como `ARG`/`ENV` en tiempo de build, npm derivo `omit=dev` y `npm ci` instalo 1264 paquetes en lugar de los 1714 del lock. Sin `autoprefixer` falla el PostCSS de `next/font`; sin `typescript` Next no lee `tsconfig.json` y deja de aplicar `paths: { "@/*": ["./*"] }`, por eso ningun import `@/...` resuelve. Verificado ademas que `next/dist/bin/next` fija `NODE_ENV=production` por si mismo, asi que la variable era innecesaria y el diagnostico original (`NODE_ENV` vacio como defecto) era incorrecto. Correccion: `.npmrc` con `include=dev` en la raiz, quitar `NODE_ENV` de EasyPanel y corregir la guia equivocada en el IMP, ROADMAP, ROLLBACK y EVIDENCE. |
+| **Impacto**     | Un ciclo de deploy perdido, sin afectar el contenedor en produccion (siguio sirviendo el build anterior). Sin cambios en codigo de aplicacion. El `.npmrc` garantiza devDependencies en cualquier host y vuelve el build independiente de la configuracion de EasyPanel. |
+| **Siguiente paso** | Quitar `NODE_ENV` en EasyPanel, desplegar y confirmar en el log que `npm ci` reporta ~1714 paquetes. Luego cerrar los tres checkboxes pendientes de `EVIDENCE.md` (alta y edicion, deploy de rama, logs post-restart). |
+| **Referencias** | `.npmrc`, `docs/reference/deuda-tecnica.md` (anti-deuda `NODE_ENV` en EasyPanel, D-006), `docs/implementation/IMP-20260913-001/`, `postcss.config.js`, `tsconfig.json`, commit `6861c23` |
+
+---
+
 ### LOG-20260911-001
 
 | Campo           | Valor |

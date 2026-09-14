@@ -145,6 +145,16 @@ Integraciones opcionales:
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID`
 - `N8N_LEAD_WEBHOOK_URL`
 
+Variables que NO deben definirse en el hosting:
+
+- `NODE_ENV`. EasyPanel con Nixpacks inyecta las variables del servicio como `ARG`/`ENV` en
+  tiempo de build. Con `NODE_ENV=production`, npm deriva `omit=dev` y `npm ci` saltea las
+  devDependencies (`autoprefixer`, `typescript`, `tailwindcss-animate`), rompiendo
+  `next build`. Ademas es innecesaria: `next build` y `next start` fijan `production` solos.
+  El `.npmrc` de la raiz (`include=dev`) blinda el build; no borrarlo. Ver
+  `docs/reference/deuda-tecnica.md` y `LOG-20260913-003`.
+- `BUILD_ID`. Ver la anti-deuda de `generateBuildId` en `docs/reference/deuda-tecnica.md`.
+
 Nunca documentar valores reales de secretos, incluir `.env.local` en commits ni convertir tokens server-only en `NEXT_PUBLIC_*`. Los cambios `NEXT_PUBLIC_*` requieren rebuild porque se resuelven en build time.
 
 ## Documentacion y fuentes de verdad

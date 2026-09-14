@@ -449,6 +449,29 @@ Next genera por defecto es el comportamiento correcto aca. **No setear `BUILD_ID
 Si algun dia hace falta identificar la version desplegada, la opcion correcta es `deploymentId`
 (ver D-004), no `generateBuildId`.
 
+### `NODE_ENV` en EasyPanel: NO fijar
+
+Se probo y rompio el deploy el 2026-09-13 (ver `LOG-20260913-003`). EasyPanel con Nixpacks inyecta
+**todas** las variables del servicio como `ARG`/`ENV` **en tiempo de build**, no solo en runtime.
+Con `NODE_ENV=production` presente, npm deriva `omit=dev` y `npm ci` saltea las devDependencies:
+en el VPS instalo 1264 paquetes en lugar de los 1714 del lock.
+
+Sin devDependencies, `next build` falla con tres sintomas que parecen independientes y son el mismo
+problema:
+
+- falta `autoprefixer` -> `postcss.config.js` no carga el plugin -> `An error occurred in next/font`;
+- falta `typescript` -> Next no puede leer `tsconfig.json` -> nunca aplica
+  `paths: { "@/*": ["./*"] }` -> **todos** los imports `@/...` quedan sin resolver;
+- falta `tailwindcss-animate`, requerido por `tailwind.config.ts`.
+
+Ademas la variable es innecesaria. `next/dist/bin/next` hace
+`process.env.NODE_ENV = process.env.NODE_ENV || defaultEnv` con `defaultEnv = "production"` para
+todo comando que no sea `dev`: `next build` y `next start` ya se ponen `production` solos. Ver la
+variable vacia con `docker exec env` es cosmetico, no un defecto.
+
+El repo quedo blindado con `.npmrc` (`include=dev`), que tiene precedencia sobre `omit` y garantiza
+devDependencies en cualquier host. **No borrar ese `.npmrc` y no setear `NODE_ENV` en EasyPanel.**
+
 ### Bypass de sharp: no "simplificarlo"
 
 `lib/admin/vehicles.ts` saltea sharp cuando la imagen ya cumple. La condicion incluye que **no

@@ -11,7 +11,8 @@
 
 - Volver a desplegar el commit anterior conocido como estable.
 - Restaurar el start command y variables solo si fueron modificados en EasyPanel.
-- Mantener `NODE_ENV=production`; no revertir esta correccion operacional.
+- No reponer `NODE_ENV` en EasyPanel: fue la causa del build roto del 2026-09-13.
+- No borrar `.npmrc`; sin `include=dev` el build vuelve a quedar expuesto al mismo fallo.
 
 ## Criterio de rollback
 

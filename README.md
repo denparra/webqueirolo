@@ -139,6 +139,7 @@ Notas criticas:
 - `SANITY_API_WRITE_TOKEN` nunca debe ser `NEXT_PUBLIC_*`.
 - `ADMIN_PASSWORD_HASH` es SHA-256 hex de la contrasena real, no la contrasena plana.
 - En desarrollo, si faltan env vars de Sanity, el frontend puede usar `mockVehicles`; en produccion debe fallar rapido para no publicar datos falsos.
+- **No definir `NODE_ENV` en EasyPanel.** Nixpacks inyecta las variables del servicio tambien en build; con `NODE_ENV=production`, `npm ci` saltea las devDependencies y `next build` falla. `next build` y `next start` ya fijan `production` por si mismos. El `.npmrc` de la raiz (`include=dev`) protege el build; no borrarlo. Detalle en `docs/reference/deuda-tecnica.md`.
 
 ## Flujo de uso del admin
 
