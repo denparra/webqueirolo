@@ -18,6 +18,7 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | `docs/reference/project-overview.md` | Referencia corta y enlaces documentales |
 | `docs/reference/project-reference.md` | Panorama tecnico integral del proyecto |
 | `docs/reference/deuda-tecnica.md` | Registro unico de deuda conocida y decisiones que NO hay que revertir |
+| `docs/reference/auditoria-cruzada-20260911.md` | Auditoria cruzada de fallas contra `control-panel-webs-automotrices` y `taller-demo-web` |
 | `docs/reference/automotive-platform-specification.md` | Especificacion reusable de arquitectura, construccion y operacion |
 
 ## 2. Fuente de verdad tecnica

@@ -30,7 +30,7 @@ El archivo real es `config.ts` en la raiz del proyecto. No existe `config.js` co
 Los vehiculos no se editan en `config.ts`.
 
 - Flujo recomendado: `/admin`.
-- Respaldo tecnico: `/studio`.
+- La operacion diaria usa exclusivamente `/admin`; el CMS tecnico se gestiona fuera de esta aplicacion.
 - Fuente de verdad de inventario: Sanity `vehicle`.
 - Schema: `sanity/schemaTypes/vehicle.ts`.
 - Mutaciones admin: `lib/admin/vehicles.ts`.

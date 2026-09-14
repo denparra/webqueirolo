@@ -9,7 +9,7 @@ Sitio web Next.js para Queirolo Autos, enfocado en inventario de vehiculos, fich
 | Sitio publico | Funcional: home, catalogo, ficha, servicios, nosotros, contacto |
 | Inventario | Sanity es la fuente de verdad; mock data solo como fallback de desarrollo |
 | Admin privado | Implementado en `/admin` para crear, editar, eliminar y ordenar vehiculos |
-| Studio tecnico | Disponible en `/studio` como respaldo CMS |
+| Studio tecnico | Retirado; la operacion se realiza desde `/admin` |
 | Leads | Formularios abren WhatsApp con mensaje precargado; endpoint n8n queda preparado pero no es canal activo |
 | Validacion | Ejecutar `npm run lint`, `npm run test` y `npx tsc --noEmit --pretty false` antes de integrar cambios |
 
@@ -28,7 +28,7 @@ Sitio web Next.js para Queirolo Autos, enfocado en inventario de vehiculos, fich
   - Formatos invalidos muestran mensaje accionable, no error crudo de Sanity.
 - Eliminacion de vehiculos duplicados desde `/admin` con confirmacion.
 - Reordenamiento de imagenes existentes: `images[0]` queda como portada publica.
-- `/studio` sigue siendo respaldo tecnico, no fue reemplazado.
+- `/admin` es la interfaz operativa unica para el inventario.
 
 ### Mejoras publicas del catalogo y ficha
 
@@ -49,7 +49,6 @@ Sitio web Next.js para Queirolo Autos, enfocado en inventario de vehiculos, fich
 | `/nosotros` | Historia/equipo |
 | `/contacto` | Datos de contacto y mapa |
 | `/admin` | Admin privado de vehiculos |
-| `/studio` | Sanity Studio tecnico |
 | `/sitemap.xml` | Sitemap desde Sanity; excluye vendidos segun politica SEO vigente |
 | `/robots.txt` | Robots |
 
@@ -68,7 +67,6 @@ Sitio web Next.js para Queirolo Autos, enfocado en inventario de vehiculos, fich
 app/
   admin/                  # Login y CRUD privado de vehiculos
   vehiculos/              # Catalogo y ficha publica
-  studio/[[...tool]]/     # Sanity Studio
 components/
   admin/                  # Shell/formulario/orden de imagenes/boton eliminar
   vehicles/               # Cards, galeria, badges, comparador
@@ -96,7 +94,6 @@ Abrir:
 
 - `http://localhost:3000`
 - `http://localhost:3000/vehiculos`
-- `http://localhost:3000/studio`
 - `http://localhost:3000/admin` si las variables `ADMIN_*` estan configuradas.
 
 ## Comandos
@@ -111,7 +108,7 @@ npm run start    # servir build existente
 
 ## Variables de entorno
 
-### Sanity publico/Studio
+### Sanity publico
 
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
@@ -155,7 +152,7 @@ Notas criticas:
 ## CMS Sanity
 
 - `/admin` es el flujo de negocio recomendado para alta/edicion diaria.
-- `/studio` sigue disponible para operaciones tecnicas o recuperacion.
+- El admin propio es la unica interfaz operativa del inventario.
 - El schema real del vehiculo esta en `sanity/schemaTypes/vehicle.ts`.
 - Las queries publicas estan en `lib/vehicles.ts`.
 - Las mutaciones admin estan en `lib/admin/vehicles.ts`.
@@ -179,7 +176,6 @@ Checklist manual:
 - Reordenar portada se refleja en `/vehiculos` y ficha.
 - Eliminar duplicado remueve el documento `vehicle` correcto.
 - `/vehiculos` y `/vehiculos/[slug]` mantienen filtros, comparador y descripcion.
-- `/studio` sigue cargando.
 
 ## Troubleshooting
 

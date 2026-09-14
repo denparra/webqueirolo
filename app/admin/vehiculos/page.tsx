@@ -140,7 +140,7 @@ export default async function AdminVehiclesPage({
             <div key={vehicle.id} className="grid gap-4 p-4 md:grid-cols-[96px_1fr_auto] md:items-center">
               <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100">
                 {vehicle.images[0]?.url ? (
-                  <Image src={vehicle.images[0].url} alt={vehicle.name} fill className="object-contain" />
+                  <Image src={vehicle.images[0].url} alt={vehicle.name} fill className="object-contain" unoptimized />
                 ) : (
                   <span className="flex h-full items-center justify-center text-xs text-gray-400">
                     Sin imagen
@@ -169,13 +169,13 @@ export default async function AdminVehiclesPage({
               <div className="flex flex-wrap gap-2 md:justify-end">
                 {vehicle.slug && (
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/vehiculos/${vehicle.slug}`} target="_blank">
+                    <a href={`/vehiculos/${vehicle.slug}`} target="_blank" rel="noopener noreferrer">
                       Ver
-                    </Link>
+                    </a>
                   </Button>
                 )}
                 <Button variant="secondary" size="sm" asChild>
-                  <Link href={`/admin/vehiculos/${encodeURIComponent(vehicle.id)}/editar`}>
+                  <Link prefetch={false} href={`/admin/vehiculos/${encodeURIComponent(vehicle.id)}/editar`}>
                     Editar
                   </Link>
                 </Button>

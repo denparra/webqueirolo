@@ -4,7 +4,7 @@
 1. Define env vars en `.env.local` (ver "Environment Variables").
 2. `npm install`
 3. `npm run dev`
-4. Abre `http://localhost:3000`, `http://localhost:3000/studio` y, si configuras auth admin, `http://localhost:3000/admin`
+4. Abre `http://localhost:3000` y, si configuras auth admin, `http://localhost:3000/admin`
 5. Revisa rutas clave: `/vehiculos`, `/vehiculos/[slug]`, `/servicios`, `/nosotros`, `/contacto`.
 
 Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el frontend usa `mockVehicles` (`lib/data.ts`). En produccion, el codigo hace fail-fast (lanza error) si falta `NEXT_PUBLIC_SANITY_PROJECT_ID`.
@@ -20,7 +20,7 @@ Nota: En desarrollo (NODE_ENV != `production`), si faltan env vars de Sanity el 
 - `app/` contains the Next.js App Router pages, layouts, and route-level UI.
 - `components/` holds reusable UI components shared across pages.
 - `lib/` is for helper functions, data utilities, and shared logic.
-- `sanity/` contains Sanity Studio config, schema, structure, and env helpers.
+- `sanity/` contains Sanity schema, CLI and env helpers.
 - `store/` holds Zustand state (favorites, compare).
 - `public/` stores static assets served at the site root (images, icons, manifest).
 - `config.ts` centralizes business data (contact, SEO, brand assets).
@@ -36,13 +36,12 @@ Routes:
 - `/vehiculos/[slug]` detalle con `notFound()` si no existe
 - `/servicios`, `/nosotros`, `/contacto`
 - `/admin` admin privado del owner para alta/edicion/eliminacion de vehiculos sobre Sanity
-- `/studio` Sanity Studio tecnico (basePath en `sanity.config.ts`)
 - `/sitemap.xml` y `/robots.txt` desde `app/sitemap.ts` y `app/robots.ts`
 - `/api/health`, `/api/calculate-loan` y `/api/submit-lead` son endpoints HTTP en `app/api/`
 - `/privacidad`, `/politica-de-privacidad`, `/terminos`, `/terminos-y-condiciones` y `/eliminacion-de-datos` son paginas legales existentes
 
 Sanity:
-- Studio usa `sanity.config.ts` + `sanity/env.ts` (env vars requeridas).
+- Sanity usa `sanity/env.ts` y `sanity/schemaTypes` (env vars requeridas).
 - Schema principal: `sanity/schemaTypes/vehicle.ts`.
 - Admin privado escribe en Sanity desde `lib/admin/vehicles.ts` usando `SANITY_API_WRITE_TOKEN`.
 - Frontend consulta en `lib/vehicles.ts` via GROQ y mapea a `Vehicle`.
@@ -58,7 +57,7 @@ Sanity:
 - `npm run test` runs Jest (smoke tests).
 
 ## Environment Variables
-Required for Studio and real data:
+Required for real data:
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`
 - `NEXT_PUBLIC_SANITY_DATASET`
 
@@ -147,7 +146,7 @@ Estas reglas son agnosticas al modelo (Claude, GPT, Gemini, Copilot u otro). El 
   - `npm run test`
   - `npx tsc --noEmit --pretty false`
   - `npm run build` only when explicitly requested for deploy verification
-  - `npm run start` and open key routes (`/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`, `/studio`)
+  - `npm run start` and open key routes (`/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`)
   - Confirm Sanity data loads (or mock fallback is expected).
   - Confirm images resolve from `cdn.sanity.io` in production.
 
@@ -169,14 +168,13 @@ Estas reglas son agnosticas al modelo (Claude, GPT, Gemini, Copilot u otro). El 
 ### Validacion rapida antes de push/deploy
 1. `npm run lint`
 2. `npm run build` only when explicitly requested for deploy verification.
-3. `npm run start` and spot-check `/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`, `/studio`.
+3. `npm run start` and spot-check `/`, `/vehiculos`, one `/vehiculos/[slug]`, `/servicios`, `/admin`.
 4. Verify env vars are set and no secrets are committed.
 5. Check images load (Sanity CDN in prod) and WhatsApp links use `config.ts`.
 
 ## Troubleshooting
 - Mock data shows in `/vehiculos`: env vars missing/quoted or Sanity not reachable; see Playbook "Debug deploy VPS".
 - Images fail in Next/Image: check `cdn.sanity.io` config and published assets.
-- Studio fails to load: missing `NEXT_PUBLIC_SANITY_*` env vars.
 - `/admin` login disabled: missing `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, or `ADMIN_SESSION_SECRET`.
 - `/admin` can list but cannot save: missing `SANITY_API_WRITE_TOKEN` or token lacks write permission.
 - Sanity rejects image as invalid: prefer JPG/PNG/WEBP/GIF; HEIC/HEIF/TIFF/BMP are converted with `sharp` when possible, otherwise convert manually before upload.
@@ -205,7 +203,8 @@ Si hay diferencia entre ambos:
 - Tipos: `lib/types.ts`
 - Panorama tecnico: `docs/reference/project-reference.md`
 - Especificacion reusable: `docs/reference/automotive-platform-specification.md`
-- Deuda tecnica y decisiones que NO revertir: `docs/reference/deuda-tecnica.md` (**leer antes de proponer mejoras**; su seccion "Anti-deuda" documenta opciones que ya se probaron y se descartaron con motivo)
+- Deuda tecnica y decisiones que NO revertir: `docs/reference/deuda-tecnica.md` (**leer antes de proponer mejoras**; su seccion "Anti-deuda" documenta opciones que ya se probaron y se descartaron con motivo). D-001 a D-007 son deuda de este repo; la seccion "Deuda en repos hermanos" (D-008 en adelante) es deuda de `taller-demo-web` y `control-panel-webs-automotrices`, centralizada aca porque esos repos no tienen registro propio. Al moverla a su repo, borrar el item de este archivo.
+- Auditoria cruzada de fallas contra los repos hermanos: `docs/reference/auditoria-cruzada-20260911.md`
 
 ---
 

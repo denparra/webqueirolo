@@ -30,9 +30,9 @@ export function VehicleFormSecondaryActions({
       </Button>
       {vehicleSlug && (
         <Button variant="secondary" asChild>
-          <Link href={`/vehiculos/${vehicleSlug}`} target="_blank">
+          <a href={`/vehiculos/${vehicleSlug}`} target="_blank" rel="noopener noreferrer">
             Preview público
-          </Link>
+          </a>
         </Button>
       )}
       {vehicleSlug && vehicleName && (

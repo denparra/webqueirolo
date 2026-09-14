@@ -53,7 +53,6 @@ npm run start
 | `/nosotros` | Institucional |
 | `/contacto` | Contacto/mapa |
 | `/admin` | Admin privado del owner |
-| `/studio` | Sanity Studio tecnico |
 | `/sitemap.xml` | Sitemap desde Sanity |
 | `/robots.txt` | Robots |
 | `/api/health` | Health check |
@@ -79,7 +78,7 @@ scripts/                   # utilidades manuales fuera del runtime
 
 ## Variables de entorno
 
-Sanity publico/Studio:
+Sanity publico:
 
 ```env
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
@@ -142,7 +141,8 @@ Estas reglas aplican igual a Claude, GPT, Gemini, Copilot u otro modelo:
 - `docs/logbook.md` - trazabilidad.
 - `docs/implementation/IMP-20260614-001/IMP.md` - admin privado.
 - `docs/reference/project-reference.md` - panorama tecnico integral.
-- `docs/reference/deuda-tecnica.md` - deuda conocida y decisiones que NO revertir. **Leer antes de proponer mejoras.**
+- `docs/reference/deuda-tecnica.md` - deuda conocida y decisiones que NO revertir. **Leer antes de proponer mejoras.** D-001 a D-007 son de este repo; D-008 en adelante es deuda de los repos hermanos (`taller-demo-web`, `control-panel-webs-automotrices`), centralizada aca porque no tienen registro propio.
+- `docs/reference/auditoria-cruzada-20260911.md` - auditoria de fallas de este repo contra los dos repos hermanos.
 - `docs/reference/configuration.md` - datos de negocio en `config.ts`.
 - `docs/reference/automotive-platform-specification.md` - especificacion reusable de construccion y despliegue.
 - `AGENTS.md` - reglas completas del repo.

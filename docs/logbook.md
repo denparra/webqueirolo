@@ -12,6 +12,68 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20260913-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260913-001 |
+| **Fecha**       | 2026-09-13 |
+| **Tipo**        | PLAN |
+| **Contexto**    | Se autorizo iniciar una iniciativa sobre una rama nueva desde el `main` actual para investigar y corregir el fan-out de solicitudes observado al entrar a `/admin`, los timeouts intermitentes hacia Sanity y la ruta `/studio` no utilizada. |
+| **Acuerdo/resultado** | Creada la rama `fix/admin-request-fanout`. Se creo `docs/implementation/IMP-20260913-001/` con SOT, roadmap, evidencia y rollback. El diagnostico identifica prefetch de enlaces admin, herencia del layout publico, miniaturas por `/_next/image`, enlace explicito a Studio y `NODE_ENV` vacio en el contenedor. El alcance prioriza correcciones minimas antes de una separacion estructural de layouts. |
+| **Impacto**     | No hay cambios funcionales de codigo aun. La rama conserva el estado actual de `main`, incluidos cambios locales preexistentes que no forman parte de esta iniciativa. |
+| **Siguiente paso** | Implementar primero el cierre del fan-out, retirar Studio segun verificacion de dependencias, corregir `NODE_ENV` en EasyPanel, ejecutar pruebas locales y remotas, y fusionar solo si se cumplen los criterios de aceptacion. |
+| **Referencias** | `docs/implementation/IMP-20260913-001/`, `app/admin/vehiculos/page.tsx`, `components/admin/AdminShell.tsx`, `app/layout.tsx`, `app/studio/[[...tool]]/page.tsx`, rama `fix/admin-request-fanout` |
+
+---
+
+### LOG-20260913-002
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260913-002 |
+| **Fecha**       | 2026-09-13 |
+| **Tipo**        | TEST |
+| **Contexto**    | Validacion de la correccion del fan-out al entrar a `/admin` y de la retirada de `/studio`. |
+| **Acuerdo/resultado** | Playwright ejecuto Chrome instalado localmente, inicio sesion con el usuario admin y cargo `/admin/vehiculos`. Se observaron 27 solicitudes y ninguna a `/studio`, fichas publicas, ediciones ni `/_next/image` por prefetch. `/studio` devolvio 404. Tambien pasaron `npm run lint`, Jest (7 suites, 56 tests) y `npx tsc --noEmit --pretty false`. |
+| **Impacto**     | La hipotesis de fan-out por prefetch queda verificada en el flujo local autenticado. No sustituye una prueba tras deploy en VPS. |
+| **Siguiente paso** | Revisar diff, configurar `NODE_ENV=production` en EasyPanel y validar en el despliegue antes de fusionar con `main`. |
+| **Referencias** | `IMP-20260913-001/EVIDENCE.md`, `app/admin/vehiculos/page.tsx`, `middleware.ts`, `__tests__/serverActionId.test.ts` |
+
+---
+
+### LOG-20260911-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260911-001 |
+| **Fecha**       | 2026-09-11 |
+| **Tipo**        | RISK |
+| **Contexto**    | El owner pidio verificar si los dos repos hermanos (`control-panel-webs-automotrices` y `taller-demo-web`) arrastran las mismas fallas documentadas en este repo. Los tres son Next.js; `taller-demo-web` declara en `docs/template-update-policy.md` que deriva de `automotive-web-template`, la misma familia. Alcance acordado con el owner: SOLO DIAGNOSTICO, sin correcciones. |
+| **Acuerdo/resultado** | Se construyo un catalogo de 11 clases de falla (R-1 a R-8 resueltas en `IMP-20260908-003`, D-001 a D-007 abiertas) y se verifico cada una contra los dos repos. Hallazgo principal: `taller-demo-web` tiene armada la cadena causal completa del incidente del 2026-09-08. `lib/admin/vehicles.ts:193-195` procesa 3 imagenes en paralelo con `mozjpeg: true`, sin `sharp.concurrency(1)` y sin bypass tipo `shouldSkipServerResize`; `lib/sanity/client.ts:12` usa `useCdn: false` y las 12 lecturas de `lib/` usan `cache: "no-store"`. Es la configuracion exacta previa al fix, con dos agravantes: no hay pre-resize en el navegador (el servidor recibe originales de hasta 10 MB) y no hay cache en ninguna capa. Atenuante: despliega a Vercel (serverless), donde cada invocacion esta aislada; el atenuante lo aporta el hosting, no el codigo. Lo que `taller-demo-web` SI corrigio: D-001 (query `status in ["available","reserved"]`), R-5, D-005, y helper de resumen de errores para leads (no para Sanity). `control-panel-webs-automotrices` casi no comparte fallas por no compartir superficie (sin sharp, sin uploads, sin Sanity); sus problemas propios son no tener script `build`/`start` y observabilidad cero. Fortaleza suya: RLS en las 13 tablas con contratos pgTAP. Patron transversal: ninguno de los tres tiene error tracking funcionando ni mitiga D-007. |
+| **Impacto**     | Sin cambios de codigo en ninguno de los tres repos. Sin commits. Solo documentacion: nuevo `docs/reference/auditoria-cruzada-20260911.md`, nuevos D-008 a D-012 en `docs/reference/deuda-tecnica.md` bajo la seccion "Deuda en repos hermanos", notas de alcance transversal agregadas a D-002 y D-007, y una fila en `docs/INDEX.md`. |
+| **Validacion**  | Verificado leyendo el archivo en esta sesion: `lib/admin/vehicles.ts`, `lib/sanity/client.ts`, `lib/sanity/admin-client.ts`, `lib/vehicles/repository.ts`, `package.json` y `.env.example` de `taller-demo-web`; `package.json`, `lib/control-panel.ts`, migraciones y `README.md` de `control-panel`; y el estado post-fix de este repo. Una parte del informe viene de exploracion delegada sin verificacion de segunda mano y esta marcada como tal en la seccion 8 del documento. No se ejecuto build, lint, tests ni `npm install` en ningun repo. |
+| **Siguiente paso** | Decision del owner: NO se corrige nada ahora; todo queda registrado como deuda para retomar. Al retomar, el orden sugerido es D-008 primero (cadena threadpool en `taller-demo-web`: se propaga a cualquier fork del template y se activa en cuanto el deploy pase de serverless a contenedor), despues D-009 (una linea), y D-002 en su version transversal si se decide resolver observabilidad para los tres repos de una. Como ninguno de los hermanos tiene registro de deuda propio, D-008 a D-012 viven aca hasta que lo tengan; al moverlos, borrar el item de este archivo. |
+| **Referencias** | `docs/reference/auditoria-cruzada-20260911.md`, `docs/reference/deuda-tecnica.md`, `docs/implementation/IMP-20260908-003/IMP.md` |
+
+---
+
+### LOG-20260910-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260910-001 |
+| **Fecha**       | 2026-09-10 |
+| **Tipo**        | SECURITY |
+| **Contexto**    | Tras cerrar el incidente del threadpool, el log de produccion sigue mostrando, repetido y tambien despues de un arranque limpio: `Failed to find Server Action "x". This request might be from an older or newer deployment. Original error: Cannot read properties of undefined (reading 'workers')`. |
+| **Acuerdo/resultado** | Diagnostico: son bots escaneando internet en busca de React2Shell (CVE-2025-55182). Mandan un POST con header `Next-Action: x`; cualquier valor sirve para tocar el camino vulnerable. Prueba: los IDs reales del build son SHA-1 hex de 40 caracteres (`.next/server/server-reference-manifest.json`), y `"x"` no puede salir de ningun formulario del sitio. El error de `workers` es el Proxy `createServerModuleMap` (`action-utils.js:30`) indexando el manifest sin chequear. Exposicion: ninguna. El RCE CVE-2025-66478 no afecta Next 14.x estable, y el DoS CVE-2025-55184 / CVE-2025-67779 esta corregido en 14.2.35, la version en produccion. Se CORRIGE D-004: atribuia estas lineas a version skew; un skew real trae un hash de 40 hex. Decision del owner: documentar ahora y dejar el fix anotado para despues. |
+| **Impacto**     | Sin cambios de codigo. Nuevo D-007 en `docs/reference/deuda-tecnica.md`; D-004 ahora explica como distinguir skew de escaneo. Tarea `[SEC-SCAN]` creada en el to-do (etiqueta `webqueirolo`). |
+| **Validacion**  | Mecanismo leido en `node_modules/next/dist/server/app-render/action-utils.js:30` y `action-handler.js:653` (Next 14.2.35). Version confirmada en `node_modules/next/package.json` y en el log de arranque de produccion. Versiones afectadas confirmadas en los avisos oficiales de Next. No se ejecuto build, lint ni tests (solo documentacion). |
+| **Siguiente paso** | Fix pendiente (D-007): guard en `middleware.ts` que responda 400 si `Next-Action` no matchea `/^[0-9a-f]{40,}$/i`, con test Jest y prueba del admin antes de desplegar. |
+| **Referencias** | `docs/reference/deuda-tecnica.md` (D-004, D-007), https://nextjs.org/blog/security-update-2025-12-11, https://nextjs.org/blog/CVE-2025-66478 |
+
+---
+
 ### LOG-20260908-003
 
 | Campo           | Valor |

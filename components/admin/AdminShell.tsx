@@ -19,11 +19,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 Ver sitio público
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/studio" target="_blank">
-                Abrir Studio
-              </Link>
-            </Button>
             <form action={logoutAction}>
               <Button variant="secondary" size="sm" type="submit">
                 Salir

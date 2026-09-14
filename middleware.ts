@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cleanEnvVar } from '@/sanity/env-utils'
 import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin/session'
+import { isValidServerActionId } from '@/lib/admin/serverActionId'
 
 /**
  * Redirige el dominio apex (queirolo.cl) al canónico con www (www.queirolo.cl).
@@ -13,6 +14,11 @@ import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin/sessi
  * puede eliminarse sin otros cambios.
  */
 export async function middleware(request: NextRequest) {
+    const serverActionId = request.headers.get('Next-Action')
+    if (serverActionId !== null && !isValidServerActionId(serverActionId)) {
+        return new NextResponse('Invalid Server Action', { status: 400 })
+    }
+
     const host = request.headers.get('host')
 
     if (host === 'queirolo.cl') {

@@ -19,7 +19,7 @@ Este documento es el panorama tecnico del sitio Queirolo Autos. Describe el esta
 | Canal publico de leads | WhatsApp desde los formularios |
 | Canal futuro preparado | `POST /api/submit-lead` puede reenviar a n8n si existe `N8N_LEAD_WEBHOOK_URL` |
 | Administracion | `/admin` privado para crear, editar, eliminar y ordenar vehiculos |
-| CMS tecnico | `/studio`, Sanity Studio montado con `basePath: '/studio'` |
+| CMS tecnico | Sanity gestionado fuera de la aplicacion; la operacion diaria usa `/admin` |
 
 ## Tecnologias
 
@@ -57,11 +57,11 @@ Este documento es el panorama tecnico del sitio Queirolo Autos. Describe el esta
 
 ### CMS Sanity
 
-- Configuracion Studio: `sanity.config.ts`, `sanity/env.ts`, `sanity/structure.ts`.
+- Configuracion Sanity CLI: `sanity.cli.ts`, `sanity/env.ts`, `sanity/structure.ts`.
 - Schema principal: `sanity/schemaTypes/vehicle.ts`.
 - El documento `vehicle` incluye identidad, precio, estado, galeria, especificaciones, descripcion Portable Text y equipamiento.
 - Los catalogos de marca, categoria, carroceria y color viven en `lib/constants/` y se reutilizan en el schema y admin.
-- Dataset por defecto en el cliente publico: `production`; Studio exige explicitamente `NEXT_PUBLIC_SANITY_DATASET`.
+- Dataset por defecto en el cliente publico: `production`; las herramientas Sanity exigen explicitamente `NEXT_PUBLIC_SANITY_DATASET`.
 
 ## Rutas publicas y privadas
 
@@ -82,7 +82,6 @@ Este documento es el panorama tecnico del sitio Queirolo Autos. Describe el esta
 | `/admin/vehiculos` | `app/admin/vehiculos/page.tsx` | Listado privado |
 | `/admin/vehiculos/nuevo` | `app/admin/vehiculos/nuevo/page.tsx` | Alta de vehiculo |
 | `/admin/vehiculos/[id]/editar` | `app/admin/vehiculos/[id]/editar/page.tsx` | Edicion, galeria y eliminacion |
-| `/studio/[[...tool]]` | `app/studio/[[...tool]]/page.tsx` | Sanity Studio |
 
 ## APIs y acciones
 
