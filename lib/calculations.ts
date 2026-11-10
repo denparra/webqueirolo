@@ -1,18 +1,21 @@
+import siteConfig from '@/config'
 import { LoanResult } from './types'
+
+const loanSimulation = siteConfig.loanSimulation
 
 /**
  * Calculate loan payment details
  * @param price - Vehicle price
  * @param downPaymentPercent - Down payment as percentage (10-50)
  * @param termMonths - Loan term in months (12-60)
- * @param annualRate - Annual interest rate (default 12%)
+ * @param annualRate - Annual interest rate (default: config.ts loanSimulation.annualRatePercent)
  * @returns Loan calculation results
  */
 export function calculateLoan(
     price: number,
     downPaymentPercent: number,
     termMonths: number,
-    annualRate: number = 12
+    annualRate: number = loanSimulation.annualRatePercent
 ): LoanResult {
     const downPayment = price * (downPaymentPercent / 100)
     const financingAmount = price - downPayment
@@ -38,9 +41,14 @@ export function calculateLoan(
 
 /**
  * Calculate estimated monthly payment for a vehicle
- * Uses standard assumptions: 20% down, 48 months, 12% annual rate
+ * Uses the reference assumptions from config.ts (loanSimulation): 20% down, 48 months, 24% annual rate
  */
 export function estimateMonthlyPayment(price: number): number {
-    const result = calculateLoan(price, 20, 48, 12)
+    const result = calculateLoan(
+        price,
+        loanSimulation.downPaymentPercent,
+        loanSimulation.termMonths,
+        loanSimulation.annualRatePercent
+    )
     return result.monthlyPayment
 }

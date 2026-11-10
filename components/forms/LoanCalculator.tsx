@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { calculateLoan } from '@/lib/calculations'
 import { formatCurrency } from '@/lib/utils'
+import siteConfig from '@/config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
@@ -17,7 +18,8 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
     const [downPaymentPercent, setDownPaymentPercent] = useState(20)
     const [term, setTerm] = useState(48)
 
-    const result = calculateLoan(price, downPaymentPercent, term, 12)
+    const { annualRatePercent, disclaimer } = siteConfig.loanSimulation
+    const result = calculateLoan(price, downPaymentPercent, term, annualRatePercent)
 
     return (
         <div className="rounded-xl bg-white p-8 shadow-lg">
@@ -98,7 +100,7 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
                         <label className="mb-2 block text-sm font-medium text-gray-700">
                             Tasa de Interés (Referencial)
                         </label>
-                        <Input type="text" value="12% anual" readOnly className="bg-gray-50" />
+                        <Input type="text" value={`${annualRatePercent}% anual`} readOnly className="bg-gray-50" />
                     </div>
                 </div>
 
@@ -153,8 +155,7 @@ export function LoanCalculator({ initialPrice = 25000000, onRequestCredit }: Loa
                     Solicitar Evaluación
                 </Button>
                 <p className="mt-4 text-xs text-gray-500">
-                    Valores referenciales. La cuota final depende de la evaluación crediticia
-                    y las condiciones de la financiera. CAE informado al momento de la solicitud.
+                    {disclaimer} Sujeto a evaluación crediticia. CAE informado al momento de la solicitud.
                 </p>
             </div>
         </div>

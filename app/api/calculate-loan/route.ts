@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import siteConfig from '@/config'
 
 // Validation schema for loan calculation
 const loanSchema = z.object({
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const validatedData = loanSchema.parse(body)
 
-        const { price, downPayment, term, interestRate = 1.5 } = validatedData
+        const { price, downPayment, term, interestRate = siteConfig.loanSimulation.annualRatePercent } = validatedData
 
         // Calculate loan amount
         const loanAmount = price - downPayment
