@@ -12,6 +12,22 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 
 ---
 
+### LOG-20261110-001
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20261110-001 |
+| **Fecha**       | 2026-11-10 |
+| **Tipo**        | ACTION |
+| **Contexto**    | El owner pidio subir la tasa del simulador de credito (12% anual era baja frente a las financieras) y dejar visible en cada cifra simulada que es solo una simulacion aproximada y que depende de la financiera con la que se evalue. |
+| **Acuerdo/resultado** | Tasa de referencia 24% anual nominal (2% mensual), decidida por el owner como escenario conservador. Referencias de mercado consultadas (blogs, no oficiales): CAE ~14-20% en Tanner, Santander Consumer y Forum, rango 12-25%; sin datos publicados de Mundo Credito ni Autofin. Los valores viven ahora en `config.ts` (`loanSimulation`: tasa, pie 20%, plazo 48 y textos de leyenda) y los leen `lib/calculations.ts`, `LoanCalculator` y el default de `/api/calculate-loan` (antes 1.5, que la formula tomaba como % anual). Leyenda corta agregada junto a cada "Desde aprox. $X/mes" (`VehicleCard`, `FeaturedVehicleCard`, ficha del vehiculo y su mini-tarjeta); `LoanCalculator` usa la leyenda completa. |
+| **Impacto**     | Solo presentacion y calculo referencial: para un auto de $10M, 20% de pie y 48 meses la cuota simulada pasa de $210.671 a $260.815. Sin cambios en Sanity, leads, WhatsApp ni rutas. `/api/calculate-loan` sin consumidores internos; su respuesta por defecto cambia de tasa 1.5 a 24. |
+| **Validacion**  | `npx jest` 10 suites / 70 tests OK (3 archivos nuevos: `loanSimulation`, `calculateLoanRoute`, `loanLegend`); `npx tsc --noEmit` OK; `npm run lint` OK; servidor de desarrollo: `/`, `/vehiculos`, `/servicios` y ficha responden 200 con leyenda en cada "Desde aprox." y `24% anual` en el simulador. No se ejecuto build. No se reviso el layout visualmente en navegador. |
+| **Siguiente paso** | Contrastar el 24% con CAE reales de Tanner, Forum y Santander antes de darlo por definitivo. Para publicar: lanzar a mano el workflow `build-destino` y desplegar el digest nuevo en el VPS destino (un push a `main` no cambia produccion). |
+| **Referencias** | `config.ts`, `lib/calculations.ts`, `components/forms/LoanCalculator.tsx`, `app/api/calculate-loan/route.ts`, `__tests__/loanSimulation.test.ts`, rama `feat/loan-simulation-rate` |
+
+---
+
 ### LOG-20260913-001
 
 | Campo           | Valor |
@@ -54,6 +70,21 @@ Registra solo cambios relevantes (no ruido operativo cotidiano).
 | **Impacto**     | Un ciclo de deploy perdido, sin afectar el contenedor en produccion (siguio sirviendo el build anterior). Sin cambios en codigo de aplicacion. El `.npmrc` garantiza devDependencies en cualquier host y vuelve el build independiente de la configuracion de EasyPanel. |
 | **Siguiente paso** | Quitar `NODE_ENV` en EasyPanel, desplegar y confirmar en el log que `npm ci` reporta ~1714 paquetes. Luego cerrar los tres checkboxes pendientes de `EVIDENCE.md` (alta y edicion, deploy de rama, logs post-restart). |
 | **Referencias** | `.npmrc`, `docs/reference/deuda-tecnica.md` (anti-deuda `NODE_ENV` en EasyPanel, D-006), `docs/implementation/IMP-20260913-001/`, `postcss.config.js`, `tsconfig.json`, commit `6861c23` |
+
+---
+
+### LOG-20260913-004
+
+| Campo           | Valor |
+|-----------------|-------|
+| **ID**          | LOG-20260913-004 |
+| **Fecha**       | 2026-09-13 |
+| **Tipo**        | PLAN |
+| **Contexto**    | Tras cerrar el incidente de deploy (`LOG-20260913-003`), el owner decide encarar la salida de Next 14 hacia Next 15 o 16 con React 19. Se solicito analisis documentado, sin tocar codigo. |
+| **Acuerdo/resultado** | Creado `docs/implementation/IMP-20260913-002/IMP.md` como SOT del frente, con el inventario verificado archivo por archivo. Hallazgos principales: `react@^18.2.0` tampoco cumple el peer de `next-sanity` (`^18.3 \|\| ^19`), asi que React se toca en cualquier escenario; y `react-leaflet@4.2.1`, unico paquete que bloqueaba React 19, resulta ser dependencia muerta (aparece solo en `package.json`, el mapa usa la API vanilla de `leaflet`). La superficie de codigo es de 10 sitios: 4 de `cookies()` y 6 de `params`/`searchParams`. Se verifico ademas que `useFormStatus`, `forwardRef` y la estrategia de cacheo con `next: { revalidate }` no requieren cambios. `D-006` se actualizo de "baja, solo vigilar" a "media, planificado" y apunta al IMP. |
+| **Impacto**     | Ningun cambio de codigo ni de configuracion. Solo documentacion y trazabilidad. El proyecto sigue en Next 14.2.35 y React 18.2. |
+| **Siguiente paso** | El owner decide Next 15 o Next 16 y se registra la decision como `DECISION` en este logbook. La recomendacion del IMP es en dos etapas: Next 15 mas React 19 primero, Next 16 despues, para no mezclar migracion de framework con cambio de bundler en el mismo deploy. |
+| **Referencias** | `docs/implementation/IMP-20260913-002/IMP.md`, `docs/reference/deuda-tecnica.md` (D-006, D-007), `lib/admin/auth.ts`, `lib/admin/serverActionId.ts`, `next.config.js`, `package.json`, `components/maps/LeafletMap.tsx` |
 
 ---
 

@@ -197,14 +197,35 @@ distintas.
 
 ## D-006 - `next-sanity@11` declara peer de Next 15/16
 
-**Prioridad: baja. Solo vigilar.**
+**Prioridad: media. Analizado a fondo. SOT: `docs/implementation/IMP-20260913-002/IMP.md`.**
 
 El proyecto usa `next@14.2.35` y `next-sanity@11.6.12`, que declara peer `next ^15.1.0-0 ||
-^16.0.0-0`. Funciona, pero es una incompatibilidad declarada. Ya anotado en
-`IMP-20260908-001`. No tocar sin una migracion validada de Next 14 a 15.
+^16.0.0-0`. Ya anotado en `IMP-20260908-001`. No tocar sin una migracion validada.
 
-Si esa migracion ocurre y D-007 ya tiene su guard implementado, revisar el guard dentro de la
-misma migracion (depende del formato interno de los IDs de Server Action).
+Lo que se descubrio el 2026-09-13 y sube la prioridad de "solo vigilar" a "planificado":
+
+- **Ya no es teorico.** `npm ci` falla con `ERESOLVE` por este conflicto en entornos con npm
+  estricto. Reproducido en local con npm 10.8.2 y con npm 10.9.2, en directorio limpio, y tambien
+  sobre el commit anterior `47ad2c9`. El VPS lo tolera hoy, pero es el mismo arbol.
+- **React tambien incumple.** `next-sanity` pide `react ^18.3 || ^19` y el proyecto declara
+  `^18.2.0`. No alcanza con migrar Next: React se toca si o si.
+- **El bloqueador que se temia no existe.** `react-leaflet@4.2.1` era el unico paquete con peer
+  `react ^18.0.0`, pero **nunca se importa**: aparece solo en `package.json`.
+  `components/maps/LeafletMap.tsx` usa la API vanilla de `leaflet`. Es dependencia muerta y se
+  elimina. Todo el resto del arbol (Sanity, Sentry, Radix, framer-motion, zustand,
+  styled-components, testing-library) ya acepta React 19.
+- **La superficie de codigo es chica:** 4 sitios de `cookies()` en `lib/admin/auth.ts` y
+  `app/admin/actions.ts`, 6 paginas con `params`/`searchParams`, y tres opciones de
+  `next.config.js`. El inventario completo con archivos y lineas esta en el IMP.
+
+Sigue vigente la advertencia original y es el riesgo principal: si la migracion ocurre, revisar el
+guard de `D-007` (`lib/admin/serverActionId.ts`) dentro de la misma migracion, porque su regex
+depende del formato interno de los IDs de Server Action, que no es API publica. Si ese formato
+cambia, el admin deja de guardar con `400 Invalid Server Action`.
+
+Decision abierta: Next 15 o Next 16. La recomendacion registrada en el IMP es hacerlo en dos
+etapas (15 + React 19 primero, 16 despues) para no mezclar migracion de framework con cambio de
+bundler en el mismo deploy.
 
 ---
 

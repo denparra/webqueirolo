@@ -91,6 +91,8 @@ Este documento es el panorama tecnico del sitio Queirolo Autos. Describe el esta
 | `/api/calculate-loan` | POST | Valida y calcula cuota, total e intereses con Zod |
 | `/api/submit-lead` | POST | Valida leads, aplica honeypot y rate limit en memoria; reenvia a n8n si esta configurado o registra en logs |
 
+Simulacion de credito: los supuestos viven en `config.ts` (`loanSimulation`): tasa de referencia 24% anual nominal, pie 20% y plazo 48 meses, mas la leyenda "simulacion aproximada; depende de la financiera". Los leen `lib/calculations.ts` (`calculateLoan`, `estimateMonthlyPayment`), `LoanCalculator` y el default de `/api/calculate-loan`. Toda cuota "Desde aprox. $X/mes" debe llevar la leyenda corta.
+
 Los formularios publicos actualmente abren WhatsApp con mensajes precargados. No documentar n8n como canal activo mientras los componentes no hayan sido cambiados para usar el endpoint.
 
 ## Flujo del inventario
