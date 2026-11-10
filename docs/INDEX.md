@@ -41,6 +41,8 @@ Guia rapida para entender el proyecto sin perderse. Leer en este orden.
 | Institucional e imagenes | `docs/implementation/IMP-20260606-002/` | Revisar estado y assets pendientes |
 | Centro de Control automotriz | `docs/implementation/IMP-20260825-004/IMP.md` | Planning; `app/panel-web-automotoras/`; `/admin` cliente preservado |
 | Estabilidad de produccion (threadpool y timeouts a Sanity) | `docs/implementation/IMP-20260908-003/IMP.md` | Cerrado y verificado en produccion 2026-09-08; deuda derivada en `docs/reference/deuda-tecnica.md` |
+| Estabilizar carga del admin y retirar Studio | `docs/implementation/IMP-20260913-001/IMP.md` | En implementacion; pendiente validacion post-deploy |
+| Migracion a Next 15/16 y React 19 | `docs/implementation/IMP-20260913-002/IMP.md` | Planning; SOT con analisis completo. Decision Next 15 vs 16 abierta. Ver `D-006` |
 
 ## 4. Trazabilidad
 

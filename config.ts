@@ -79,6 +79,15 @@ const siteConfig = {
         whatsappVehicle: (brand: string, model: string) => `Hola, me interesa el ${brand} ${model}`,
     },
 
+    // Simulación de crédito (referencial): alimenta el simulador y los "Desde aprox. $X/mes"
+    loanSimulation: {
+        annualRatePercent: 24, // tasa anual nominal de referencia (conservadora frente al mercado de financieras)
+        downPaymentPercent: 20,
+        termMonths: 48,
+        disclaimer: 'Solo es una simulación aproximada. Las condiciones finales dependen de la financiera con la que se evalúe.',
+        disclaimerShort: 'Simulación aproximada; depende de la financiera.',
+    },
+
     // SEO y metadatos
     seo: {
         title: 'Queirolo Autos - Venta de Vehículos Seminuevos en Lo Barnechea',

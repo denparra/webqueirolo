@@ -141,6 +141,9 @@ export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
                     </p>
                     <p className="mt-0.5 mb-3 text-xs text-gray-400">
                         Desde aprox. {formatCurrency(vehicle.monthlyPayment)}/mes
+                        <span className="block text-[11px] leading-tight text-gray-400">
+                            {siteConfig.loanSimulation.disclaimerShort}
+                        </span>
                     </p>
 
                     {/* Actions */}

@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { MapPinIcon } from '@heroicons/react/24/outline'
 import type { FeaturedVehicle } from '@/lib/featured-vehicles'
+import siteConfig from '@/config'
 
 interface FeaturedVehicleCardProps {
   vehicle: FeaturedVehicle
@@ -87,7 +88,10 @@ export function FeaturedVehicleCard({ vehicle, priority = false }: FeaturedVehic
         <div className="flex items-end justify-between border-t border-gray-100 pt-3">
           <div>
             <p className="text-xl font-bold text-primary-600 leading-none">{formatPrice(vehicle.price)}</p>
-            <p className="mt-0.5 text-xs text-gray-400">Desde aprox. {formatPrice(vehicle.monthlyPayment)}/mes</p>
+            <p className="mt-0.5 text-xs text-gray-400">
+              Desde aprox. {formatPrice(vehicle.monthlyPayment)}/mes
+              <span className="block text-[11px] leading-tight">{siteConfig.loanSimulation.disclaimerShort}</span>
+            </p>
           </div>
           <span className="text-sm font-medium text-primary-500 transition-colors group-hover:text-primary-600 shrink-0 ml-2">
             Ver &rarr;

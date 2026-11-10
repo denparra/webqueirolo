@@ -165,6 +165,9 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                     <p className="text-sm text-gray-600">
                                         o desde aprox. {formatCurrency(vehicle.monthlyPayment)}/mes
                                     </p>
+                                    <p className="text-xs text-gray-500">
+                                        {siteConfig.loanSimulation.disclaimerShort}
+                                    </p>
                                 </div>
                             </div>
 
@@ -384,6 +387,9 @@ export default async function VehicleDetailPage({ params }: { params: { slug: st
                                 <CardContent>
                                     <p className="mb-4 text-sm text-gray-600">
                                         Calcula una cuota mensual aproximada
+                                        <span className="mt-1 block text-xs text-gray-500">
+                                            {siteConfig.loanSimulation.disclaimerShort}
+                                        </span>
                                     </p>
                                     <Button variant="secondary" className="w-full" asChild>
                                         <a href="#calculadora">Ver Calculadora Completa</a>
